@@ -1,23 +1,34 @@
 <!doctype html>
-
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Meet the researchers of the Sharaf Lab."
+    />
     <title>Lab Members | Sharaf Lab</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600&family=Montserrat:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="styles.css" />
   </head>
-
-  <body>
+  <body class="members-body">
     <header>
       <div class="nav">
-        <a class="brand" href="index.html" aria-label="Sharaf Lab home"><img src="assets/sharaf-lab-logo.png" alt="Sharaf Lab" /></a>
-
-        <nav>
+        <a class="brand" href="index.html" aria-label="Sharaf Lab home"
+          ><img src="assets/sharaf-lab-logo.png" alt="Sharaf Lab"
+        /></a>
+        <nav aria-label="Primary navigation">
           <a href="index.html">Home</a>
           <a href="philosophy.html">Philosophy</a>
           <a href="research.html">Research</a>
-          <a class="active" href="members.html">Lab Members</a>
+          <a class="active" href="members.html" aria-current="page"
+            >Lab Members</a
+          >
           <a href="photos.html">Photos</a>
           <a href="outreach.html">Outreach</a>
           <a href="join.html">Join the Lab</a>
@@ -25,14 +36,177 @@
         </nav>
       </div>
     </header>
+    <main>
+      <section class="members-hero">
+        <p class="eyebrow eyebrow-dark">The people behind the science</p>
+        <h1>Current lab members</h1>
+      </section>
 
-    <main class="page">
-      <h1 class="section-title">Lab Members</h1>
-      <p class="lead">
-        Add PI, trainees, staff, collaborators, and alumni profiles here.
-      </p>
+      <section class="pi-section" aria-labelledby="pi-title">
+        <div class="pi-portrait">
+          <img
+            src="assets/members/naima-sharaf.jpg"
+            alt="Naima Gabriela Sharaf"
+          />
+        </div>
+        <div class="pi-copy">
+          <p class="member-role">Principal Investigator</p>
+          <h2 id="pi-title">Naima Gabriela Sharaf, Ph.D.</h2>
+          <p>
+            Naima earned her undergraduate degree in Chemistry at the University
+            of North Carolina at Chapel Hill and completed her Ph.D. at the
+            University of Pittsburgh in Angela Gronenborn’s lab, using fluorine
+            solution NMR to study inhibitor-induced conformational changes in
+            HIV-1 reverse transcriptase.
+          </p>
+          <p>
+            During her postdoctoral training at Caltech with Doug Rees, she used
+            biophysical and biochemical tools to characterize the
+            <em>Neisseria meningitidis</em> methionine ABC transport system. Her
+            lab now connects biochemistry, structural biology, microbiology, and
+            immunology to translate lipoprotein research into new therapeutic
+            and biomaterial possibilities.
+          </p>
+          <div class="member-links">
+            <a href="mailto:ngsharaf@stanford.edu">Email</a>
+            <a
+              href="https://scholar.google.com/citations?user=eJQX_iEAAAAJ"
+              target="_blank"
+              rel="noopener noreferrer"
+              >Google Scholar <span aria-hidden="true">↗</span></a
+            >
+          </div>
+        </div>
+      </section>
+
+      <section class="member-directory" aria-labelledby="team-title">
+        <div class="member-section-heading">
+          <p class="eyebrow eyebrow-dark">Researchers</p>
+          <h2 id="team-title">Meet the team</h2>
+        </div>
+        <div class="member-grid">
+          <article class="member-card">
+            <img src="assets/members/claire-stewart.jpg" alt="Claire Stewart" />
+            <div class="member-card-copy">
+              <p class="member-role">Postdoctoral Scholar · PRISM Fellow</p>
+              <h3>Claire Stewart, Ph.D.</h3>
+              <p>
+                Claire earned her Ph.D. in Chemistry from the University of
+                North Carolina at Chapel Hill, where she conducted research with
+                Gary Pielak.
+              </p>
+              <a href="mailto:cjstew@stanford.edu">cjstew@stanford.edu</a>
+            </div>
+          </article>
+          <article class="member-card">
+            <img
+              src="assets/members/heather-liu.jpg"
+              alt="Qianqiao Heather Liu"
+            />
+            <div class="member-card-copy">
+              <p class="member-role">Postdoctoral Scholar</p>
+              <h3>Qianqiao (Heather) Liu, Ph.D.</h3>
+              <p>
+                Heather earned her Ph.D. in Biochemistry at the University of
+                Illinois Urbana-Champaign, studying the structures and functions
+                of human and bacterial Immunoglobulin A receptors.
+              </p>
+              <a href="mailto:QL8@stanford.edu">QL8@stanford.edu</a>
+            </div>
+          </article>
+          <article class="member-card">
+            <img
+              src="assets/members/francesca-starvaggi.jpg"
+              alt="Francesca Starvaggi"
+            />
+            <div class="member-card-copy">
+              <p class="member-role">Ph.D. Candidate</p>
+              <h3>Francesca Starvaggi</h3>
+              <p>
+                Francesca brings a background in polymer chemistry and
+                biomedical engineering to the development of novel protein-based
+                biomaterials.
+              </p>
+              <a href="mailto:fstar@stanford.edu">fstar@stanford.edu</a>
+            </div>
+          </article>
+          <article class="member-card">
+            <img src="assets/members/victor-nunez.jpg" alt="Victor Nuñez" />
+            <div class="member-card-copy">
+              <p class="member-role">Ph.D. Candidate</p>
+              <h3>Victor Nuñez</h3>
+              <p>
+                Victor studied Molecular Biophysics and Biochemistry at Yale
+                University, where he explored receptor tyrosine kinase structure
+                and function.
+              </p>
+            </div>
+          </article>
+          <article class="member-card">
+            <img src="assets/members/sara-suchanti.jpg" alt="Sara Suchanti" />
+            <div class="member-card-copy">
+              <p class="member-role">Undergraduate Researcher</p>
+              <h3>Sara Suchanti</h3>
+              <a href="mailto:sarasuch@stanford.edu">sarasuch@stanford.edu</a>
+            </div>
+          </article>
+          <article class="member-card">
+            <img src="assets/members/uchenna-abba.jpg" alt="Uchenna Abba" />
+            <div class="member-card-copy">
+              <p class="member-role">Undergraduate Researcher</p>
+              <h3>Uchenna Abba</h3>
+              <p>
+                Uchenna is interested in chemical engineering and joined the lab
+                through Stanford’s BSURP summer program.
+              </p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="alumni-section" aria-labelledby="alumni-title">
+        <div class="member-section-heading">
+          <p class="eyebrow">Our community</p>
+          <h2 id="alumni-title">Lab alumni</h2>
+        </div>
+        <div class="alumni-list">
+          <p><strong>Aylin Rangel</strong><span>COOP summer intern</span></p>
+          <p>
+            <strong>Jaedyn Hoenig</strong><span>Undergraduate student</span>
+          </p>
+          <p>
+            <strong>Marc Arslanian</strong
+            ><span>Undergraduate student · Medical School</span>
+          </p>
+          <p>
+            <strong>Matthew Treviño</strong><span>Undergraduate student</span>
+          </p>
+          <p>
+            <strong>Scott Weston</strong
+            ><span>Technician · Graduate School, Miami</span>
+          </p>
+          <p>
+            <strong>Kofi Amankwah</strong><span>Technician · Genentech</span>
+          </p>
+          <p><strong>Jaime Morales Gallardo</strong><span>Technician</span></p>
+          <p><strong>Steven Diaz</strong><span>Undergraduate student</span></p>
+          <p><strong>Abood Mohaisen</strong><span>COOP summer intern</span></p>
+          <p>
+            <strong>Jasmine Padilla</strong><span>Undergraduate student</span>
+          </p>
+          <p>
+            <strong>Duke Emil Escobar</strong
+            ><span>Technician · University of Hawaii JABSOM</span>
+          </p>
+          <p>
+            <strong>Brandon Aponte</strong><span>Undergraduate student</span>
+          </p>
+          <p>
+            <strong>Aylin Torres Rangel</strong><span>Mission College</span>
+          </p>
+        </div>
+      </section>
     </main>
-
     <footer>© 2026 Sharaf Lab. Built with GitHub Pages.</footer>
   </body>
 </html>
