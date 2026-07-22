@@ -47,7 +47,7 @@ header {
 }
 
 .brand {
-  width: clamp(190px, 19vw, 270px);
+  width: clamp(220px, 22vw, 320px);
   flex: 0 0 auto;
   display: block;
   text-decoration: none;
@@ -93,7 +93,7 @@ nav a.active {
 .hero h1 {
   font-family: "Montserrat", Arial, sans-serif;
   font-weight: 500;
-  font-size: clamp(40px, 6vw, 76px);
+  font-size: clamp(40px, 4vw, 50px);
   line-height: 1.05;
   margin: 0 0 24px;
 }
@@ -393,7 +393,7 @@ footer {
 .research-hero h1 {
   max-width: 760px;
   margin: 0;
-  font-size: clamp(44px, 5vw, 70px);
+  font-size: clamp(42px, 4vw, 50px);
   font-weight: 500;
   letter-spacing: -.045em;
   line-height: 1.02;
@@ -437,7 +437,7 @@ footer {
 .research-intro h2,
 .research-cta h2 {
   margin: 0;
-  font-size: clamp(38px, 5vw, 64px);
+  font-size: clamp(38px, 4vw, 50px);
   font-weight: 500;
   letter-spacing: -.04em;
   line-height: 1.08;
@@ -506,7 +506,7 @@ footer {
 
 .research-publications-heading h2 {
   margin: 0;
-  font-size: clamp(40px, 5vw, 64px);
+  font-size: clamp(40px, 4vw, 50px);
   font-weight: 500;
   letter-spacing: -.04em;
   line-height: 1.08;
@@ -559,7 +559,7 @@ footer {
 .members-hero h1 {
   max-width: 840px;
   margin: 0 0 24px;
-  font-size: clamp(54px, 8vw, 100px);
+  font-size: clamp(42px, 4vw, 50px);
   font-weight: 500;
   letter-spacing: -.055em;
   line-height: .98;
@@ -586,7 +586,7 @@ footer {
 .pi-portrait { position: sticky; top: 120px; }
 .pi-portrait img { width: 100%; max-height: 680px; display: block; object-fit: cover; object-position: center top; }
 .member-role { margin: 0 0 14px; color: var(--members-teal); font-size: 11px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; }
-.pi-copy h2 { margin: 0 0 30px; font-size: clamp(38px, 5vw, 58px); font-weight: 500; letter-spacing: -.04em; line-height: 1.05; }
+.pi-copy h2 { margin: 0 0 30px; font-size: clamp(38px, 4vw, 50px); font-weight: 500; letter-spacing: -.04em; line-height: 1.05; }
 .pi-copy > p:not(.member-role) { margin: 0 0 18px; color: #4c6268; font-size: 17px; line-height: 1.85; }
 .member-links { display: flex; flex-wrap: wrap; gap: 18px; margin-top: 30px; }
 .member-links a,
@@ -594,7 +594,7 @@ footer {
 
 .member-directory { padding: 110px max(24px, calc((100vw - 1132px) / 2)) 130px; background: var(--members-cream); }
 .member-section-heading { margin-bottom: 54px; }
-.member-section-heading h2 { margin: 0; font-size: clamp(42px, 6vw, 70px); font-weight: 500; letter-spacing: -.045em; line-height: 1; }
+.member-section-heading h2 { margin: 0; font-size: clamp(42px, 4vw, 50px); font-weight: 500; letter-spacing: -.045em; line-height: 1; }
 .member-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 54px 30px; }
 .member-card { min-width: 0; }
 .member-card > img { width: 100%; aspect-ratio: 4 / 4.7; display: block; object-fit: cover; object-position: center top; filter: saturate(.88); }
@@ -615,13 +615,13 @@ footer {
 /* Join the lab */
 .join-body { --join-navy: #071f2d; --join-teal: #0b6870; --join-cream: #f4f1e8; }
 .join-hero { padding: 110px max(24px, calc((100vw - 1132px) / 2)); display: grid; grid-template-columns: 1.15fr .85fr; gap: 90px; align-items: end; background: var(--join-navy); color: #fff; }
-.join-hero h1 { max-width: 760px; margin: 0; font-size: clamp(50px, 7vw, 88px); font-weight: 500; letter-spacing: -.055em; line-height: .98; }
+.join-hero h1 { max-width: 760px; margin: 0; font-size: clamp(42px, 4vw, 50px); font-weight: 500; letter-spacing: -.04em; line-height: 1.05; }
 .join-hero-copy > p { margin: 0 0 34px; color: #bfd0d4; font-size: 18px; line-height: 1.8; }
 .join-availability,
 .rotation-section { padding: 110px max(24px, calc((100vw - 1132px) / 2)) 120px; }
 .join-section-heading { margin-bottom: 52px; }
 .join-section-heading h2,
-.join-contact h2 { margin: 0; font-size: clamp(40px, 5vw, 64px); font-weight: 500; letter-spacing: -.045em; line-height: 1.05; }
+.join-contact h2 { margin: 0; font-size: clamp(40px, 4vw, 50px); font-weight: 500; letter-spacing: -.045em; line-height: 1.05; }
 .updated-date { margin: 18px 0 0; color: #71868a; font-size: 13px; }
 .availability-list { border-top: 1px solid #cbd8d8; }
 .availability-card { padding: 34px 0; display: grid; grid-template-columns: 18px 1fr; gap: 22px; border-bottom: 1px solid #cbd8d8; }
@@ -648,13 +648,13 @@ footer {
 /* Outreach resources */
 .outreach-body { --outreach-navy: #082532; --outreach-teal: #0b6870; --outreach-cream: #f4f1e8; }
 .outreach-hero { max-width: 1180px; margin: 0 auto; padding: 110px 24px 90px; }
-.outreach-hero h1 { margin: 0 0 28px; font-size: clamp(56px, 8vw, 100px); font-weight: 500; letter-spacing: -.055em; line-height: .98; }
+.outreach-hero h1 { margin: 0 0 28px; font-size: clamp(42px, 4vw, 50px); font-weight: 500; letter-spacing: -.04em; line-height: 1.05; }
 .outreach-hero > p:last-child { max-width: 740px; margin: 0; color: #586e73; font-size: 19px; line-height: 1.8; }
 .resource-section { padding: 100px max(24px, calc((100vw - 1132px) / 2)) 110px; border-top: 1px solid #d7dfdf; }
 .resource-section-soft { background: var(--outreach-cream); }
 .resource-heading { margin-bottom: 52px; display: grid; grid-template-columns: 70px 1fr; gap: 20px; }
 .resource-number { margin: 8px 0 0; color: #84979a; font-size: 12px; font-weight: 700; }
-.resource-heading h2 { margin: 0; font-size: clamp(40px, 5vw, 64px); font-weight: 500; letter-spacing: -.045em; line-height: 1.05; }
+.resource-heading h2 { margin: 0; font-size: clamp(40px, 4vw, 50px); font-weight: 500; letter-spacing: -.045em; line-height: 1.05; }
 .resource-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
 .resource-grid-two { grid-template-columns: repeat(2, 1fr); }
 .resource-card { min-height: 330px; padding: 30px; position: relative; display: flex; flex-direction: column; background: #fff; border: 1px solid #d8e0e0; color: #102a33; text-decoration: none; transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease; }
@@ -733,7 +733,7 @@ footer {
   .research-hero-content { padding-top: 44px; }
   .research-intro { padding-bottom: 60px; }
   .members-hero { padding-top: 72px; }
-  .members-hero h1 { font-size: 54px; }
+  .members-hero h1 { font-size: 42px; }
   .pi-section { padding-top: 60px; padding-bottom: 80px; }
   .member-directory,
   .alumni-section { padding-top: 80px; padding-bottom: 90px; }
