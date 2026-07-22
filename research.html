@@ -4,19 +4,29 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Explore Sharaf Lab research into bacterial proteins, membrane biology, and new therapeutic strategies."
+    />
     <title>Research | Sharaf Lab</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="styles.css" />
   </head>
 
-  <body>
+  <body class="research-body">
     <header>
       <div class="nav">
         <a class="brand" href="index.html">Sharaf Lab</a>
 
-        <nav>
+        <nav aria-label="Primary navigation">
           <a href="index.html">Home</a>
           <a href="philosophy.html">Philosophy</a>
-          <a class="active" href="research.html">Research</a>
+          <a class="active" href="research.html" aria-current="page">Research</a>
           <a href="publications.html">Publications</a>
           <a href="members.html">Lab Members</a>
           <a href="photos.html">Photos</a>
@@ -27,25 +37,134 @@
       </div>
     </header>
 
-    <main class="page">
-      <h1 class="section-title">Research</h1>
+    <main>
+      <section class="research-hero">
+        <img
+          class="research-hero-image"
+          src="assets/research-membrane-hero-v2.png"
+          alt="Molecular visualization of triacylated lipoproteins, a lipoprotein nanoparticle, and proteins interacting with a bacterial membrane"
+        />
+        <div class="research-hero-shade"></div>
+        <div class="research-hero-content">
+          <p class="eyebrow">Structure · Function · Biomaterials</p>
+          <h1>We investigate the hidden lives of bacterial proteins.</h1>
+          <p class="research-hero-lead">
+            We investigate the role of proteins in bacterial physiology, and we leverage these insights to design novel biomaterials.
+          </p>
+          <a class="research-button research-button-light" href="#programs">Explore our work <span aria-hidden="true">↓</span></a>
+        </div>
+      </section>
 
-      <div class="cards">
-        <div class="card">
-          <h2>Bacterial Proteins</h2>
-          <p>Characterizing protein structure, dynamics, and function.</p>
+      <section class="research-intro" aria-labelledby="approach-title">
+        <div>
+          <p class="eyebrow eyebrow-dark">Our approach</p>
+          <h2 id="approach-title">Following biology across scales</h2>
+        </div>
+        <div class="research-intro-copy">
+          <p>
+            Bacterial proteins do not work alone. Their structures shift, their
+            environments matter, and their interactions ripple outward into
+            physiology. We bring biochemistry, biology, microbiology, and
+            immunology together to see the whole system.
+          </p>
+          <a class="text-link" href="philosophy.html">Our research philosophy <span aria-hidden="true">↗</span></a>
+        </div>
+      </section>
+
+      <section class="research-process" aria-label="Research process">
+        <article>
+          <span class="process-number">01</span>
+          <div class="process-icon" aria-hidden="true">⌁</div>
+          <h3>Molecule</h3>
+          <p>Resolve protein structure, motion, and interactions at molecular detail.</p>
+        </article>
+        <article>
+          <span class="process-number">02</span>
+          <div class="process-icon" aria-hidden="true">◎</div>
+          <h3>Mechanism</h3>
+          <p>Connect molecular behavior to membranes, pathways, and bacterial physiology.</p>
+        </article>
+        <article>
+          <span class="process-number">03</span>
+          <div class="process-icon" aria-hidden="true">✦</div>
+          <h3>Possibility</h3>
+          <p>Translate mechanistic insight into new tools and therapeutic directions.</p>
+        </article>
+      </section>
+
+      <section class="research-programs" id="programs" aria-labelledby="programs-title">
+        <div class="programs-heading">
+          <p class="eyebrow eyebrow-dark">Research programs</p>
+          <h2 id="programs-title">Questions that drive us</h2>
         </div>
 
-        <div class="card">
-          <h2>Membrane Biology</h2>
-          <p>Studying membrane proteins and lipoproteins.</p>
-        </div>
+        <div class="program-list">
+          <article class="program-card program-card-blue">
+            <div class="program-index">01</div>
+            <div class="program-copy">
+              <p class="program-label">Protein biophysics</p>
+              <h3>Bacterial Proteins</h3>
+              <p>
+                How do structure and motion give rise to function? We characterize
+                bacterial proteins at molecular resolution to understand how they
+                recognize partners, bind substrates, and perform their cellular roles.
+              </p>
+              <ul>
+                <li>Protein structure &amp; dynamics</li>
+                <li>Molecular recognition</li>
+                <li>Biophysical characterization</li>
+              </ul>
+            </div>
+            <div class="program-art protein-art" aria-hidden="true"><span></span></div>
+          </article>
 
-        <div class="card">
-          <h2>Therapeutic Discovery</h2>
-          <p>Translating mechanistic insight into intervention strategies.</p>
+          <article class="program-card program-card-teal">
+            <div class="program-index">02</div>
+            <div class="program-copy">
+              <p class="program-label">Cellular context</p>
+              <h3>Membrane Biology</h3>
+              <p>
+                Bacterial membranes are busy, complex environments. We study
+                membrane proteins and lipoproteins to learn how location, lipids,
+                and neighboring molecules tune protein behavior.
+              </p>
+              <ul>
+                <li>Membrane proteins</li>
+                <li>Bacterial lipoproteins</li>
+                <li>Protein–lipid interactions</li>
+              </ul>
+            </div>
+            <div class="program-art membrane-art" aria-hidden="true"><span></span></div>
+          </article>
+
+          <article class="program-card program-card-coral">
+            <div class="program-index">03</div>
+            <div class="program-copy">
+              <p class="program-label">Translation</p>
+              <h3>Therapeutic Discovery</h3>
+              <p>
+                Deep mechanism creates new possibilities. We use what we learn
+                about bacterial systems to identify intervention points and build
+                a foundation for future therapeutic strategies.
+              </p>
+              <ul>
+                <li>Mechanism-guided discovery</li>
+                <li>Target identification</li>
+                <li>Biomaterial development</li>
+              </ul>
+            </div>
+            <div class="program-art discovery-art" aria-hidden="true"><span></span></div>
+          </article>
         </div>
-      </div>
+      </section>
+
+      <section class="research-cta">
+        <div>
+          <p class="eyebrow">See the science</p>
+          <h2>Explore our latest discoveries.</h2>
+        </div>
+        <a class="research-button research-button-light" href="publications.html">View publications <span aria-hidden="true">→</span></a>
+      </section>
     </main>
 
     <footer>© 2026 Sharaf Lab. Built with GitHub Pages.</footer>
