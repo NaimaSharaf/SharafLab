@@ -27,7 +27,7 @@
           <a href="index.html">Home</a>
           <a href="philosophy.html">Philosophy</a>
           <a class="active" href="research.html" aria-current="page">Research</a>
-          <a href="publications.html">Publications</a>
+          <a href="#publications">Publications</a>
           <a href="members.html">Lab Members</a>
           <a href="photos.html">Photos</a>
           <a href="outreach.html">Outreach</a>
@@ -41,17 +41,21 @@
       <section class="research-hero">
         <img
           class="research-hero-image"
-          src="assets/research-membrane-hero-v2.png"
+          src="assets/research-membrane-hero-v7.png"
           alt="Molecular visualization of triacylated lipoproteins, a lipoprotein nanoparticle, and proteins interacting with a bacterial membrane"
         />
         <div class="research-hero-shade"></div>
         <div class="research-hero-content">
-          <p class="eyebrow">Structure · Function · Biomaterials</p>
-          <h1>We investigate the hidden lives of bacterial proteins.</h1>
-          <p class="research-hero-lead">
-            We investigate the role of proteins in bacterial physiology, and we leverage these insights to design novel biomaterials.
-          </p>
-          <a class="research-button research-button-light" href="#programs">Explore our work <span aria-hidden="true">↓</span></a>
+          <div class="research-hero-heading">
+            <p class="eyebrow">Structure · Function · Biomaterials</p>
+            <h1>We investigate the hidden lives of bacterial proteins.</h1>
+          </div>
+          <div class="research-hero-summary">
+            <p class="research-hero-lead">
+              We investigate the role of proteins in bacterial physiology, and we leverage these insights to design novel biomaterials.
+            </p>
+            <a class="research-button research-button-light" href="#programs">Explore our work <span aria-hidden="true">↓</span></a>
+          </div>
         </div>
       </section>
 
@@ -158,12 +162,91 @@
         </div>
       </section>
 
-      <section class="research-cta">
-        <div>
-          <p class="eyebrow">See the science</p>
-          <h2>Explore our latest discoveries.</h2>
+      <section class="research-publications" id="publications" aria-labelledby="publications-title">
+        <div class="research-publications-heading">
+          <div>
+            <p class="eyebrow">Publications</p>
+            <h2 id="publications-title">Explore our discoveries.</h2>
+          </div>
+          <p>
+            Our work spans bacterial lipoproteins, protein structure and
+            dynamics, biomaterials, and molecular mechanisms.
+          </p>
         </div>
-        <a class="research-button research-button-light" href="publications.html">View publications <span aria-hidden="true">→</span></a>
+
+        <div class="publication-list">
+          <article class="publication-card">
+            <p class="publication-meta">Nanoscale Adv. 2026</p>
+            <h2>Development and characterization of LipoCatch, a lipoprotein-based biomaterial</h2>
+            <p>Francesca Starvaggi, Claire J. Stewart, Marc Arslanian, Matthew Treviño, Naima Sharaf</p>
+            <a href="https://pubs.rsc.org/na/article/doi/10.1039/D6NA00554C/1277264/Development-and-characterization-of-LipoCatch-a" target="_blank" rel="noopener noreferrer">RSC Article <span aria-hidden="true">↗</span></a>
+          </article>
+
+          <article class="publication-card">
+            <p class="publication-meta">J Biol Chem. 2026</p>
+            <h2>Structural basis for selective thymidine binding by the Borrelia burgdorferi substrate-binding protein BmpA</h2>
+            <p>Qianqiao Liu, Victor A. Nunez, Daniel Fernandez, Claire J. Stewart, Naima G. Sharaf</p>
+            <a href="https://pubmed.ncbi.nlm.nih.gov/42208901/" target="_blank" rel="noopener noreferrer">PubMed <span aria-hidden="true">↗</span></a>
+          </article>
+
+          <article class="publication-card">
+            <p class="publication-meta">J Biol Chem. 2024</p>
+            <h2>Expression, purification, and characterization of diacylated Lipo-YcjN from Escherichia coli</h2>
+            <p>Matthew A. Trevino, Kofi A. Amankwah, Daniel Fernandez, Scott A. Weston, Claire J. Stewart, Jaime Morales Gallardo, Mona Shahgholi, Naima G. Sharaf</p>
+            <a href="https://pubmed.ncbi.nlm.nih.gov/39362470/" target="_blank" rel="noopener noreferrer">PubMed <span aria-hidden="true">↗</span></a>
+          </article>
+
+          <article class="publication-card">
+            <p class="publication-meta">J Biomol NMR. 2017</p>
+            <h2>Correction to: NMR structure of the HIV-1 reverse transcriptase thumb subdomain</h2>
+            <p>Naima G. Sharaf, Andrew E. Brereton, In-Ja L. Byeon, P. Andrew Karplus, Angela M. Gronenborn</p>
+            <a href="https://pubmed.ncbi.nlm.nih.gov/29234947/" target="_blank" rel="noopener noreferrer">PubMed <span aria-hidden="true">↗</span></a>
+          </article>
+
+          <article class="publication-card">
+            <p class="publication-meta">Proteins. 2017</p>
+            <h2>The HIV-1 p66 homodimeric RT exhibits different conformations in the binding-competent and -incompetent NNRTI site</h2>
+            <p>Naima G. Sharaf, Zhaoyong Xi, Rieko Ishima, Angela M. Gronenborn</p>
+            <a href="https://pubmed.ncbi.nlm.nih.gov/28905420/" target="_blank" rel="noopener noreferrer">PubMed <span aria-hidden="true">↗</span></a>
+          </article>
+
+          <article class="publication-card">
+            <p class="publication-meta">J Biomol NMR. 2016</p>
+            <h2>NMR structure of the HIV-1 reverse transcriptase thumb subdomain</h2>
+            <p>Naima G. Sharaf, Andrew E. Brereton, In-Ja L. Byeon, P. Andrew Karplus, Angela M. Gronenborn</p>
+            <a href="https://pubmed.ncbi.nlm.nih.gov/27858311/" target="_blank" rel="noopener noreferrer">PubMed <span aria-hidden="true">↗</span></a>
+          </article>
+
+          <article class="publication-card">
+            <p class="publication-meta">Biochemistry. 2016</p>
+            <h2>Conformational Plasticity of the NNRTI-Binding Pocket in HIV-1 Reverse Transcriptase: A Fluorine Nuclear Magnetic Resonance Study</h2>
+            <p>Naima G. Sharaf, Rieko Ishima, Angela M. Gronenborn</p>
+            <a href="https://pubmed.ncbi.nlm.nih.gov/27163463/" target="_blank" rel="noopener noreferrer">PubMed <span aria-hidden="true">↗</span></a>
+          </article>
+
+          <article class="publication-card">
+            <p class="publication-meta">Methods Enzymol. 2015</p>
+            <h2>(19)F-modified proteins and (19)F-containing ligands as tools in solution NMR studies of protein interactions</h2>
+            <p>Naima G. Sharaf, Angela M. Gronenborn</p>
+            <a href="https://pubmed.ncbi.nlm.nih.gov/26577728/" target="_blank" rel="noopener noreferrer">PubMed <span aria-hidden="true">↗</span></a>
+          </article>
+
+          <article class="publication-card">
+            <p class="publication-meta">Proteins. 2014</p>
+            <h2>The p66 immature precursor of HIV-1 reverse transcriptase</h2>
+            <p>Naima G. Sharaf, Eric Poliner, Ryan L. Slack, Martin T. Christen, In-Ja L. Byeon, Michael A. Parniak, Angela M. Gronenborn, Rieko Ishima</p>
+            <a href="https://pubmed.ncbi.nlm.nih.gov/24771554/" target="_blank" rel="noopener noreferrer">PubMed <span aria-hidden="true">↗</span></a>
+          </article>
+
+          <article class="publication-card">
+            <p class="publication-meta">J Magn Reson. 2010</p>
+            <h2>A bioreactor for in-cell protein NMR</h2>
+            <p>Naima G. Sharaf, Christopher O. Barnes, Lisa M. Charlton, Gregory B. Young, Gary J. Pielak</p>
+            <a href="https://pubmed.ncbi.nlm.nih.gov/19910228/" target="_blank" rel="noopener noreferrer">PubMed <span aria-hidden="true">↗</span></a>
+          </article>
+        </div>
+
+        <a class="research-button research-button-light publication-pubmed-link" href="https://pubmed.ncbi.nlm.nih.gov/?term=sharaf+NG" target="_blank" rel="noopener noreferrer">View full PubMed search <span aria-hidden="true">↗</span></a>
       </section>
     </main>
 
