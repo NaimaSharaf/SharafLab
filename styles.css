@@ -38,10 +38,17 @@ header {
 }
 
 .brand {
-  font-size: 25px;
-  font-weight: 700;
+  width: clamp(190px, 19vw, 270px);
+  flex: 0 0 auto;
+  display: block;
   text-decoration: none;
   color: var(--text);
+}
+
+.brand img {
+  width: 100%;
+  height: auto;
+  display: block;
 }
 
 nav {
@@ -408,7 +415,6 @@ footer {
 }
 
 .research-intro h2,
-.programs-heading h2,
 .research-cta h2 {
   margin: 0;
   font-size: clamp(38px, 5vw, 64px);
@@ -450,68 +456,6 @@ footer {
 .process-icon { margin: 42px 0 24px; color: var(--research-teal); font-size: 42px; line-height: 1; }
 .research-process h3 { margin: 0 0 10px; font-size: 24px; }
 .research-process p { margin: 0; color: #64787d; font-size: 14px; line-height: 1.7; }
-
-.research-programs {
-  padding: 110px 24px 130px;
-  background: var(--research-cream);
-}
-
-.programs-heading,
-.program-list {
-  max-width: 1180px;
-  margin-right: auto;
-  margin-left: auto;
-}
-
-.programs-heading { margin-bottom: 60px; }
-.program-list { display: grid; gap: 18px; }
-
-.program-card {
-  min-height: 430px;
-  display: grid;
-  grid-template-columns: 70px 1.2fr .8fr;
-  gap: 38px;
-  align-items: center;
-  padding: 52px;
-  overflow: hidden;
-  color: white;
-}
-
-.program-card-blue { background: #123d5a; }
-.program-card-teal { background: #1a7776; }
-.program-card-coral { background: #b85f4c; }
-.program-index { align-self: start; color: rgba(255,255,255,.64); font-size: 13px; font-weight: 700; }
-.program-label { margin: 0 0 12px; color: #b9efea; font-size: 11px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; }
-.program-card-coral .program-label { color: #ffe0d7; }
-.program-copy h3 { margin: 0 0 18px; font-size: clamp(34px, 4vw, 50px); font-weight: 500; letter-spacing: -.035em; }
-.program-copy > p:not(.program-label) { max-width: 600px; margin: 0; color: rgba(255,255,255,.82); font-size: 16px; line-height: 1.75; }
-.program-copy ul { display: flex; flex-wrap: wrap; gap: 8px; margin: 28px 0 0; padding: 0; list-style: none; }
-.program-copy li { padding: 7px 12px; border: 1px solid rgba(255,255,255,.3); border-radius: 999px; font-size: 11px; }
-
-.program-art {
-  width: 250px;
-  aspect-ratio: 1;
-  position: relative;
-  justify-self: center;
-  border: 1px solid rgba(255,255,255,.22);
-  border-radius: 50%;
-}
-
-.program-art::before,
-.program-art::after,
-.program-art span {
-  content: "";
-  position: absolute;
-  border: 1px solid rgba(255,255,255,.42);
-  border-radius: 50%;
-}
-
-.program-art::before { inset: 18%; }
-.program-art::after { inset: 34%; background: rgba(255,255,255,.12); }
-.program-art span { width: 12px; height: 12px; top: 12%; left: 48%; background: #fff; box-shadow: 45px 80px 0 -2px rgba(255,255,255,.75), -66px 100px 0 -3px rgba(255,255,255,.72); }
-.membrane-art { border-radius: 44% 56% 48% 52%; transform: rotate(12deg); }
-.membrane-art::before { border-radius: 52% 48% 60% 40%; }
-.discovery-art::before { inset: 25% 12%; border-radius: 50%; transform: rotate(45deg); }
 
 .research-cta {
   padding: 90px max(24px, calc((100vw - 1132px) / 2));
@@ -573,6 +517,13 @@ footer {
 .publication-pubmed-link { margin-top: 40px; }
 
 @media (max-width: 850px) {
+  .nav {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .brand { width: 220px; }
+
   .hero {
     grid-template-columns: 1fr;
   }
@@ -608,17 +559,13 @@ footer {
   .research-process article { border-right: 0; border-bottom: 1px solid #cbd8d8; }
   .research-process article:last-child { border-bottom: 0; }
   .process-icon { margin: 22px 0 16px; }
-  .program-card { grid-template-columns: 40px 1fr; padding: 38px 28px; }
-  .program-art { display: none; }
   .research-cta { align-items: flex-start; flex-direction: column; }
   .research-publications-heading { grid-template-columns: 1fr; gap: 24px; }
 }
 
 @media (max-width: 540px) {
+  .brand { width: 190px; }
   .research-hero h1 { font-size: 46px; }
   .research-hero-content { padding-top: 44px; }
   .research-intro { padding-bottom: 60px; }
-  .research-programs { padding: 80px 18px; }
-  .program-card { grid-template-columns: 1fr; gap: 14px; }
-  .program-copy h3 { font-size: 36px; }
 }
