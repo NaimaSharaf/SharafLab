@@ -126,6 +126,41 @@ nav a.active {
   max-width: 820px;
 }
 
+.philosophy-page {
+  min-height: calc(100vh - 159px);
+  padding: 80px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    linear-gradient(rgba(255, 255, 255, .16), rgba(255, 255, 255, .16)),
+    url("2026images/IMG_7713.jpg") center / cover no-repeat;
+  color: #000000;
+  text-align: center;
+}
+
+.philosophy-content {
+  max-width: 1120px;
+}
+
+.philosophy-content h1,
+.philosophy-content h2 {
+  margin: 0 0 34px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 30px;
+  line-height: 1.2;
+}
+
+.philosophy-content h2 {
+  margin-top: 44px;
+}
+
+.philosophy-content p {
+  margin: 0 auto;
+  font-size: 24px;
+  line-height: 1.9;
+}
+
 .cards {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -200,5 +235,19 @@ footer {
 
   .photo-gallery {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  .philosophy-page {
+    padding: 56px 20px;
+  }
+
+  .philosophy-content h1,
+  .philosophy-content h2 {
+    font-size: 25px;
+  }
+
+  .philosophy-content p {
+    font-size: 18px;
+    line-height: 1.75;
   }
 }
