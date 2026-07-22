@@ -4,36 +4,165 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Outreach | Sharaf Lab</title>
+    <meta name="description" content="Links of interest and verified Stanford training resources from the Sharaf Lab." />
+    <title>Links of Interest | Sharaf Lab</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="styles.css" />
   </head>
 
-  <body>
+  <body class="outreach-body">
     <header>
       <div class="nav">
         <a class="brand" href="index.html" aria-label="Sharaf Lab home"><img src="assets/sharaf-lab-logo.png" alt="Sharaf Lab" /></a>
-
-        <nav>
+        <nav aria-label="Primary navigation">
           <a href="index.html">Home</a>
           <a href="philosophy.html">Philosophy</a>
           <a href="research.html">Research</a>
           <a href="members.html">Lab Members</a>
           <a href="photos.html">Photos</a>
-          <a class="active" href="outreach.html">Outreach</a>
+          <a class="active" href="outreach.html" aria-current="page">Links of Interest</a>
           <a href="join.html">Join the Lab</a>
-          <a href="contact.html">Contact</a>
         </nav>
       </div>
     </header>
 
-    <main class="page">
-      <h1 class="section-title">Outreach</h1>
-      <p class="lead">
-        Community engagement, mentoring, and educational activities.
-      </p>
+    <main>
+      <section class="outreach-hero">
+        <p class="eyebrow eyebrow-dark">Access · Mentorship · Community</p>
+        <h1>Pathways into science.</h1>
+        <p>
+          Explore verified Stanford programs and resources for prospective
+          graduate students, postdoctoral scholars, and emerging researchers.
+        </p>
+      </section>
+
+      <section class="resource-section resource-section-soft" aria-labelledby="undergraduate-title">
+        <div class="resource-heading">
+          <p class="resource-number">01</p>
+          <div>
+            <p class="eyebrow eyebrow-dark">Undergraduate summer opportunities</p>
+            <h2 id="undergraduate-title">Explore research pathways.</h2>
+          </div>
+        </div>
+        <div class="resource-grid resource-grid-two">
+          <a class="resource-card" href="https://bsurp.stanford.edu/" target="_blank" rel="noopener noreferrer">
+            <span>Stanford Biology</span>
+            <h3>Biology Summer Undergraduate Research Program</h3>
+            <p>Paid summer research opportunities for current Stanford undergraduates.</p>
+            <span class="resource-arrow" aria-hidden="true">↗</span>
+          </a>
+          <a class="resource-card" href="https://ccop.stanford.edu/apply-now" target="_blank" rel="noopener noreferrer">
+            <span>Community College Outreach Program</span>
+            <h3>CCOP Research Opportunities</h3>
+            <p>Explore internships and programs for community college students. The Summer 2026 CORE application is closed.</p>
+            <span class="resource-arrow" aria-hidden="true">↗</span>
+          </a>
+        </div>
+      </section>
+
+      <section class="resource-section" aria-labelledby="graduate-title">
+        <div class="resource-heading">
+          <p class="resource-number">02</p>
+          <div>
+            <p class="eyebrow eyebrow-dark">Graduate education</p>
+            <h2 id="graduate-title">Find your program.</h2>
+          </div>
+        </div>
+        <div class="resource-grid">
+          <a class="resource-card" href="https://biosciences.stanford.edu/program-overview/" target="_blank" rel="noopener noreferrer">
+            <span>Stanford Biosciences</span>
+            <h3>Program Overview</h3>
+            <p>Explore Stanford’s collaborative network of Biosciences Ph.D. home programs.</p>
+            <span class="resource-arrow" aria-hidden="true">↗</span>
+          </a>
+          <a class="resource-card" href="https://gradadmissions.stanford.edu/explore-programs" target="_blank" rel="noopener noreferrer">
+            <span>Graduate Admissions</span>
+            <h3>Explore Graduate Programs</h3>
+            <p>Browse Stanford graduate degrees and application pathways.</p>
+            <span class="resource-arrow" aria-hidden="true">↗</span>
+          </a>
+          <a class="resource-card" href="https://www.stanford.edu/academics/schools" target="_blank" rel="noopener noreferrer">
+            <span>Stanford University</span>
+            <h3>Academic Schools</h3>
+            <p>Learn about Stanford’s seven schools and interdisciplinary environment.</p>
+            <span class="resource-arrow" aria-hidden="true">↗</span>
+          </a>
+        </div>
+      </section>
+
+      <section class="resource-section resource-section-soft" aria-labelledby="preview-title">
+        <div class="resource-heading">
+          <p class="resource-number">03</p>
+          <div>
+            <p class="eyebrow eyebrow-dark">Preview programs</p>
+            <h2 id="preview-title">See yourself here.</h2>
+          </div>
+        </div>
+        <div class="resource-grid resource-grid-two">
+          <a class="resource-card" href="https://biology.stanford.edu/academics/phd-program/stanford-biology-preview-program-bpp-navigating-stanford-biology-phd" target="_blank" rel="noopener noreferrer">
+            <span>Department of Biology</span>
+            <h3>Biology Preview Program</h3>
+            <p>Navigate the Stanford Biology Ph.D. application process and research community.</p>
+            <span class="resource-arrow" aria-hidden="true">↗</span>
+          </a>
+          <a class="resource-card" href="https://med.stanford.edu/immunol/about/diversity/preview-2023.html" target="_blank" rel="noopener noreferrer">
+            <span>Stanford Immunology</span>
+            <h3>Immunology Preview</h3>
+            <p>Explore graduate training and community in Stanford Immunology.</p>
+            <span class="resource-arrow" aria-hidden="true">↗</span>
+          </a>
+        </div>
+      </section>
+
+      <section class="resource-section" aria-labelledby="postdoc-title">
+        <div class="resource-heading">
+          <p class="resource-number">04</p>
+          <div>
+            <p class="eyebrow eyebrow-dark">Postdoctoral pathways</p>
+            <h2 id="postdoc-title">Take the next step.</h2>
+          </div>
+        </div>
+        <div class="resource-grid resource-grid-two">
+          <a class="resource-card" href="https://postdocs.stanford.edu/current/fellowship/prism" target="_blank" rel="noopener noreferrer">
+            <span>Office of Postdoctoral Affairs</span>
+            <h3>PRISM</h3>
+            <p>Stanford’s Postdoctoral Recruitment Initiative in Sciences and Medicine.</p>
+            <span class="resource-arrow" aria-hidden="true">↗</span>
+          </a>
+          <a class="resource-card" href="https://propel.stanford.edu/" target="_blank" rel="noopener noreferrer">
+            <span>Stanford School of Medicine</span>
+            <h3>Propel Postdoctoral Scholars</h3>
+            <p>Inclusive training and professional development for future faculty leaders.</p>
+            <span class="resource-arrow" aria-hidden="true">↗</span>
+          </a>
+        </div>
+      </section>
+
+      <section class="resource-section resource-section-soft" aria-labelledby="postbac-title">
+        <div class="resource-heading">
+          <p class="resource-number">05</p>
+          <div>
+            <p class="eyebrow eyebrow-dark">Postbaccalaureate research</p>
+            <h2 id="postbac-title">Prepare for what comes next.</h2>
+          </div>
+        </div>
+        <div class="resource-grid resource-grid-two">
+          <a class="resource-card" href="https://postbacs.stanford.edu/" target="_blank" rel="noopener noreferrer">
+            <span>Stanford Medicine</span>
+            <h3>REACH Postbaccalaureate Research Program</h3>
+            <p>Explore a research-intensive pathway designed to prepare scholars for graduate study.</p>
+            <span class="resource-arrow" aria-hidden="true">↗</span>
+          </a>
+          <a class="resource-card" href="https://stanford.referrals.selectminds.com/jobs/search/22456622" target="_blank" rel="noopener noreferrer">
+            <span>Stanford Careers</span>
+            <h3>Postbaccalaureate Opportunities</h3>
+            <p>View opportunities for applicants who have completed an undergraduate degree.</p>
+            <span class="resource-arrow" aria-hidden="true">↗</span>
+          </a>
+        </div>
+      </section>
     </main>
 
     <footer>© 2026 Sharaf Lab. Built with GitHub Pages.</footer>
