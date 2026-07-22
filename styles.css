@@ -603,10 +603,47 @@ footer {
 .member-card-copy > p:not(.member-role) { margin: 0 0 18px; color: #5c6f73; line-height: 1.7; }
 
 .alumni-section { padding: 110px max(24px, calc((100vw - 1132px) / 2)) 130px; background: #0a2632; color: #fff; }
-.alumni-list { display: grid; grid-template-columns: repeat(2, 1fr); column-gap: 70px; }
-.alumni-list p { margin: 0; padding: 20px 0; display: flex; justify-content: space-between; gap: 20px; border-bottom: 1px solid rgba(255,255,255,.15); }
-.alumni-list span { color: #9db3b9; text-align: right; }
+.alumni-list { border-top: 1px solid rgba(255,255,255,.2); }
+.alumni-row { padding: 20px 0; display: grid; grid-template-columns: 1fr 1.15fr 1fr; gap: 32px; border-bottom: 1px solid rgba(255,255,255,.15); }
+.alumni-row span { color: #9db3b9; }
+.alumni-row strong a { color: #fff; text-decoration-color: rgba(255,255,255,.35); text-underline-offset: 4px; }
+.alumni-row strong a span { color: #8de0dc; }
+.alumni-header { padding: 14px 0; font-family: "Montserrat", Arial, sans-serif; font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+.alumni-header span { color: #8de0dc; }
 .members-body footer { background: #0a2632; border-color: rgba(255,255,255,.12); color: #9db3b9; }
+
+/* Join the lab */
+.join-body { --join-navy: #071f2d; --join-teal: #0b6870; --join-cream: #f4f1e8; }
+.join-hero { padding: 110px max(24px, calc((100vw - 1132px) / 2)); display: grid; grid-template-columns: 1.15fr .85fr; gap: 90px; align-items: end; background: var(--join-navy); color: #fff; }
+.join-hero h1 { max-width: 760px; margin: 0; font-size: clamp(50px, 7vw, 88px); font-weight: 500; letter-spacing: -.055em; line-height: .98; }
+.join-hero-copy > p { margin: 0 0 34px; color: #bfd0d4; font-size: 18px; line-height: 1.8; }
+.join-availability,
+.rotation-section { padding: 110px max(24px, calc((100vw - 1132px) / 2)) 120px; }
+.join-section-heading { margin-bottom: 52px; }
+.join-section-heading h2,
+.join-contact h2 { margin: 0; font-size: clamp(40px, 5vw, 64px); font-weight: 500; letter-spacing: -.045em; line-height: 1.05; }
+.updated-date { margin: 18px 0 0; color: #71868a; font-size: 13px; }
+.availability-list { border-top: 1px solid #cbd8d8; }
+.availability-card { padding: 34px 0; display: grid; grid-template-columns: 18px 1fr; gap: 22px; border-bottom: 1px solid #cbd8d8; }
+.status-dot { width: 10px; height: 10px; margin-top: 8px; border: 2px solid #9aadaf; border-radius: 50%; }
+.availability-open .status-dot { border-color: #148078; background: #148078; box-shadow: 0 0 0 5px rgba(20,128,120,.12); }
+.availability-status { margin: 0 0 8px; color: #71868a; font-family: "Montserrat", Arial, sans-serif; font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+.availability-open .availability-status { color: #0b756e; }
+.availability-card h3 { margin: 0 0 8px; font-size: 26px; font-weight: 500; }
+.availability-card div > p:last-child { max-width: 760px; margin: 0; color: #5f7377; }
+.rotation-section { background: var(--join-cream); }
+.rotation-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+.rotation-card { padding: 42px; background: #fff; border: 1px solid #dedfd9; }
+.rotation-number { margin: 0 0 50px; color: #829699; font-size: 12px; font-weight: 700; }
+.rotation-kicker { margin: 0 0 12px; color: var(--join-teal); font-family: "Montserrat", Arial, sans-serif; font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+.rotation-card h3 { min-height: 2.3em; margin: 0 0 20px; font-size: 30px; font-weight: 500; line-height: 1.15; }
+.rotation-card > p:not(.rotation-number):not(.rotation-kicker) { color: #5c7074; line-height: 1.75; }
+.rotation-card h4 { margin: 32px 0 12px; font-family: "Montserrat", Arial, sans-serif; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; }
+.rotation-card ul { margin: 0; padding-left: 20px; color: #53676b; }
+.rotation-card li { margin-bottom: 10px; padding-left: 5px; }
+.join-contact { padding: 90px max(24px, calc((100vw - 1132px) / 2)); display: flex; justify-content: space-between; align-items: end; gap: 60px; background: var(--join-navy); color: #fff; }
+.join-contact > div > p:last-child { max-width: 650px; margin: 20px 0 0; color: #aebfc4; }
+.join-body footer { background: var(--join-navy); border-color: rgba(255,255,255,.12); color: #9db3b9; }
 
 @media (max-width: 850px) {
   .nav {
@@ -655,8 +692,10 @@ footer {
   .research-publications-heading { grid-template-columns: 1fr; gap: 24px; }
   .pi-section { grid-template-columns: 1fr; gap: 46px; }
   .pi-portrait { position: static; }
-  .member-grid,
-  .alumni-list { grid-template-columns: 1fr; }
+  .member-grid { grid-template-columns: 1fr; }
+  .join-hero { grid-template-columns: 1fr; gap: 40px; }
+  .rotation-grid { grid-template-columns: 1fr; }
+  .join-contact { align-items: flex-start; flex-direction: column; }
 }
 
 @media (max-width: 540px) {
@@ -669,6 +708,14 @@ footer {
   .pi-section { padding-top: 60px; padding-bottom: 80px; }
   .member-directory,
   .alumni-section { padding-top: 80px; padding-bottom: 90px; }
-  .alumni-list p { align-items: flex-start; flex-direction: column; gap: 5px; }
-  .alumni-list span { text-align: left; }
+  .alumni-row { grid-template-columns: 1fr; gap: 5px; }
+  .alumni-header { display: none; }
+  .alumni-row span::before { display: block; color: #8de0dc; font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+  .alumni-row span:nth-child(2)::before { content: "Current role"; }
+  .alumni-row span:nth-child(3)::before { content: "Position in the lab"; margin-top: 8px; }
+  .join-hero { padding-top: 76px; padding-bottom: 80px; }
+  .join-availability,
+  .rotation-section { padding-top: 80px; padding-bottom: 90px; }
+  .rotation-card { padding: 30px 24px; }
+  .rotation-card h3 { min-height: 0; }
 }

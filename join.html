@@ -4,6 +4,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Graduate rotation opportunities in the Sharaf Lab at Stanford University." />
     <title>Join the Lab | Sharaf Lab</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -11,30 +12,105 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
 
-  <body>
+  <body class="join-body">
     <header>
       <div class="nav">
         <a class="brand" href="index.html" aria-label="Sharaf Lab home"><img src="assets/sharaf-lab-logo.png" alt="Sharaf Lab" /></a>
-
-        <nav>
+        <nav aria-label="Primary navigation">
           <a href="index.html">Home</a>
           <a href="philosophy.html">Philosophy</a>
           <a href="research.html">Research</a>
           <a href="members.html">Lab Members</a>
           <a href="photos.html">Photos</a>
           <a href="outreach.html">Outreach</a>
-          <a class="active" href="join.html">Join the Lab</a>
+          <a class="active" href="join.html" aria-current="page">Join the Lab</a>
           <a href="contact.html">Contact</a>
         </nav>
       </div>
     </header>
 
-    <main class="page">
-      <h1 class="section-title">Join the Lab</h1>
-      <p class="lead">
-        Prospective students, postdocs, and collaborators are encouraged to get
-        in touch.
-      </p>
+    <main>
+      <section class="join-hero">
+        <div>
+          <p class="eyebrow">Join the Sharaf Lab</p>
+          <h1>Build the next chapter of bacterial protein science.</h1>
+        </div>
+        <div class="join-hero-copy">
+          <p>
+            Rotation projects are assigned with a dedicated mentor. Once you
+            join the lab, you will have the flexibility to pursue your research
+            interests in either—or both—of our focus areas.
+          </p>
+          <a class="research-button research-button-light" href="mailto:ngsharaf@stanford.edu">Contact Prof. Sharaf <span aria-hidden="true">↗</span></a>
+        </div>
+      </section>
+
+      <section class="join-availability" aria-labelledby="availability-title">
+        <div class="join-section-heading">
+          <p class="eyebrow eyebrow-dark">Opportunities</p>
+          <h2 id="availability-title">Current availability</h2>
+          <p class="updated-date">Updated <time datetime="2026-07-22">July 22, 2026</time></p>
+        </div>
+        <div class="availability-list">
+          <article class="availability-card availability-open">
+            <span class="status-dot" aria-hidden="true"></span>
+            <div>
+              <p class="availability-status">Positions available</p>
+              <h3>Graduate students</h3>
+              <p>Positions are available for highly motivated graduate students in the Stanford Biosciences program.</p>
+            </div>
+          </article>
+          <article class="availability-card">
+            <span class="status-dot" aria-hidden="true"></span>
+            <div>
+              <p class="availability-status">No positions currently available</p>
+              <h3>High school and undergraduate students</h3>
+              <p>We are not currently accepting high school or undergraduate researchers.</p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="rotation-section" aria-labelledby="rotation-title">
+        <div class="join-section-heading">
+          <p class="eyebrow eyebrow-dark">Graduate rotations</p>
+          <h2 id="rotation-title">Choose a scientific direction.</h2>
+          <p class="updated-date">Updated <time datetime="2026-07-22">July 22, 2026</time></p>
+        </div>
+        <div class="rotation-grid">
+          <article class="rotation-card">
+            <p class="rotation-number">01</p>
+            <p class="rotation-kicker">Structure &amp; function</p>
+            <h3>A <em>Borrelia burgdorferi</em> lipoprotein</h3>
+            <p>Investigate bacterial lipoprotein structure and function through protein production and high-resolution biophysics.</p>
+            <h4>This project will involve</h4>
+            <ul>
+              <li>Overexpression of lipoproteins using an <em>E. coli</em> expression system</li>
+              <li>Structural and functional studies using X-ray crystallography and cryo-EM</li>
+            </ul>
+          </article>
+          <article class="rotation-card">
+            <p class="rotation-number">02</p>
+            <p class="rotation-kicker">Biomaterials</p>
+            <h3>A novel lipoprotein-based material</h3>
+            <p>Develop and characterize a new protein-based biomaterial using complementary structural and biophysical approaches.</p>
+            <h4>This project will involve</h4>
+            <ul>
+              <li>Overexpression of lipoproteins using an <em>E. coli</em> expression system</li>
+              <li>Characterization using cryo-EM, negative-stain TEM, nanoDSF, and DLS</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <section class="join-contact">
+        <div>
+          <p class="eyebrow">Interested?</p>
+          <h2>Start a conversation.</h2>
+          <p>Graduate students interested in a rotation can contact Professor Sharaf directly by email.</p>
+        </div>
+        <a class="research-button research-button-light" href="mailto:ngsharaf@stanford.edu">ngsharaf@stanford.edu <span aria-hidden="true">→</span></a>
+      </section>
     </main>
 
     <footer>© 2026 Sharaf Lab. Built with GitHub Pages.</footer>
