@@ -33,6 +33,17 @@
 
       <p class="lead">Life in the Lab: lab work, out reach and celebrations.</p>
 
+      <nav class="photo-year-links" aria-label="Photo gallery years">
+        <a href="#year-2026" data-year="2026" aria-current="true">2026</a>
+        <a href="#year-2025" data-year="2025">2025</a>
+        <a href="#year-2024" data-year="2024">2024</a>
+        <a href="#year-2023" data-year="2023">2023</a>
+        <a href="#year-2022" data-year="2022">2022</a>
+        <a href="#year-2021" data-year="2021">2021</a>
+      </nav>
+
+      <section class="photo-year" id="year-2026">
+        <h2>2026</h2>
       <div class="photo-gallery">
         <div class="gallery-item">
           <img
@@ -97,7 +108,12 @@
           />
           <p>261217 Sara’s first graduate school acceptance</p>
         </div>
+      </div>
+      </section>
 
+      <section class="photo-year" id="year-2025" hidden>
+        <h2>2025</h2>
+      <div class="photo-gallery">
         <div class="gallery-item">
           <img
             src="2026images/Screenshot+2026-03-17+at+12.20.13 PM.png"
@@ -201,7 +217,12 @@
           />
           <p>250121 Michigan Med School Acceptance!</p>
         </div>
+      </div>
+      </section>
 
+      <section class="photo-year" id="year-2024" hidden>
+        <h2>2024</h2>
+      <div class="photo-gallery">
         <div class="gallery-item">
           <img
             src="2026images/IMG_3099.jpg"
@@ -313,7 +334,12 @@
           />
           <p>240123 Cactus Garden</p>
         </div>
+      </div>
+      </section>
 
+      <section class="photo-year" id="year-2023" hidden>
+        <h2>2023</h2>
+      <div class="photo-gallery">
         <div class="gallery-item">
           <img
             src="2026images/IMG_7873.jpg"
@@ -430,7 +456,12 @@
           />
           <p>230420 Welcome Claire and Steven</p>
         </div>
+      </div>
+      </section>
 
+      <section class="photo-year" id="year-2022" hidden>
+        <h2>2022</h2>
+      <div class="photo-gallery">
         <div class="gallery-item">
           <img src="2026images/IMG_1883.jpg" alt="Sharaf Lab photo: 221220" />
           <p>221220</p>
@@ -529,7 +560,12 @@
           />
           <p>220131: The plants before</p>
         </div>
+      </div>
+      </section>
 
+      <section class="photo-year" id="year-2021" hidden>
+        <h2>2021</h2>
+      <div class="photo-gallery">
         <div class="gallery-item">
           <img
             src="2026images/211209.jpg"
@@ -546,8 +582,40 @@
           <p>211027: October Birthdays</p>
         </div>
       </div>
+      </section>
     </main>
 
     <footer>© 2026 Sharaf Lab. Built with GitHub Pages.</footer>
+    <script>
+      const yearLinks = document.querySelectorAll(".photo-year-links a");
+      const yearSections = document.querySelectorAll(".photo-year");
+
+      function showYear(year) {
+        const selectedSection = document.getElementById(`year-${year}`);
+        if (!selectedSection) return;
+
+        yearSections.forEach((section) => {
+          section.hidden = section !== selectedSection;
+        });
+
+        yearLinks.forEach((link) => {
+          if (link.dataset.year === year) {
+            link.setAttribute("aria-current", "true");
+          } else {
+            link.removeAttribute("aria-current");
+          }
+        });
+      }
+
+      yearLinks.forEach((link) => {
+        link.addEventListener("click", () => showYear(link.dataset.year));
+      });
+
+      window.addEventListener("hashchange", () => {
+        showYear(window.location.hash.replace("#year-", "") || "2026");
+      });
+
+      showYear(window.location.hash.replace("#year-", "") || "2026");
+    </script>
   </body>
 </html>

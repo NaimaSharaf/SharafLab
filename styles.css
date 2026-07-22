@@ -287,6 +287,39 @@ nav a.active {
   color: var(--text);
 }
 
+.photo-year-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.photo-year-links a {
+  padding: 8px 16px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--soft);
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.photo-year-links a:hover,
+.photo-year-links a[aria-current="true"] {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.photo-year {
+  scroll-margin-top: 120px;
+  margin-top: 48px;
+}
+
+.photo-year h2 {
+  margin: 0;
+  font-size: 28px;
+}
+
 .photo-gallery {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
