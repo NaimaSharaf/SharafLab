@@ -183,6 +183,69 @@ nav a.active {
   padding: 24px;
 }
 
+.publication-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+  margin-top: 34px;
+}
+
+.publication-card {
+  padding: 24px;
+  background: var(--soft);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.publication-card::before {
+  content: "Image";
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  border: 1px dashed #cbd5e1;
+  border-radius: 8px;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.publication-card h2 {
+  margin: 0 0 12px;
+  font-size: 21px;
+  line-height: 1.35;
+}
+
+.publication-card p {
+  margin: 0 0 16px;
+  color: var(--muted);
+}
+
+.publication-card a {
+  color: var(--accent);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.publication-card a:hover {
+  text-decoration: underline;
+}
+
+.publication-meta {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.publication-actions {
+  margin-top: 28px;
+}
+
 .links {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -238,7 +301,8 @@ footer {
   }
 
   .cards,
-  .links {
+  .links,
+  .publication-list {
     grid-template-columns: 1fr;
   }
 
