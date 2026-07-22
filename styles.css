@@ -667,8 +667,8 @@ footer {
 .rotation-section { background: var(--join-cream); }
 .rotation-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
 .rotation-card { padding: 42px; background: #fff; border: 1px solid #dedfd9; }
-.rotation-number { margin: 0 0 50px; color: #829699; font-size: 12px; font-weight: 700; }
-.rotation-kicker { margin: 0 0 12px; color: var(--join-teal); font-family: "Montserrat", Arial, sans-serif; font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+.rotation-number { margin: 0 0 50px; color: #829699; font-size: 40px; font-weight: 700; }
+.rotation-kicker { margin: 0 0 12px; color: var(--join-teal); font-family: "Montserrat", Arial, sans-serif; font-size: 40px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
 .rotation-card h3 { min-height: 2.3em; margin: 0 0 20px; font-size: 30px; font-weight: 500; line-height: 1.15; }
 .rotation-card > p:not(.rotation-number):not(.rotation-kicker) { color: #5c7074; line-height: 1.75; }
 .rotation-card h4 { margin: 32px 0 12px; font-family: "Montserrat", Arial, sans-serif; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; }
@@ -703,6 +703,20 @@ footer {
 .resource-feature h3 { margin: 0; font-size: clamp(24px, 3vw, 36px); font-weight: 500; }
 .resource-feature > span { color: #b8cbd0; white-space: nowrap; }
 .outreach-body footer { background: var(--outreach-navy); border-color: rgba(255,255,255,.12); color: #9db3b9; }
+
+/* Consistent accent labels and section numbers across the site */
+.eyebrow,
+.publication-meta,
+.member-role,
+.availability-status,
+.rotation-kicker,
+.resource-card > span:first-child,
+.resource-feature p,
+.process-number,
+.rotation-number,
+.resource-number {
+  font-size: 15px;
+}
 
 @media (max-width: 850px) {
   .nav {
