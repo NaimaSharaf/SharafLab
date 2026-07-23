@@ -477,6 +477,8 @@ footer {
 .research-button:hover { transform: translateY(-2px); }
 .research-button-light { color: #fff; }
 .research-button-light:hover { background: rgba(255,255,255,.1); }
+.research-button-dark { color: var(--research-navy); }
+.research-button-dark:hover { background: rgba(15, 56, 77, .08); }
 
 .research-intro {
   max-width: 1180px;
