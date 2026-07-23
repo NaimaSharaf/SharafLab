@@ -238,7 +238,7 @@ nav a.active {
   padding: 24px;
   background: var(--soft);
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 0;
 }
 
 .publication-card::before {
@@ -251,7 +251,7 @@ nav a.active {
   justify-content: center;
   background: #ffffff;
   border: 1px dashed #cbd5e1;
-  border-radius: 8px;
+  border-radius: 0;
   color: var(--muted);
   font-size: 14px;
   font-weight: 700;
@@ -407,6 +407,7 @@ footer {
   aspect-ratio: 1672 / 941;
   display: block;
   object-fit: cover;
+  border-radius: 0;
 }
 
 .research-hero-shade {
@@ -414,6 +415,7 @@ footer {
   inset: 0;
   z-index: 1;
   height: 100%;
+  border-radius: 0;
   background: linear-gradient(0deg, rgba(3, 20, 33, .22), transparent 26%);
   pointer-events: none;
 }
@@ -581,6 +583,7 @@ footer {
   flex-direction: column;
   background: rgba(255, 255, 255, .055);
   border-color: rgba(255, 255, 255, .14);
+  border-radius: 0;
 }
 
 .research-publications .publication-card::before { display: none; }
@@ -777,12 +780,12 @@ footer {
 .resource-card,
 .link-box {
   border-radius: 0;
-  clip-path: var(--hex-card);
+  clip-path: none;
 }
 
 .publication-card::before {
   border-radius: 0;
-  clip-path: var(--hex-card);
+  clip-path: none;
 }
 
 .eyebrow {
