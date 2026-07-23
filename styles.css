@@ -386,8 +386,8 @@ footer {
 .research-hero {
   display: grid;
   grid-template-areas:
-    "visual"
-    "copy";
+    "copy"
+    "visual";
   background: var(--research-navy);
   color: #fff;
 }
@@ -396,7 +396,9 @@ footer {
 .research-hero-shade {
   grid-area: visual;
   width: 100%;
+  max-width: 1132px;
   height: 100%;
+  justify-self: center;
 }
 
 .research-hero-image {
@@ -671,7 +673,8 @@ footer {
 .status-dot {
   position: relative;
   width: 22px;
-  height: 22px;
+  height: auto;
+  aspect-ratio: 1.1547 / 1;
   margin-top: 4px;
   background: #9aadaf;
   clip-path: polygon(25% 6.7%, 75% 6.7%, 100% 50%, 75% 93.3%, 25% 93.3%, 0 50%);
@@ -781,7 +784,7 @@ footer {
 }
 
 .eyebrow::before {
-  width: 13px;
+  width: 17.32px;
   height: 15px;
   flex: 0 0 auto;
   background: currentColor;
@@ -797,7 +800,7 @@ footer {
 }
 
 .section-title::before {
-  width: 18px;
+  width: 24.25px;
   height: 21px;
   flex: 0 0 auto;
   background: var(--accent);
@@ -806,7 +809,7 @@ footer {
 }
 
 .process-icon {
-  width: 64px;
+  width: 80.83px;
   height: 70px;
   display: flex;
   align-items: center;
@@ -829,7 +832,7 @@ footer {
   position: absolute;
   top: 4px;
   right: 18px;
-  width: 22px;
+  width: 28.87px;
   height: 25px;
   background: #13827e;
   clip-path: var(--hexagon);
