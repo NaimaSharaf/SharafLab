@@ -7,7 +7,7 @@
   --soft: #f7f8fa;
   --hex-card: polygon(18px 0, calc(100% - 18px) 0, 100% 18px, 100% calc(100% - 18px), calc(100% - 18px) 100%, 18px 100%, 0 calc(100% - 18px), 0 18px);
   --hex-button: polygon(12px 0, calc(100% - 12px) 0, 100% 50%, calc(100% - 12px) 100%, 12px 100%, 0 50%);
-  --hexagon: polygon(25% 6.7%, 75% 6.7%, 100% 50%, 75% 93.3%, 25% 93.3%, 0 50%);
+  --hexagon: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
   --hex-pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='156' viewBox='0 0 180 156'%3E%3Cg fill='none' stroke='%230b6870' stroke-opacity='.07' stroke-width='1'%3E%3Cpath d='M45 2l37 21v42L45 86 8 65V23z'/%3E%3Cpath d='M135 2l37 21v42l-37 21-37-21V23z'/%3E%3Cpath d='M90 80l37 21v42l-37 21-37-21v-42z'/%3E%3C/g%3E%3C/svg%3E");
   --node-pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='420' height='280' viewBox='0 0 420 280'%3E%3Cg fill='none' stroke='%234b7882' stroke-opacity='.09' stroke-width='1'%3E%3Cpath d='M24 58L104 24l73 54 87-35 66 68 66-27M104 24l18 105 55-51 49 96 38-131M24 58l42 124 56-53 79 102 25-57 104-63 66 92M66 182l135 49 129-120'/%3E%3C/g%3E%3Cg fill='%230b6870' fill-opacity='.13'%3E%3Ccircle cx='24' cy='58' r='4'/%3E%3Ccircle cx='104' cy='24' r='5'/%3E%3Ccircle cx='177' cy='78' r='4'/%3E%3Ccircle cx='264' cy='43' r='5'/%3E%3Ccircle cx='330' cy='111' r='4'/%3E%3Ccircle cx='396' cy='84' r='3'/%3E%3Ccircle cx='66' cy='182' r='4'/%3E%3Ccircle cx='122' cy='129' r='5'/%3E%3Ccircle cx='201' cy='231' r='4'/%3E%3Ccircle cx='226' cy='174' r='5'/%3E%3Ccircle cx='396' cy='203' r='4'/%3E%3C/g%3E%3C/svg%3E");
   --science-pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1200' height='520' viewBox='0 0 1200 520'%3E%3Cg fill='none' stroke='%234b7882' stroke-opacity='.09' stroke-width='1'%3E%3Cpath d='M20 85L105 32l82 61 91-38 82 78 72-35M105 32l24 132 58-71 52 139 39-177M20 85l51 180 58-101 90 137 20-69 121-99 72 116M71 265l148 36 141-168'/%3E%3C/g%3E%3Cg fill='%230b6870' fill-opacity='.14'%3E%3Ccircle cx='20' cy='85' r='4'/%3E%3Ccircle cx='105' cy='32' r='5'/%3E%3Ccircle cx='187' cy='93' r='4'/%3E%3Ccircle cx='278' cy='55' r='5'/%3E%3Ccircle cx='360' cy='133' r='4'/%3E%3Ccircle cx='71' cy='265' r='4'/%3E%3Ccircle cx='129' cy='164' r='5'/%3E%3Ccircle cx='219' cy='301' r='4'/%3E%3Ccircle cx='239' cy='232' r='5'/%3E%3Ccircle cx='432' cy='249' r='4'/%3E%3C/g%3E%3Cg fill='none' stroke='%230b6870' stroke-linecap='round' stroke-opacity='.08'%3E%3Cpath stroke-width='9' d='M355 280c44-92 91-117 134-67s65 132 112 83 42-148 101-132 54 140 119 125'/%3E%3Cpath stroke-width='4' d='M372 310c38-58 79-75 114-32s75 70 113 22 59-104 97-63 57 91 101 72'/%3E%3Cpath stroke-width='3' d='M402 205c42 51 58 84 91 40s60-75 94-17 64 66 103 15 67-44 93 4'/%3E%3C/g%3E%3Cg fill='none' stroke='%230b6870' stroke-opacity='.07' stroke-width='1'%3E%3Cpath d='M940 25l42 24v48l-42 24-42-24V49zM1052 83l42 24v48l-42 24-42-24v-48zM1160 20l35 20v40l-35 20-35-20V40zM941 202l52 30v60l-52 30-52-30v-60zM1090 266l46 27v53l-46 27-46-27v-53zM1171 390l32 19v38l-32 19-32-19v-38zM1001 408l38 22v44l-38 22-38-22v-44z'/%3E%3Cpath d='M982 73l70 58 108-71M941 262l149 57 81 109M1001 452l89-133'/%3E%3C/g%3E%3C/svg%3E");
@@ -684,17 +684,16 @@ footer {
 .status-dot {
   position: relative;
   width: 22px;
-  height: auto;
-  aspect-ratio: 1.1547 / 1;
+  height: 22px;
   margin-top: 4px;
   background: #9aadaf;
-  clip-path: polygon(25% 6.7%, 75% 6.7%, 100% 50%, 75% 93.3%, 25% 93.3%, 0 50%);
+  border-radius: 50%;
 }
 .status-dot::after {
   position: absolute;
   inset: 4px;
   background: #fff;
-  clip-path: inherit;
+  border-radius: 50%;
   content: "";
 }
 .availability-open .status-dot { background: #148078; }
@@ -703,7 +702,7 @@ footer {
   z-index: 2;
   inset: 7px;
   background: #148078;
-  clip-path: inherit;
+  border-radius: 50%;
   content: "";
 }
 .availability-status { margin: 0 0 8px; color: #71868a; font-family: "Montserrat", Arial, sans-serif; font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
