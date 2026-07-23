@@ -403,7 +403,7 @@ footer {
 .research-hero-shade {
   grid-area: visual;
   width: 100%;
-  max-width: 1132px;
+  max-width: 760px;
   height: 100%;
   justify-self: center;
 }
