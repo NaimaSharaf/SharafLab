@@ -391,20 +391,15 @@ footer {
 }
 
 .research-hero {
-  display: grid;
-  grid-template-areas:
-    "copy"
-    "visual";
+  position: relative;
   background: var(--research-navy);
   color: #fff;
 }
 
 .research-hero-image,
 .research-hero-shade {
-  grid-area: visual;
   width: 100%;
-  max-width: 760px;
-  height: 100%;
+  max-width: 1132px;
   justify-self: center;
 }
 
@@ -415,20 +410,24 @@ footer {
 }
 
 .research-hero-shade {
+  position: absolute;
+  inset: 0;
   z-index: 1;
+  height: 100%;
   background: linear-gradient(0deg, rgba(3, 20, 33, .22), transparent 26%);
   pointer-events: none;
 }
 
 .research-hero-content {
-  grid-area: copy;
-  z-index: 1;
+  position: absolute;
+  inset: 0;
+  z-index: 2;
   width: 100%;
   padding: 72px max(24px, calc((100vw - 1132px) / 2)) 80px;
   display: grid;
   grid-template-columns: 1.2fr .8fr;
   gap: 90px;
-  align-items: end;
+  align-items: start;
   border-top: 1px solid rgba(255, 255, 255, .12);
 }
 
