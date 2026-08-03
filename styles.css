@@ -798,7 +798,7 @@ footer {
   height: 15px;
   flex: 0 0 auto;
   background: currentColor;
-  clip-path: var(--hexagon);
+  border-radius: 50%;
   content: "";
   opacity: .75;
 }
@@ -814,7 +814,7 @@ footer {
   height: 21px;
   flex: 0 0 auto;
   background: var(--accent);
-  clip-path: var(--hexagon);
+  border-radius: 50%;
   content: "";
 }
 
@@ -825,7 +825,7 @@ footer {
   align-items: center;
   justify-content: center;
   background: rgba(11, 104, 112, .08);
-  clip-path: var(--hexagon);
+  border-radius: 50%;
 }
 
 .join-section-heading,
@@ -845,7 +845,7 @@ footer {
   width: 28.87px;
   height: 25px;
   background: #13827e;
-  clip-path: var(--hexagon);
+  border-radius: 50%;
   content: "";
   filter: drop-shadow(27px 16px 0 rgba(19, 130, 126, .55)) drop-shadow(-27px 16px 0 rgba(19, 130, 126, .28));
   opacity: .22;
