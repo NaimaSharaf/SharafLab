@@ -186,7 +186,7 @@ nav a.active {
   justify-content: center;
   background:
     linear-gradient(rgba(255, 255, 255, .16), rgba(255, 255, 255, .16)),
-    url("2026images/IMG_7713.jpg") center / cover no-repeat;
+    url("assets/IMG_7713.jpg") center / cover no-repeat;
   color: #000000;
   text-align: center;
 }
