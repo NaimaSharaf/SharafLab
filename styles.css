@@ -168,7 +168,7 @@ nav a.active {
 .section-title {
   font-family: "Montserrat", Arial, sans-serif;
   font-weight: 500;
-  font-size: 34px;
+  font-size: 35.333px; /* increased by 1pt (1pt ≈ 1.333px) */
   margin-bottom: 20px;
 }
 
