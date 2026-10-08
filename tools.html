@@ -89,6 +89,10 @@
 .ss-source a{color:#0b6870;font-weight:700;text-underline-offset:4px}
 @media(max-width:600px){.ss-tool{padding:0 16px 60px}}
 .ss-tool{padding:0 0 10px}
+.tool-caution{max-width:1132px;margin:-60px auto 70px;padding:16px 20px;background:#fff7ec;border:1px solid #f0d2a8;border-left:4px solid #d9822b;border-radius:8px;color:#5c3b12;font-size:15px;line-height:1.6}
+.tool-caution strong{color:#8a4b0f}
+@media(max-width:1180px){.tool-caution{margin-left:24px;margin-right:24px}}
+@media(max-width:800px){.tool-caution{margin-top:-40px;margin-bottom:50px}}
 .tool-index{max-width:1180px;margin:-50px auto 0;padding:0 24px 60px;display:flex;flex-wrap:wrap;gap:12px}
 .tool-index a{display:flex;align-items:center;gap:12px;padding:14px 20px;background:#fff;border:1px solid #d8e0e0;color:#102a33;text-decoration:none;font-family:"Montserrat",Arial,sans-serif;font-size:14px;font-weight:600}
 .tool-index a:hover{border-color:#0b6870;color:#0b6870}
@@ -109,6 +113,12 @@
 .pdf-row{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:14px 0;border-bottom:1px solid #e4ebeb}
 .pdf-row span{display:block;font-weight:600}
 .pdf-row small{display:block;color:#6b7f83;font-size:13px}
+.pdf-row label{display:block;font-weight:600}
+.pdf-field{display:inline-flex;align-items:center;gap:6px;color:#586e73;white-space:nowrap}
+.pdf-settings input,.pdf-settings select{font:inherit;padding:7px 8px;border:1px solid #b8c8d5;border-radius:5px;background:#fff;color:#102a33}
+.pdf-settings input{width:78px}
+.pdf-settings input:focus-visible,.pdf-settings select:focus-visible{outline:3px solid #0b6870;outline-offset:2px}
+.pdf-settings [hidden]{display:none}
 .pdf-row strong{font-family:"Montserrat",Arial,sans-serif;color:#0b6870;white-space:nowrap}
 .pdf-privacy{margin:18px 0 0;color:#586e73;font-size:14px}
 .pdf-file{margin-top:16px;padding:18px 22px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;background:#fff;border:1px solid #d8e0e0}
@@ -150,17 +160,42 @@
 .topo-canvas{padding:16px;overflow:auto;min-height:120px;color:#586e73}
 .topo-canvas svg{display:block;width:100%;height:auto;max-height:720px;touch-action:none;user-select:none}
 .topo-el{cursor:grab}
+.topo-loop{cursor:pointer;outline:none}
+.topo-loop .topo-hit{pointer-events:stroke}
+.topo-loop:hover .topo-vis{stroke:#0b6870;stroke-width:2.4}
+.topo-loop.selected .topo-vis,.topo-loop:focus-visible .topo-vis{stroke:#e8590c;stroke-width:3}
 .topo-el:focus{outline:none}
 .topo-el.selected polygon,.topo-el.selected path,.topo-el.selected ellipse,.topo-el:focus-visible polygon,.topo-el:focus-visible path{stroke:#e8590c;stroke-width:2.4}
 .topo-sel{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;padding:12px 20px;background:#edf7f6;border-top:1px solid #e4ebeb;font-size:14px}
-.topo-sel span{flex:1;min-width:200px}
+.topo-sel span{flex:1 1 140px;min-width:0}
+.topo-sel.idle span{color:#6b7f83}
+.topo-sel #topo-jiggle{margin-left:auto}
 .topo-sel[hidden],.topo-tool [hidden]{display:none}
+.topo-tool [hidden]{display:none!important}
+.topo-steps{margin:0 0 18px;padding:14px 20px 14px 40px;background:#edf7f6;border:1px solid #cfe7e4;border-radius:10px;color:#173650;font-size:15px;line-height:1.6}
+.topo-steps li+li{margin-top:4px}
+.topo-steps a{color:#0b6870;font-weight:700;text-underline-offset:3px}
+.topo-sub{margin:40px 0 14px;font-size:20px;font-weight:600;letter-spacing:-.01em;scroll-margin-top:90px}
+.topo-tool .ss-tool{padding:0;max-width:none}
+.topo-tool .ss-tool .canvas svg{width:100%;height:auto;max-width:100%}
+.topo-tool .ss-tool .ss-source{margin:0 0 14px}
 .topo-3d-controls{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px}
 .topo-3d-controls label{display:inline-flex;align-items:center;gap:6px;font-size:14px}
 .topo-3d-note{padding:12px 20px 0}
+.topo-pair{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:16px;align-items:stretch;margin-bottom:16px}
+.topo-pair>.topo-panel{margin-bottom:0;display:flex;flex-direction:column}
+.topo-pair .topo-canvas{flex:1;display:flex;align-items:center}
+.topo-pair .topo-3d-box .topo-3d{flex:1;min-height:420px}
+.topo-3d-empty{position:absolute;inset:0;display:grid;place-items:center;margin:0;color:#8a9ba0;font-size:14px}
+@media(max-width:1000px){.topo-pair{grid-template-columns:1fr}}
 .topo-3d{position:relative;height:460px;margin:12px 20px 20px;border:1px solid #e4ebeb;border-radius:8px;overflow:hidden;background:#fff}
 @media(max-width:600px){.topo-3d{height:340px;margin:12px}}
 .topo-domains-box .topo-note{padding:12px 20px 0}
+.topo-seqout{border-top:1px solid #e4ebeb;padding:14px 0 18px}
+.topo-seqout-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px 16px;padding:0 20px}
+.topo-seqout-actions{display:flex;gap:8px;flex-wrap:wrap}
+.topo-seqout .topo-note{padding:6px 20px 0}
+#topo-seqText{margin:10px 20px 0;max-height:320px;overflow:auto;padding:12px 14px;background:#f4f7f9;border:1px solid #e1e8ee;border-radius:8px;font:12px/1.6 ui-monospace,Menlo,Consolas,monospace;color:#142d44;white-space:pre-wrap;overflow-wrap:anywhere}
 #topo-domains{display:flex;flex-direction:column;gap:10px;padding:8px 20px 18px}
 .topo-domain{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px}
 .topo-domain input[type=color]{width:38px;height:32px;border:0;padding:0;background:transparent}
@@ -205,31 +240,54 @@
         </p>
       </section>
 
+      <div class="tool-caution" role="note">
+        <strong>Check every result.</strong> These tools were vibe coded: built
+        quickly with AI assistance and not independently validated. Compare
+        their output with your own data and standard software before using it
+        in figures, analyses or publications.
+      </div>
+
       <nav class="tool-index" aria-label="Tools on this page">
-        <a href="#secondary-structure"><span>01</span>Secondary structure viewer</a>
+        <a href="#structure"><span>01</span>Sequence, topology and 3D</a>
         <a href="#extend-pdf"><span>02</span>Extend PDF for notes</a>
-        <a href="#topology"><span>03</span>Topology diagram</a>
       </nav>
 
-      <section class="tool-section" id="secondary-structure" aria-labelledby="ss-title">
+
+      <section class="tool-section" id="structure" aria-labelledby="structure-title">
         <div class="resource-heading">
           <p class="resource-number">01</p>
           <div>
-            <p class="eyebrow eyebrow-dark">Sequence · Structure</p>
-            <h2 id="ss-title">Secondary structure, residue by residue.</h2>
+            <p class="eyebrow eyebrow-dark">Sequence · Domains · Topology · 3D</p>
+            <h2 id="structure-title">From sequence to topology.</h2>
             <p class="tool-lede">
-              Open a DSSP-annotated CIF or mmCIF file to draw helices, strands,
-              and loops above the amino acid sequence, adjust the figure, and
-              download it as an SVG.
+              Open one DSSP-processed CIF file to see its secondary structure
+              residue by residue, find domains from the coordinates, draw a topology
+              diagram, and view the chain in 3D. Every view uses the same
+              domain colors, and each one downloads as a figure.
             </p>
           </div>
         </div>
+
+        <div class="topo-tool">
+          <ol class="topo-steps">
+            <li><strong>Process your structure with DSSP first.</strong> Upload your .cif (or PDB) file to <a href="https://pdb-redo.eu/dssp" target="_blank" rel="noopener noreferrer">pdb-redo.eu/dssp</a> and download the annotated mmCIF it returns.</li>
+            <li><strong>Open that DSSP-processed .cif file here.</strong> The sequence, domains, topology diagram and 3D view all read from it.</li>
+          </ol>
+          <div class="topo-bar">
+            <label class="topo-file">Open CIF<input id="topo-file" type="file" accept=".cif,.mmcif,.txt"></label>
+            <label>Chain <select id="topo-chain"></select></label>
+          </div>
+          <div class="topo-message" id="topo-msg" role="status"></div>
+          <p class="topo-note" id="topo-source"></p>
+
+
+          <h3 class="topo-sub" id="secondary-structure">Sequence and secondary structure</h3>
       <div class="ss-tool">
         <p class="ss-source">
           Source code:
           <a href="https://github.com/NaimaSharaf/Second-Structure" target="_blank" rel="noopener noreferrer">NaimaSharaf/Second-Structure</a>
         </p>
-<div class="toolbar"><label class="file">Open CIF / table<input id="file" type="file" accept=".cif,.mmcif,.txt,.tsv,.dat,.dssp"></label><button id="run" class="primary" disabled>Run viewer</button><button id="reset">Clear data</button><label>Chain <select id="chain"></select></label><label>First residue number <input id="firstNumber" type="number" step="1" aria-describedby="numberingNote"></label><button id="resetNumbering" type="button">File numbering</button><label>Residues per row <select id="wrap"><option>30</option><option selected>60</option><option>90</option></select></label><label>Find residue <input id="find" type="number" placeholder="e.g. 15"></label><button id="go">Find</button><button id="export" class="primary">Download SVG</button></div>
+<div class="toolbar"><label class="file" hidden>Open CIF / table<input id="file" type="file" accept=".cif,.mmcif,.txt,.tsv,.dat,.dssp"></label><button id="run" class="primary" disabled hidden>Run viewer</button><button id="reset" hidden>Clear data</button><label hidden>Chain <select id="chain"></select></label><label>First residue number <input id="firstNumber" type="number" step="1" aria-describedby="numberingNote"></label><button id="resetNumbering" type="button">File numbering</button><label>Residues per row <select id="wrap"><option>30</option><option selected>60</option><option>90</option></select></label><label>Find residue <input id="find" type="number" placeholder="e.g. 15"></label><button id="go">Find</button><button id="export" class="primary">Download SVG</button></div>
 <div id="message" role="status"></div><p class="note" id="numberingNote" hidden></p><p class="note" id="source"></p><div class="stats" id="stats"></div><section class="summary" id="summary" aria-label="Structure summary" hidden></section>
 <section class="editor" aria-label="Picture editor"><h2>Edit your picture</h2><div class="editor-grid">
 <label>SVG width (inches) <input id="svgWidth" type="number" min="1" max="100" step="0.1" value="5"><span id="svgHeight" class="note"></span></label><label>Title <input id="figureTitle" type="text" value="Secondary structure" maxlength="80"></label>
@@ -237,16 +295,83 @@
 <label>Sequence font (pt) <input id="fontSize" type="number" min="1" max="200" step="0.5" value="8"><output id="fontSizeValue" hidden>8</output></label>
 <label>Label font (pt) <input id="labelFont" type="number" min="1" max="200" step="0.5" value="6"></label><label>Residue spacing <input id="spacing" type="range" min="9" max="16" step="any" value="9"><output id="spacingValue">9</output></label>
 <label>Row spacing <input id="rowSpace" type="range" min="47.5" max="82.5" step="any" value="56"><output id="rowSpaceValue">56</output></label>
-<label><input id="elementNames" type="checkbox" checked>Element names</label><label><input id="numbers" type="checkbox" checked>Residue numbers</label><button id="resetStyle">Reset appearance</button>
+<label><input id="domainShade" type="checkbox" checked>Shade sequence by domain</label><label><input id="elementNames" type="checkbox" checked>Element names</label><label><input id="numbers" type="checkbox" checked>Residue numbers</label><button id="resetStyle">Reset appearance</button>
 </div><div class="range-editor"><p>Select a letter to edit one residue, or enter a range in the current chain. Structure overrides change the drawing, not your source file.</p><div class="editor-grid">
 <label>From <input id="rangeStart" type="number" aria-label="First residue to edit"></label><label>To <input id="rangeEnd" type="number" aria-label="Last residue to edit"></label>
 <label>Draw as <select id="assignment"><option value="H">α-helix</option><option value="G">3₁₀ helix</option><option value="I">π-helix</option><option value="E">β-strand</option><option value="B">β-bridge</option><option value="T">Turn</option><option value="S">Bend</option><option value="P">Polyproline II</option><option value=".">Loop / unassigned</option></select></label>
 <button id="applyRange">Apply to range</button><button id="undoEdit" disabled>Undo</button><button id="restoreAssignments">Restore file assignments</button></div></div><div id="editStatus" class="edit-status" role="status">No structure overrides.</div></section>
 <section class="panel"><div class="panelhead"><strong id="title">Chain A</strong><div class="legend"><span style="--c:#2e8b57">α-helix</span><span style="--c:#8cc084">3₁₀ / π helix</span><span style="--c:#2f6db5">β-strand</span><span style="--c:#8293a4">Loop / turn / bend</span></div></div><div class="canvas" id="canvas"></div><div class="detail" id="detail" aria-live="polite">Select a residue to inspect its position and structure. Use left and right arrow keys to move along the sequence.</div></section>
-<section class="source-view" id="sourceView" aria-labelledby="sourceViewTitle" hidden><div class="source-head"><h2 id="sourceViewTitle">File data used</h2><div class="source-controls"><label>Show <select id="sourcePart"></select></label><label><input id="sourceWrap" type="checkbox">Wrap lines</label><button id="copySource" type="button">Copy</button></div></div><p class="note" id="sourceInfo"></p><pre id="sourceText" tabindex="0" aria-label="File text"></pre></section>
-<details><summary>Paste CIF or a structure table</summary><p class="note">Open a DSSP-annotated .cif or .mmcif file, or paste its contents below. CIF files with a polymer sequence scheme and supported structure ranges also work. The viewer reads existing annotations; it does not calculate DSSP from atomic coordinates. The original whitespace-separated table format is also supported. Raw PDB and classic fixed-width DSSP files are not supported.</p><textarea id="paste" aria-label="CIF or structure table" placeholder="Paste annotated CIF or residue table here"></textarea><button id="load">Load pasted data</button></details>
+
+
 <p class="note">Element labels use CIF identifiers: α1 means alpha helix 1; β1 · A means strand 1 in sheet A. Hover over a label for the full identifier. Edited assignments are marked “Edited”. Coils represent helices: α-helices (H) and 3₁₀ / π helices (G, I) use separate colors; arrows represent E strands and B bridges. Other assignments appear as lines. Wrapped segments continue onto the next row; arrows point toward the C terminus. This is a sequence schematic, not a 3D structure.</p><p class="ss-foot">Files are processed in your browser. No upload service or external libraries.</p>
       </div>
+
+          <h3 class="topo-sub" id="topology">Topology diagram</h3>
+          <div class="topo-bar">
+            <label>Min helix (res) <input id="topo-minHelix" type="number" min="1" max="30" step="1" value="3"></label>
+            <label>Min strand (res) <input id="topo-minStrand" type="number" min="1" max="30" step="1" value="2"></label>
+            <label>Label font (pt) <input id="topo-font" type="number" min="1" max="72" step="0.5" value="6"></label>
+            <label>SVG width (in) <input id="topo-width" type="number" min="1" max="100" step="0.1" value="5"></label>
+            <span class="topo-size" id="topo-size"></span>
+          </div>
+          <div class="topo-bar">
+            <label>Title <input id="topo-title" type="text" maxlength="80" placeholder="Optional, e.g. E"></label>
+            <button id="topo-reset" type="button">Reset layout</button>
+            <button id="topo-showAll" type="button" hidden>Show hidden</button>
+            <button id="topo-export" class="topo-primary" type="button" disabled>Download SVG</button>
+          </div>
+
+          <div class="topo-pair">
+          <div class="topo-panel">
+            <div class="topo-panel-head">
+              <strong id="topo-stats">No file loaded</strong>
+              <span class="topo-help">Drag to move · click a loop to select it · click again or Esc to unselect · double-click or F to flip · arrow keys nudge · Delete hides</span>
+            </div>
+            <div class="topo-canvas" id="topo-canvas"></div>
+            <div class="topo-sel" id="topo-sel">
+              <span id="topo-selText">Click a helix, strand or loop to select it.</span>
+              <label id="topo-selDomainWrap">Domain <select id="topo-selDomain"></select></label>
+              <button id="topo-flip" type="button">Flip direction</button>
+              <button id="topo-hide" type="button">Hide</button>
+              <button id="topo-unselect" type="button">Unselect</button>
+              <button id="topo-jiggle" type="button" title="Line up rows and even out spacing, keeping your arrangement">Jiggle</button>
+            </div>
+          </div>
+          <div class="topo-panel topo-3d-box">
+            <div class="topo-panel-head">
+              <strong>3D structure</strong>
+              <div class="topo-3d-controls">
+                <button id="topo-3dShow" type="button" disabled>Show 3D structure</button>
+                <button id="topo-3dCenter" type="button" hidden>Center on selection</button>
+                <button id="topo-3dReset" type="button" hidden>Reset view</button>
+                <label id="topo-3dLabelsWrap" hidden><input id="topo-3dLabels" type="checkbox" checked> Labels</label>
+                <label id="topo-3dSpinWrap" hidden><input id="topo-3dSpin" type="checkbox"> Spin</label>
+                <button id="topo-3dPng" type="button" hidden>Save image (PNG)</button>
+              </div>
+            </div>
+            <p class="topo-note topo-3d-note" id="topo-3dNote">Open a CIF file with atom coordinates to view the chain in 3D, colored like the diagram.</p>
+            <div class="topo-3d" id="topo-3d"><p class="topo-3d-empty" id="topo-3dEmpty">The 3D structure appears here.</p></div>
+          </div>
+          </div>
+
+          <div class="topo-domains-box" id="domains">
+            <div class="topo-panel-head"><strong>Domains</strong><button id="topo-addDomain" type="button">Add domain</button></div>
+            <div class="topo-finder"><button id="topo-findDomains" type="button" disabled>Find domains from coordinates</button><label>Number of domains <select id="topo-domainCount"><option value="auto" selected>Automatic</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select></label></div>
+            <p class="topo-note" id="topo-domainNote" role="status"></p>
+            <p class="topo-note">Residue ranges use the file's label numbering; separate pieces with commas (e.g. 1–10, 71–164). Helices take the domain color; strands use a lighter tint.</p>
+            <div id="topo-domains"></div>
+            <div class="topo-seqout">
+              <div class="topo-seqout-head"><strong>Residues in each domain</strong><div class="topo-seqout-actions"><button id="topo-seqCopy" type="button">Copy</button><button id="topo-seqFasta" type="button">Download FASTA</button></div></div>
+              <p class="topo-note" id="topo-seqNote">One-letter sequence of each domain, in residue order, with one entry for each continuous piece. Residues that are not in any domain are listed last.</p>
+              <pre id="topo-seqText" tabindex="0" aria-label="Domain sequences"></pre>
+            </div>
+          </div>
+
+
+          <div class="ss-tool topo-source-wrap">
+<section class="source-view" id="sourceView" aria-labelledby="sourceViewTitle" hidden><div class="source-head"><h2 id="sourceViewTitle">File data used</h2><div class="source-controls"><label>Show <select id="sourcePart"></select></label><label><input id="sourceWrap" type="checkbox">Wrap lines</label><button id="copySource" type="button">Copy</button></div></div><p class="note" id="sourceInfo"></p><pre id="sourceText" tabindex="0" aria-label="File text"></pre></section>
+          </div>
+        </div>
       </section>
 
       <section class="tool-section tool-section-soft" id="extend-pdf" aria-labelledby="pdf-title">
@@ -256,9 +381,9 @@
             <p class="eyebrow eyebrow-dark">PDF · Notes</p>
             <h2 id="pdf-title">Give your pages room for notes.</h2>
             <p class="tool-lede">
-              Adds 3 inches of blank space to the right side of every page so
-              you can annotate papers and slides. The original content stays
-              exactly where it is.
+              Adds blank space to every page so you can annotate papers and
+              slides. Choose how much space, which side it goes on, and the
+              page height. The original content is never changed.
             </p>
           </div>
         </div>
@@ -273,9 +398,9 @@
               <span class="pdf-limit">PDF files only · processed locally</span>
             </div>
             <aside class="pdf-settings" aria-label="Output settings">
-              <div class="pdf-row"><div><span>Extension</span><small>Blank space added on the right</small></div><strong>+ 3.00 in</strong></div>
-              <div class="pdf-row"><div><span>Placement</span><small>Original content stays at the left</small></div><strong>Right</strong></div>
-              <div class="pdf-row"><div><span>Page height</span><small>Preserved from source</small></div><strong>Same</strong></div>
+              <div class="pdf-row"><div><label for="pdf-ext">Extension</label><small id="pdf-extHint">Blank space added on the right</small></div><span class="pdf-field"><input id="pdf-ext" type="number" min="0" max="30" step="0.25" value="3"> in</span></div>
+              <div class="pdf-row"><div><label for="pdf-place">Placement</label><small id="pdf-placeHint">Original content stays at the left</small></div><select id="pdf-place"><option value="right" selected>Right</option><option value="left">Left</option><option value="both">Both sides</option><option value="bottom">Bottom</option><option value="top">Top</option></select></div>
+              <div class="pdf-row"><div><label for="pdf-height">Page height</label><small id="pdf-heightHint">Preserved from source</small></div><span class="pdf-field"><select id="pdf-height"><option value="same" selected>Same</option><option value="11">US Letter (11 in)</option><option value="11.69">A4 (11.69 in)</option><option value="custom">Custom</option></select><input id="pdf-heightCustom" type="number" min="1" max="100" step="0.25" value="11" aria-label="Custom page height in inches" hidden></span></div>
               <p class="pdf-privacy">Your file never leaves this device.</p>
             </aside>
           </div>
@@ -293,78 +418,6 @@
           </div>
 
           <div class="pdf-message" id="pdf-message" role="status" hidden></div>
-        </div>
-      </section>
-      <section class="tool-section" id="topology" aria-labelledby="topo-title-h">
-        <div class="resource-heading">
-          <p class="resource-number">03</p>
-          <div>
-            <p class="eyebrow eyebrow-dark">Sheets · Helices · Topology</p>
-            <h2 id="topo-title-h">Draw a topology diagram.</h2>
-            <p class="tool-lede">
-              Open a CIF file to lay out helices as cylinders and strands as
-              arrows, with strands placed side by side in their β-sheets. Color
-              domains, drag elements into place, and download an SVG.
-            </p>
-          </div>
-        </div>
-
-        <div class="topo-tool">
-          <div class="topo-bar">
-            <label class="topo-file">Open CIF<input id="topo-file" type="file" accept=".cif,.mmcif,.txt"></label>
-            <label>Chain <select id="topo-chain"></select></label>
-            <label>Min helix (res) <input id="topo-minHelix" type="number" min="1" max="30" step="1" value="3"></label>
-            <label>Min strand (res) <input id="topo-minStrand" type="number" min="1" max="30" step="1" value="2"></label>
-            <label>Label font (pt) <input id="topo-font" type="number" min="1" max="72" step="0.5" value="6"></label>
-            <label>SVG width (in) <input id="topo-width" type="number" min="1" max="100" step="0.1" value="5"></label>
-            <span class="topo-size" id="topo-size"></span>
-          </div>
-          <div class="topo-bar">
-            <label>Title <input id="topo-title" type="text" maxlength="80" placeholder="Optional, e.g. E"></label>
-            <button id="topo-reset" type="button">Reset layout</button>
-            <button id="topo-showAll" type="button" hidden>Show hidden</button>
-            <button id="topo-export" class="topo-primary" type="button" disabled>Download SVG</button>
-          </div>
-          <div class="topo-message" id="topo-msg" role="status"></div>
-          <p class="topo-note" id="topo-source"></p>
-
-          <div class="topo-panel">
-            <div class="topo-panel-head">
-              <strong id="topo-stats">No file loaded</strong>
-              <span class="topo-help">Drag to move · click again or Esc to unselect · double-click or F to flip · arrow keys nudge · Delete hides</span>
-            </div>
-            <div class="topo-canvas" id="topo-canvas"></div>
-            <div class="topo-sel" id="topo-sel" hidden>
-              <span id="topo-selText"></span>
-              <button id="topo-flip" type="button">Flip direction</button>
-              <button id="topo-hide" type="button">Hide</button>
-              <button id="topo-unselect" type="button">Unselect</button>
-            </div>
-          </div>
-
-          <div class="topo-panel topo-3d-box">
-            <div class="topo-panel-head">
-              <strong>3D structure</strong>
-              <div class="topo-3d-controls">
-                <button id="topo-3dShow" type="button" disabled>Show 3D structure</button>
-                <button id="topo-3dCenter" type="button" hidden>Center on selection</button>
-                <button id="topo-3dReset" type="button" hidden>Reset view</button>
-                <label id="topo-3dLabelsWrap" hidden><input id="topo-3dLabels" type="checkbox" checked> Labels</label>
-                <label id="topo-3dSpinWrap" hidden><input id="topo-3dSpin" type="checkbox"> Spin</label>
-                <button id="topo-3dPng" type="button" hidden>Save image (PNG)</button>
-              </div>
-            </div>
-            <p class="topo-note topo-3d-note" id="topo-3dNote">Open a CIF file with atom coordinates to view the chain in 3D, colored like the diagram.</p>
-            <div class="topo-3d" id="topo-3d" hidden></div>
-          </div>
-
-          <div class="topo-domains-box">
-            <div class="topo-panel-head"><strong>Domains</strong><button id="topo-addDomain" type="button">Add domain</button></div>
-            <div class="topo-finder"><button id="topo-findDomains" type="button" disabled>Find domains from coordinates</button><label>Number of domains <select id="topo-domainCount"><option value="auto" selected>Automatic</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select></label></div>
-            <p class="topo-note" id="topo-domainNote" role="status"></p>
-            <p class="topo-note">Residue ranges use the file's label numbering; separate pieces with commas (e.g. 1–10, 71–164). Helices take the domain color; strands use a lighter tint.</p>
-            <div id="topo-domains"></div>
-          </div>
         </div>
       </section>
     </main>
@@ -482,11 +535,14 @@ if(k==='helix'){
  let d='';for(let x=x0;x<=x1;x+=.5){const yy=y+9*Math.sin((x-margin+lo*step)/step*2*Math.PI);d+=(d?' L':'M')+x+' '+yy}svg.append(el('path',{d,fill:'none',stroke:current[i].ss==='H'?colors.alpha:colors.helix310,'stroke-width':4,'stroke-linecap':'round'}))
 }
 else if(k==='strand'){const continues=end<count&&current[end].ss===current[end-1].ss&&labelFor(current[end])===labelFor(current[end-1])&&current[end].n===current[end-1].n+1;const head=continues?0:Math.min(12,(x1-x0)*.7);const points=head?`${x0},${y-5} ${x1-head},${y-5} ${x1-head},${y-11} ${x1},${y} ${x1-head},${y+11} ${x1-head},${y+5} ${x0},${y+5}`:`${x0},${y-5} ${x1},${y-5} ${x1},${y+5} ${x0},${y+5}`;svg.append(el('polygon',{points,fill:colors.strand}))}i=end}
-for(let i=lo;i<hi;i++){const r=current[i],x=margin+(i-lo)*step;const g=el('g',{id:'r'+i,class:'residue',tabindex:i===0?'0':'-1',role:'button','aria-label':`${r.res} ${shown(r)}, ${names[r.ss]}`});g.append(el('rect',{x:x-8,y:y+17,width:16,height:27,rx:4,fill:'transparent'}),el('text',{x,y:y+36,'text-anchor':'middle','font-family':'monospace','font-size':seqFont,fill:'#142d44'},aa[r.res]||'X'),el('title',{},`${r.res} ${shown(r)} · ${names[r.ss]}`));g.addEventListener('click',()=>inspect(i));g.addEventListener('focus',()=>inspect(i));g.addEventListener('keydown',e=>{if(['ArrowRight','ArrowLeft','Enter',' '].includes(e.key)){e.preventDefault();inspect(Math.max(0,Math.min(count-1,i+(e.key==='ArrowRight'?1:e.key==='ArrowLeft'?-1:0))),true)}});svg.append(g);if($('numbers').checked&&(i===lo||i===hi-1||(shown(r)%10===0&&i-lo>2&&hi-1-i>2)))svg.append(el('text',{x,y:y+65,'text-anchor':'middle','font-family':'Arial','font-size':labelFont,fill:'#607589'},shown(r)))}}
+for(let i=lo;i<hi;i++){const r=current[i],x=margin+(i-lo)*step;const g=el('g',{id:'r'+i,class:'residue',tabindex:i===0?'0':'-1',role:'button','aria-label':`${r.res} ${shown(r)}, ${names[r.ss]}`});g.append(el('rect',{x:x-8,y:y+17,width:16,height:27,rx:4,fill:domainShade(r)}),el('text',{x,y:y+36,'text-anchor':'middle','font-family':'monospace','font-size':seqFont,fill:'#142d44'},aa[r.res]||'X'),el('title',{},`${r.res} ${shown(r)} · ${names[r.ss]}`));g.addEventListener('click',()=>inspect(i));g.addEventListener('focus',()=>inspect(i));g.addEventListener('keydown',e=>{if(['ArrowRight','ArrowLeft','Enter',' '].includes(e.key)){e.preventDefault();inspect(Math.max(0,Math.min(count-1,i+(e.key==='ArrowRight'?1:e.key==='ArrowLeft'?-1:0))),true)}});svg.append(g);if($('numbers').checked&&(i===lo||i===hi-1||(shown(r)%10===0&&i-lo>2&&hi-1-i>2)))svg.append(el('text',{x,y:y+65,'text-anchor':'middle','font-family':'Arial','font-size':labelFont,fill:'#607589'},shown(r)))}}
 $('canvas').replaceChildren(svg);updateExportSize();$('detail').textContent='Select a residue to inspect its position and structure. Use left and right arrow keys to move along the sequence.'}
 function updateExportSize(){const svg=$('canvas').querySelector('svg'),inches=Number($('svgWidth').value),valid=svg&&Number.isFinite(inches)&&inches>=1&&inches<=100;$('svgHeight').textContent=valid?`× ${(inches*svg.viewBox.baseVal.height/svg.viewBox.baseVal.width).toFixed(2)} in tall`:'';if(valid){svg.setAttribute('width',inches+'in');svg.setAttribute('height',(inches*svg.viewBox.baseVal.height/svg.viewBox.baseVal.width).toFixed(4)+'in')}}
 function syncSizeControls(){const inches=Number($('svgWidth').value);if(!Number.isFinite(inches)||inches<1||inches>100){updateExportSize();return}const next=inches/10,ratio=next/sizeScale;for(const [id,low,high] of [['spacing',18,32],['rowSpace',95,165]]){const input=$(id),value=Number(input.value)*ratio;input.min=low*next;input.max=high*next;input.step='any';input.value=value;$(id+'Value').textContent=Number(value.toFixed(2))}for(const id of ['fontSize','labelFont'])$(id).value=Number((Number($(id).value)*ratio).toFixed(2));sizeScale=next;refreshPicture()}
 $('svgWidth').addEventListener('input',syncSizeControls);
+// Background behind each letter in its domain color (domains come from the topology section).
+function domainShade(r){if(!$('domainShade').checked||!window.topoDomainColor)return'transparent';const c=window.topoDomainColor(r.chain,r.n);if(!c)return'transparent';const h=[1,3,5].map(i=>parseInt(c.slice(i,i+2),16));return'#'+h.map(v=>Math.round(v+(255-v)*0.55).toString(16).padStart(2,'0')).join('')}
+$('domainShade').addEventListener('input',()=>refreshPicture());
 function refreshPicture(){const i=selected;render();if(i>=0&&i<current.length)inspect(i)}
 for(const id of ['figureTitle','alphaColor','helix310Color','strandColor','loopColor','fontSize','spacing','rowSpace','numbers','elementNames','labelFont'])$(id).addEventListener('input',()=>{if($(id+'Value'))$(id+'Value').textContent=Number(Number($(id).value).toFixed(2));refreshPicture()});
 const DEFAULTS={svgWidth:5,figureTitle:'Secondary structure',alphaColor:'#2e8b57',helix310Color:'#8cc084',strandColor:'#2f6db5',loopColor:'#8293a4',fontSize:8,labelFont:6,spacing:18,rowSpace:112};
@@ -508,7 +564,7 @@ function saveHistory(){history.push(all.map(r=>r.ss));$('undoEdit').disabled=fal
 $('applyRange').onclick=()=>{const start=Number($('rangeStart').value),end=Number($('rangeEnd').value);if(!$('rangeStart').value||!$('rangeEnd').value||!Number.isInteger(start)||!Number.isInteger(end)||start>end||!current.some(r=>shown(r)===start)||!current.some(r=>shown(r)===end)){$('message').textContent='Choose valid start and end residues in the current chain.';return}saveHistory();current.filter(r=>shown(r)>=start&&shown(r)<=end).forEach(r=>r.ss=$('assignment').value);$('message').textContent='';render();$('rangeStart').value=start;$('rangeEnd').value=end};
 $('undoEdit').onclick=()=>{const previous=history.pop();if(!previous)return;all.forEach((r,i)=>r.ss=previous[i]);$('undoEdit').disabled=!history.length;render()};
 $('restoreAssignments').onclick=()=>{if(!all.some(r=>r.ss!==r.originalSS))return;saveHistory();all.forEach(r=>r.ss=r.originalSS);render()};
-$('chain').onchange=()=>{$('rangeStart').value='';$('rangeEnd').value='';render()};$('wrap').onchange=render;$('reset').onclick=()=>{all=[];numberShift={};showSource('');current=[];history=[];selected=-1;pendingText='';$('paste').value='';$('chain').replaceChildren();$('source').textContent='';$('message').textContent='';$('run').disabled=true;$('undoEdit').disabled=true;$('editStatus').textContent='No structure overrides.';render()};$('run').onclick=()=>load(pendingText);$('load').onclick=()=>load($('paste').value);
+$('chain').onchange=()=>{$('rangeStart').value='';$('rangeEnd').value='';render()};$('wrap').onchange=render;$('reset').onclick=()=>{all=[];numberShift={};showSource('');current=[];history=[];selected=-1;pendingText='';$('chain').replaceChildren();$('source').textContent='';$('message').textContent='';$('run').disabled=true;$('undoEdit').disabled=true;$('editStatus').textContent='No structure overrides.';render()};$('run').onclick=()=>load(pendingText);
 $('file').onchange=async e=>{const f=e.target.files[0];if(!f)return;if(f.size>25e6){$('message').textContent='Please use a file smaller than 25 MB.';return}try{pendingText=await f.text();$('source').textContent=f.name+' — ready to run';$('run').disabled=false;$('message').textContent='' }catch{$('message').textContent='Could not read this file.'}e.target.value=''};
 function syncNumbering(){const shift=numberShift[$('chain').value]||0;if(document.activeElement!==$('firstNumber'))$('firstNumber').value=current.length?shown(current[0]):'';$('resetNumbering').disabled=!shift;$('numberingNote').hidden=!shift;$('numberingNote').textContent=shift?`Renumbered: file residue ${current[0].n} is shown as ${shown(current[0])} (${shift>0?'+':''}${shift}). Range edits and Find use the new numbers. Your file is unchanged.`:''}
 $('firstNumber').addEventListener('input',()=>{const v=$('firstNumber').value;if(!current.length||v===''||!Number.isInteger(Number(v)))return;numberShift[$('chain').value]=Number(v)-current[0].n;$('rangeStart').value='';$('rangeEnd').value='';refreshPicture()});
@@ -542,7 +598,6 @@ render();
     // Extend PDF for notes. Source: NaimaSharaf/PDFnotesextend (app.js)
     (() => {
       const POINTS_PER_INCH = 72;
-      const EXTENSION_INCHES = 3;
       const q = (id) => document.getElementById(id);
       const dropZone = q('pdf-drop'), fileInput = q('pdf-input'), fileCard = q('pdf-file');
       const fileName = q('pdf-file-name'), fileMeta = q('pdf-file-meta');
@@ -550,6 +605,30 @@ render();
       const progressArea = q('pdf-progress'), progressLabel = q('pdf-progress-label');
       const progressValue = q('pdf-progress-value'), progressBar = q('pdf-bar'), message = q('pdf-message');
       let selectedFile = null;
+
+      // ---------- settings ----------
+      const place = q('pdf-place'), heightSel = q('pdf-height'), heightCustom = q('pdf-heightCustom'), extIn = q('pdf-ext');
+      function updateHints() {
+        const p = place.value, inches = Number(extIn.value) || 0, vertical = p === 'top' || p === 'bottom';
+        q('pdf-extHint').textContent = `Blank space added ${({ right: 'on the right', left: 'on the left', both: 'split between left and right', bottom: 'below the content', top: 'above the content' })[p]}`;
+        q('pdf-placeHint').textContent = ({ right: 'Original content stays at the left', left: 'Original content stays at the right', both: 'Original content stays centred', bottom: 'Original content stays at the top', top: 'Original content stays at the bottom' })[p];
+        heightSel.disabled = heightCustom.disabled = vertical;
+        heightCustom.hidden = heightSel.value !== 'custom';
+        q('pdf-heightHint').textContent = vertical ? `Grows by ${inches.toFixed(2)} in from the extension` : heightSel.value === 'same' ? 'Preserved from source' : 'Content stays at the top; shorter pages shrink the content to fit';
+      }
+      for (const c of [place, heightSel, heightCustom, extIn]) c.addEventListener('input', updateHints);
+      updateHints();
+      function readSettings() {
+        const inches = Number(extIn.value), vertical = place.value === 'top' || place.value === 'bottom';
+        if (!(inches >= 0 && inches <= 30)) { showMessage('Enter an extension between 0 and 30 inches.'); extIn.focus(); return null; }
+        let height = null;
+        if (!vertical && heightSel.value !== 'same') {
+          height = heightSel.value === 'custom' ? Number(heightCustom.value) : Number(heightSel.value);
+          if (!(height >= 1 && height <= 100)) { showMessage('Enter a page height between 1 and 100 inches.'); heightCustom.focus(); return null; }
+        }
+        if (inches === 0 && !height) { showMessage('Set an extension above 0 or choose a page height.'); extIn.focus(); return null; }
+        return { inches, place: place.value, height };
+      }
 
       function showMessage(text, type = 'error') {
         message.textContent = text;
@@ -598,10 +677,32 @@ render();
         try {
           const sourcePdf = await PDFLib.PDFDocument.load(await selectedFile.arrayBuffer());
           const pages = sourcePdf.getPages();
-          const extensionPoints = EXTENSION_INCHES * POINTS_PER_INCH;
+          const opt = readSettings();
+          if (!opt) { resetProgress(); extendButton.disabled = false; return; }
+          const ext = opt.inches * POINTS_PER_INCH, { PDFName, PDFDict, PDFArray } = PDFLib;
           pages.forEach((page, index) => {
-            const { width, height } = page.getSize();
-            page.setSize(width + extensionPoints, height);
+            const box = page.getMediaBox(), w = box.width, h = box.height;
+            let newW = w, newH = h, dx = 0, dy = 0, scale = 1;
+            if (opt.place === 'top' || opt.place === 'bottom') { newH = h + ext; if (opt.place === 'bottom') dy = ext; }
+            else {
+              const H = opt.height ? opt.height * POINTS_PER_INCH : h;
+              if (H < h) scale = H / h;  // shorter page: shrink the content to fit instead of cutting it
+              newH = H; dy = H - h * scale;  // content stays at the top; extra height goes below it
+              newW = w * scale + ext; dx = opt.place === 'left' ? ext : opt.place === 'both' ? ext / 2 : 0;
+            }
+            if (scale !== 1) page.scaleContent(scale, scale);
+            if (dx || dy) page.translateContent(dx, dy);
+            page.setMediaBox(box.x, box.y, newW, newH);
+            page.setCropBox(box.x, box.y, newW, newH);
+            // Keep links and other annotations over the content they belong to.
+            try {
+              const annots = page.node.Annots();
+              if (annots && (dx || dy || scale !== 1)) for (let a = 0; a < annots.size(); a++) {
+                const dict = annots.lookup(a, PDFDict), rect = dict.lookupMaybe(PDFName.of('Rect'), PDFArray); if (!rect) continue;
+                const v = rect.asArray().map((n) => n.asNumber());
+                dict.set(PDFName.of('Rect'), sourcePdf.context.obj([v[0] * scale + dx, v[1] * scale + dy, v[2] * scale + dx, v[3] * scale + dy]));
+              }
+            } catch (err) { /* annotations stay where they were */ }
             setProgress(Math.max(10, Math.round(((index + 1) / pages.length) * 90)), `Extending page ${index + 1} of ${pages.length}`);
           });
           const outputBytes = await sourcePdf.save();
@@ -869,12 +970,24 @@ render();
         const geo = els.map((e) => ({ e, p: pos.get(e.uid), ...ends(e, pos.get(e.uid)), x: pos.get(e.uid).x, hw: HW[e.type] }));
         const defs = el('defs'), connectors = el('g', { fill: 'none', stroke: '#1f2a33', 'stroke-width': 1.6, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }), shapes = el('g'), labels = el('g');
         const pts = [];
+        // Loops: the residues between two drawn elements (and the two termini) can be selected like elements.
+        state.loops = new Map();
+        const ca = state.ca[$('topo-chain').value] || [], seqStart = ca[0]?.n ?? geo[0].e.start, seqEnd = ca.at(-1)?.n ?? geo.at(-1).e.end;
+        const loopGroup = (start, end, label, shapesOf) => {
+          const g = el('g');
+          if (end < start) { shapesOf(g, false); connectors.append(g); return; }
+          const id = `L${start}-${end}`; state.loops.set(id, { uid: id, start, end, label, loop: true });
+          g.setAttribute('class', 'topo-loop' + (state.sel === id ? ' selected' : '')); g.setAttribute('data-uid', id); g.setAttribute('tabindex', '0'); g.setAttribute('role', 'button');
+          g.setAttribute('aria-label', `${label}, residues ${start} to ${end}`); g.append(el('title', {}, `${label} · residues ${start}–${end}`));
+          shapesOf(g, true); connectors.append(g);
+        };
+        const poly = (path) => (g, hit) => { g.append(el('polyline', { points: path.map((q) => q.join(',')).join(' '), class: 'topo-vis' })); if (hit) g.append(el('polyline', { points: path.map((q) => q.join(',')).join(' '), class: 'topo-hit', stroke: 'transparent', 'stroke-width': 12 })); };
         geo.forEach((k, i) => {
-          if (i) { const path = route(geo[i - 1].exit, k.entry, (i % 4) * 5, geo); pts.push(...path); connectors.append(el('polyline', { points: path.map((q) => q.join(',')).join(' ') })); }
+          if (i) { const prev = geo[i - 1], path = route(prev.exit, k.entry, (i % 4) * 5, geo); pts.push(...path); loopGroup(prev.e.end + 1, k.e.start - 1, `Loop ${prev.e.label}–${k.e.label}`, poly(path)); }
         });
         // N and C termini
-        const term = (pt, text) => { const out = pt.side === 'top' ? -1 : 1, y = pt.y + out * 24; connectors.append(el('line', { x1: pt.x, y1: pt.y, x2: pt.x, y2: y - out * 8 })); const g = el('g'); g.append(el('rect', { x: pt.x - 8, y: y - 8, width: 16, height: 16, fill: '#ffffff', stroke: '#1f2a33', 'stroke-width': 1 }), el('text', { x: pt.x, y: y + 4.5, 'text-anchor': 'middle', 'font-family': 'Arial, Helvetica, sans-serif', 'font-size': 12, fill: '#1f2a33' }, text)); labels.append(g); pts.push([pt.x - 8, y - 8], [pt.x + 8, y + 8]); };
-        term(geo[0].entry, 'N'); term(geo.at(-1).exit, 'C');
+        const term = (pt, text, start, end) => { const out = pt.side === 'top' ? -1 : 1, y = pt.y + out * 24; loopGroup(start, end, text === 'N' ? 'N-terminal segment' : 'C-terminal segment', poly([[pt.x, pt.y], [pt.x, y - out * 8]])); const g = el('g'); g.append(el('rect', { x: pt.x - 8, y: y - 8, width: 16, height: 16, fill: '#ffffff', stroke: '#1f2a33', 'stroke-width': 1 }), el('text', { x: pt.x, y: y + 4.5, 'text-anchor': 'middle', 'font-family': 'Arial, Helvetica, sans-serif', 'font-size': 12, fill: '#1f2a33' }, text)); labels.append(g); pts.push([pt.x - 8, y - 8], [pt.x + 8, y + 8]); };
+        term(geo[0].entry, 'N', seqStart, geo[0].e.start - 1); term(geo.at(-1).exit, 'C', geo.at(-1).e.end + 1, seqEnd);
         for (const k of geo) { pts.push([k.x - 18, k.top - 8], [k.x + 18, k.bottom + 8]); }
         const minX = Math.min(...pts.map((q) => q[0])) - 24, maxX = Math.max(...pts.map((q) => q[0])) + 24, minY = Math.min(...pts.map((q) => q[1])) - 24 - ($('topo-title').value ? 30 : 0), maxY = Math.max(...pts.map((q) => q[1])) + 24;
         const vb = state.frozenBox || [minX, minY, maxX - minX, maxY - minY];
@@ -899,20 +1012,33 @@ render();
         $('topo-stats').textContent = `${pl(counts.H, 'α-helix', 'α-helices')}${counts.G ? ` · ${pl(counts.G, '3₁₀ helix', '3₁₀ helices')} (η)` : ''}${counts.I ? ` · ${pl(counts.I, 'π-helix', 'π-helices')}` : ''} · ${pl(counts.E, 'β-strand', 'β-strands')}${sheets.size ? ` in ${sheets.size} sheet${sheets.size > 1 ? 's' : ''}` : ''}`;
         showSelection();
         style3D();
+        syncSequence();
       }
 
       // ---------- interaction ----------
+      // The current selection: a drawn element or a loop.
+      function selected() { if (!state.sel) return null; if (state.loops?.has(state.sel)) return state.loops.get(state.sel); const e = chainElements().find((x) => x.uid === state.sel); return e && !state.hidden.has(e.uid) ? e : null; }
       function showSelection() {
-        const e = chainElements().find((x) => x.uid === state.sel), bar = $('topo-sel');
-        if (!e || state.hidden.has(e.uid)) { bar.hidden = true; return; }
-        bar.hidden = false; $('topo-selText').textContent = `${e.label} · residues ${e.start}–${e.end} · ${e.type === 'E' ? `strand, ${e.fileId}` : e.type === 'G' ? '3₁₀ helix' : e.type === 'I' ? 'π-helix' : 'α-helix'}`;
+        const e = selected(), bar = $('topo-sel');
+        bar.hidden = !state.all.length;
+        const none = !e;
+        for (const id of ['topo-selDomainWrap', 'topo-unselect']) $(id).hidden = none;
+        if (none) { $('topo-flip').hidden = $('topo-hide').hidden = true; $('topo-selText').textContent = 'Click a helix, strand or loop to select it.'; bar.classList.add('idle'); return; }
+        bar.classList.remove('idle');
+        $('topo-flip').hidden = $('topo-hide').hidden = !!e.loop;
+        const dsel = $('topo-selDomain'), mid = (e.start + e.end) / 2, cur = domains.findIndex((d) => d.ranges.some(([a, b]) => mid >= a && mid <= b));
+        dsel.replaceChildren(...domains.map((d, i) => new Option(d.name || `Domain ${i + 1}`, i)), new Option('New domain', 'new'));
+        if (cur < 0) dsel.prepend(new Option('No domain', '', true, true)); else dsel.value = String(cur);
+        bar.hidden = false; $('topo-selText').textContent = e.loop ? `${e.label} · residues ${e.start}–${e.end}` : `${e.label} · residues ${e.start}–${e.end} · ${e.type === 'E' ? `strand, ${e.fileId}` : e.type === 'G' ? '3₁₀ helix' : e.type === 'I' ? 'π-helix' : 'α-helix'}`;
       }
-      function select(uid) { state.sel = uid; queueMicrotask(() => style3D()); document.querySelectorAll('#topo-canvas .topo-el').forEach((g) => g.classList.toggle('selected', g.dataset.uid === uid)); showSelection(); }
+      function select(uid) { state.sel = uid; queueMicrotask(() => style3D()); document.querySelectorAll('#topo-canvas .topo-el, #topo-canvas .topo-loop').forEach((g) => g.classList.toggle('selected', g.dataset.uid === uid)); showSelection(); }
       function setManual(uid, patch) { const cur = state.lastLayout.get(uid); state.manual.set(uid, { ...(state.manual.get(uid) || {}), x: cur.x, y: cur.y, dir: cur.dir, ...patch }); }
       function flip(uid) { const p = state.lastLayout.get(uid); if (!p) return; setManual(uid, { dir: p.dir === 'up' ? 'down' : 'up' }); render(); focusEl(uid); }
       function focusEl(uid) { document.querySelector(`#topo-canvas .topo-el[data-uid="${uid}"]`)?.focus({ preventScroll: true }); }
       const canvas = $('topo-canvas');
       canvas.addEventListener('pointerdown', (ev) => {
+        const loopEl = ev.target.closest('.topo-loop');
+        if (loopEl) { ev.preventDefault(); const id = loopEl.dataset.uid; if (state.sel === id) { loopEl.blur(); select(null); } else { select(id); loopEl.focus({ preventScroll: true }); } return; }
         const g = ev.target.closest('.topo-el');
         if (!g) { if (state.sel) { document.activeElement?.blur(); select(null); } return; }  // click on empty space: unselect
         ev.preventDefault(); const uid = g.dataset.uid, svg = canvas.querySelector('svg'), wasSelected = state.sel === uid; select(uid);
@@ -928,8 +1054,9 @@ render();
         window.addEventListener('pointermove', move); window.addEventListener('pointerup', up);
       });
       canvas.addEventListener('dblclick', (ev) => { const g = ev.target.closest('.topo-el'); if (g) flip(g.dataset.uid); });
-      canvas.addEventListener('focusin', (ev) => { const g = ev.target.closest('.topo-el'); if (g && state.sel !== g.dataset.uid) select(g.dataset.uid); });
+      canvas.addEventListener('focusin', (ev) => { const g = ev.target.closest('.topo-el, .topo-loop'); if (g && state.sel !== g.dataset.uid) select(g.dataset.uid); });
       canvas.addEventListener('keydown', (ev) => {
+        const lp = ev.target.closest('.topo-loop'); if (lp && ev.key === 'Escape') { ev.preventDefault(); lp.blur(); select(null); return; }
         const g = ev.target.closest('.topo-el'); if (!g) return; const uid = g.dataset.uid, p = state.lastLayout.get(uid), step = ev.shiftKey ? 16 : 4;
         const d = { ArrowLeft: [-step, 0], ArrowRight: [step, 0], ArrowUp: [0, -step], ArrowDown: [0, step] }[ev.key];
         if (d) { ev.preventDefault(); setManual(uid, { x: p.x + d[0], y: p.y + d[1] }); render(); focusEl(uid); }
@@ -937,12 +1064,70 @@ render();
         else if (ev.key === 'Delete' || ev.key === 'Backspace') { ev.preventDefault(); hide(uid); }
         else if (ev.key === 'Escape') { ev.preventDefault(); g.blur(); select(null); }
       });
+      // Put the selected element's whole residue range into one domain, taking it out of the others.
+      function subtractRange(ranges, s, e) { const out = []; for (const [a, b] of ranges) { if (b < s || a > e) out.push([a, b]); else { if (a < s) out.push([a, s - 1]); if (b > e) out.push([e + 1, b]); } } return out; }
+      function mergeRanges(ranges) { const r = [...ranges].sort((x, y) => x[0] - y[0]), out = []; for (const [a, b] of r) { const l = out.at(-1); if (l && a <= l[1] + 1) l[1] = Math.max(l[1], b); else out.push([a, b]); } return out; }
+      $('topo-selDomain').onchange = () => {
+        const e = selected(), v = $('topo-selDomain').value; if (!e || v === '') return;
+        for (const d of domains) d.ranges = subtractRange(d.ranges, e.start, e.end);
+        let target;
+        if (v === 'new') { target = { name: `Domain ${domains.length + 1}`, ranges: [], color: PALETTE[domains.length % PALETTE.length] }; domains.push(target); }
+        else target = domains[Number(v)];
+        target.ranges = mergeRanges([...target.ranges, [e.start, e.end]]);
+        domains = domains.filter((d) => d.ranges.length || d === target);
+        renderDomains(); render();
+        $('topo-domainNote').textContent = `${e.label} (residues ${e.start}–${e.end}) is now in ${target.name}.`;
+      };
       function hide(uid) { state.hidden.add(uid); state.sel = null; render(); }
       $('topo-flip').onclick = () => state.sel && flip(state.sel);
       $('topo-hide').onclick = () => state.sel && hide(state.sel);
       $('topo-unselect').onclick = () => select(null);
       $('topo-showAll').onclick = () => { state.hidden.clear(); render(); };
       $('topo-reset').onclick = () => { state.manual.clear(); state.hidden.clear(); render(); };
+      // Jiggle: keep the order and rough placement you chose, but line elements up in rows,
+      // space them evenly, and remove overlaps.
+      function jiggle() {
+        const pos = state.lastLayout; if (!pos) return;
+        const els = chainElements().filter((e) => !state.hidden.has(e.uid) && pos.has(e.uid));
+        const P = new Map(els.map((e) => [e.uid, { ...pos.get(e.uid) }]));
+        const half = (e) => lengthOf(e) / 2, hw = (e) => (e.type === 'E' ? 17 : HW[e.type]);
+        const strandYs = els.filter((e) => e.type === 'E').map((e) => P.get(e.uid).y).sort((a, b) => a - b);
+        const sheetY = strandYs.length ? strandYs[Math.floor(strandYs.length / 2)] : 0;
+        // Anchor: strands by their centre, helices by the end that faces the sheet.
+        const anchor = (e) => { const p = P.get(e.uid); return e.type === 'E' ? p.y : p.y < sheetY ? p.y + half(e) : p.y - half(e); };
+        // 1. Group into rows by anchor height and line each row up on its median.
+        const rows = [];
+        for (const group of [els.filter((e) => e.type === 'E'), els.filter((e) => e.type !== 'E')]) {
+          const sorted = group.map((e) => ({ e, a: anchor(e) })).sort((x, y) => x.a - y.a); let r = null;
+          for (const item of sorted) { if (r && item.a - r.at(-1).a <= 30) r.push(item); else rows.push(r = [item]); }
+        }
+        for (const r of rows) { const med = r.map((x) => x.a).sort((a, b) => a - b)[Math.floor(r.length / 2)]; for (const { e } of r) { const p = P.get(e.uid), top = p.y < sheetY; p.y = e.type === 'E' ? med : top ? med - half(e) : med + half(e); } }
+        // 2. Even spacing inside each row, keeping left-to-right order.
+        for (const r of rows) {
+          const list = r.map((x) => x.e).sort((a, b) => P.get(a.uid).x - P.get(b.uid).x); if (list.length < 2) continue;
+          const center = list.reduce((s, e) => s + P.get(e.uid).x, 0) / list.length;
+          for (let i = 1; i < list.length; i++) {
+            const a = list[i - 1], b = list[i], pa = P.get(a.uid), pb = P.get(b.uid), gap = pb.x - pa.x;
+            const tight = a.type === 'E' && b.type === 'E' ? SP : hw(a) + hw(b) + 14;
+            pb.x = pa.x + (gap < tight * 1.6 ? tight : Math.max(tight, Math.round(gap / 10) * 10));
+          }
+          const shift = center - list.reduce((s, e) => s + P.get(e.uid).x, 0) / list.length;
+          for (const e of list) P.get(e.uid).x += shift;
+        }
+        // 3. Remove any remaining overlaps between rows by nudging sideways.
+        for (let it = 0; it < 60; it++) {
+          let moved = false;
+          for (let i = 0; i < els.length; i++) for (let j = i + 1; j < els.length; j++) {
+            const a = els[i], b = els[j], pa = P.get(a.uid), pb = P.get(b.uid);
+            const ox = hw(a) + hw(b) + 10 - Math.abs(pa.x - pb.x), oy = half(a) + half(b) + 8 - Math.abs(pa.y - pb.y);
+            if (ox > 0 && oy > 0) { const d = (pa.x <= pb.x ? 1 : -1) * (ox / 2 + 1); pa.x -= d; pb.x += d; moved = true; }
+          }
+          if (!moved) break;
+        }
+        for (const [uid, p] of P) state.manual.set(uid, { x: Math.round(p.x / 2) * 2, y: Math.round(p.y / 2) * 2, dir: p.dir });
+        render();
+      }
+      $('topo-jiggle').onclick = jiggle;
 
       // ---------- domains from coordinates ----------
       // Cα contact map (8 Å), then repeated two-way splits that minimize the normalized cut
@@ -1063,6 +1248,7 @@ render();
       function residueColor(resi) {
         const e = chainElements().find((x) => resi >= x.start && resi <= x.end && !state.hidden.has(x.uid));
         if (e && e.uid === state.sel) return '#e8590c';
+        const lp = state.loops?.get(state.sel); if (lp && resi >= lp.start && resi <= lp.end) return '#e8590c';
         const d = domains.find((d) => d.ranges.some(([a, b]) => resi >= a && resi <= b)), base = d ? d.color : '#9aa5b1';
         return !e ? mix(base, '#c9d1d9', 0.55) : e.type === 'E' ? mix(base, '#ffffff', 0.42) : base;
       }
@@ -1093,9 +1279,12 @@ render();
         if (!state.atoms[chain]?.length) return;
         $('topo-3dShow').disabled = true; $('topo-3dNote').textContent = 'Loading the 3D viewer…';
         try { await loadLib(); } catch (err) { $('topo-3dNote').textContent = err.message; $('topo-3dShow').disabled = false; return; }
-        box.hidden = false;
+        $('topo-3dEmpty').hidden = true; v3.shown = true;
         if (!v3.viewer) {
-          try { v3.viewer = $3Dmol.createViewer(box, { backgroundColor: 'white', antialias: true }); } catch (err) { $('topo-3dNote').textContent = 'This browser cannot show 3D graphics (WebGL is unavailable).'; box.hidden = true; return; }
+          try { v3.viewer = $3Dmol.createViewer(box, { backgroundColor: 'white', antialias: true }); } catch (err) { $('topo-3dNote').textContent = 'This browser cannot show 3D graphics (WebGL is unavailable).'; $('topo-3dEmpty').hidden = false; v3.shown = false; return; }
+          // Runs after 3Dmol's own mousedown handler: treat the right button like the middle button (translate).
+          box.addEventListener('mousedown', (ev) => { if (ev.button === 2) v3.viewer.mouseButton = 2; });
+          box.addEventListener('contextmenu', (ev) => ev.preventDefault());
         }
         const viewer = v3.viewer; viewer.clear();
         viewer.addModel(pdbText(chain), 'pdb');
@@ -1105,14 +1294,14 @@ render();
         for (const id of ['topo-3dCenter', 'topo-3dReset', 'topo-3dPng', 'topo-3dSpinWrap', 'topo-3dLabelsWrap']) $(id).hidden = false;
         $('topo-3dShow').textContent = 'Reload 3D'; $('topo-3dShow').disabled = false;
         const caOnly = v3.caOnly;
-        $('topo-3dNote').textContent = `Chain ${chain} · ${state.atoms[chain].length.toLocaleString()} atoms · cartoon colored by domain (helices in the domain color, strands lighter, loops grey-tinted, selection orange). Drag to rotate, scroll to zoom, click a helix or strand to select it in the diagram.${caOnly ? ' This file has only Cα atoms, so the chain is drawn as a tube instead of a cartoon.' : ''}`;
+        $('topo-3dNote').textContent = `Chain ${chain} · ${state.atoms[chain].length.toLocaleString()} atoms${caOnly ? ' (Cα only, drawn as a tube)' : ''} · left-drag rotates · right-drag moves · scroll zooms · click a helix or strand to select it`;
       }
       function update3DAvailability() {
         const chain = $('topo-chain').value, has = !!state.atoms[chain]?.length;
         $('topo-3dShow').disabled = !has;
-        if (!has) { $('topo-3d').hidden = true; for (const id of ['topo-3dCenter', 'topo-3dReset', 'topo-3dPng', 'topo-3dSpinWrap', 'topo-3dLabelsWrap']) $(id).hidden = true; $('topo-3dShow').textContent = 'Show 3D structure'; $('topo-3dNote').textContent = state.all.length ? 'This file has no atom coordinates for this chain, so there is nothing to show in 3D.' : 'Open a CIF file with atom coordinates to view the chain in 3D, colored like the diagram.'; return; }
-        if (v3.viewer && !$('topo-3d').hidden && v3.chain !== chain) show3D();
-        else if ($('topo-3d').hidden) $('topo-3dNote').textContent = 'Show the chain as a 3D cartoon colored like the diagram. The viewer (3Dmol.js) loads when you click.';
+        if (!has) { v3.shown = false; if (v3.viewer) { v3.viewer.clear(); v3.viewer.render(); } $('topo-3dEmpty').hidden = false; $('topo-3dEmpty').textContent = state.all.length ? 'No atom coordinates for this chain.' : 'The 3D structure appears here.'; for (const id of ['topo-3dCenter', 'topo-3dReset', 'topo-3dPng', 'topo-3dSpinWrap', 'topo-3dLabelsWrap']) $(id).hidden = true; $('topo-3dShow').textContent = 'Show 3D structure'; $('topo-3dNote').textContent = state.all.length ? 'This file has no atom coordinates for this chain, so there is nothing to show in 3D.' : 'Open a CIF file with atom coordinates to view the chain in 3D, colored like the diagram.'; return; }
+        // Side by side with the diagram, so open the 3D view as soon as there are coordinates.
+        if (!v3.shown || v3.chain !== chain) show3D();
       }
       $('topo-3dShow').onclick = show3D;
       $('topo-3dReset').onclick = () => { v3.viewer?.zoomTo(); v3.viewer?.render(); };
@@ -1125,19 +1314,20 @@ render();
       function load(text, name) {
         state.notes = []; state.manual.clear(); state.hidden.clear(); state.sel = null; v3.chain = null; state.atoms = {};
         try {
-          if (!/^\s*(?:#.*\r?\n\s*)?data_/im.test(text)) throw Error('This is not a CIF file. Open a .cif or .mmcif file with secondary-structure annotations.');
+          if (!/^\s*(?:#.*\r?\n\s*)?data_/im.test(text)) throw Error('This is not a CIF file. Process your structure at pdb-redo.eu/dssp and open the .cif file it returns.');
           const cats = readCif(text); state.orders = {}; state.ca = cats._ca || {}; state.atoms = state.ca._atoms || {}; delete state.ca._atoms;
           for (const o of cats._struct_sheet_order || []) (state.orders[o.sheet_id] ??= []).push({ a: o.range_id_1, b: o.range_id_2, parallel: /^par/i.test(o.sense || '') });
           state.all = elementsFrom(cats);
-          if (!state.all.length) throw Error('No helices or strands found. Use a CIF with _struct_conf / _struct_sheet_range or DSSP annotations.');
+          if (!state.all.length) throw Error('No helices or strands found in this file. Process it with DSSP at pdb-redo.eu/dssp first, then open the CIF file it returns.');
           const chains = [...new Set(state.all.map((e) => e.chain))]; $('topo-chain').replaceChildren(...chains.map((c) => { const o = document.createElement('option'); o.value = o.textContent = c; return o; }));
           $('topo-source').textContent = name ? `${name} · label residue numbering` : 'Label residue numbering';
           coordDomains(false); render(); update3DAvailability();
+          window.load?.(text); syncChain();  // the sequence view reads the same file
           message(state.notes.join(' '));
         } catch (err) { state.all = []; render(); update3DAvailability(); message(err.message); }
       }
       $('topo-file').addEventListener('change', async () => { const f = $('topo-file').files[0]; if (!f) return; if (f.size > 25e6) { message('Files up to 25 MB are supported.'); return; } load(await f.text(), f.name); });
-      $('topo-chain').onchange = () => { state.manual.clear(); state.hidden.clear(); state.sel = null; state.notes = []; coordDomains(false); render(); update3DAvailability(); message(state.notes.join(' ')); };
+      $('topo-chain').onchange = () => { state.manual.clear(); state.hidden.clear(); state.sel = null; state.notes = []; coordDomains(false); render(); update3DAvailability(); syncChain(); message(state.notes.join(' ')); };
       for (const id of ['topo-minHelix', 'topo-minStrand']) $(id).addEventListener('input', () => { state.manual.clear(); render(); });
       for (const id of ['topo-font', 'topo-width', 'topo-title']) $(id).addEventListener('input', render);
       $('topo-export').onclick = () => {
@@ -1145,10 +1335,54 @@ render();
         const inches = Number($('topo-width').value); if (!(inches >= 1 && inches <= 100)) { message('Enter a width between 1 and 100 inches.'); $('topo-width').focus(); return; }
         const copy = svg.cloneNode(true), vb = copy.viewBox.baseVal;
         copy.setAttribute('width', inches + 'in'); copy.setAttribute('height', (inches * vb.height / vb.width).toFixed(4) + 'in');
-        copy.querySelectorAll('.topo-el').forEach((g) => { g.removeAttribute('tabindex'); g.removeAttribute('role'); g.removeAttribute('class'); g.removeAttribute('data-uid'); });
+        copy.querySelectorAll('.topo-hit').forEach((h) => h.remove());
+        copy.querySelectorAll('.topo-el, .topo-loop').forEach((g) => { g.removeAttribute('tabindex'); g.removeAttribute('role'); g.removeAttribute('class'); g.removeAttribute('data-uid'); });
         const url = URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(copy)], { type: 'image/svg+xml' }));
         const a = document.createElement('a'); a.href = url; a.download = `topology-chain-${$('topo-chain').value}.svg`; document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000);
       };
+      // Residues of each domain as one-letter sequences (FASTA). Uses the full sequence from the sequence view when available.
+      const ONE = { ALA: 'A', ARG: 'R', ASN: 'N', ASP: 'D', CYS: 'C', GLN: 'Q', GLU: 'E', GLY: 'G', HIS: 'H', ILE: 'I', LEU: 'L', LYS: 'K', MET: 'M', PHE: 'F', PRO: 'P', SER: 'S', THR: 'T', TRP: 'W', TYR: 'Y', VAL: 'V', MSE: 'M', SEC: 'U', PYL: 'O' };
+      function chainResidues() {
+        const chain = $('topo-chain').value, seen = new Map();
+        // `all` is the sequence view's residue list (shared global from that script).
+        for (const r of (typeof all !== 'undefined' ? all : [])) if (r.chain === chain && !seen.has(r.n)) seen.set(r.n, r.res);
+        if (!seen.size) for (const a of state.atoms[chain] || []) if (!seen.has(a.n)) seen.set(a.n, a.resn);
+        return [...seen].sort((a, b) => a[0] - b[0]).map(([n, res]) => ({ n, aa: ONE[String(res).toUpperCase()] || 'X' }));
+      }
+      function domainFasta() {
+        // One FASTA entry per continuous piece, so a domain split by an insertion gives one record per segment.
+        const chain = $('topo-chain').value, res = chainResidues(), used = new Set(), wrap = (t) => t.match(/.{1,60}/g)?.join('\n') || '', blocks = [];
+        if (!res.length) return '';
+        const pieces = (list) => { const out = []; for (const r of list) { const l = out.at(-1); if (l && r.n === l.at(-1).n + 1) l.push(r); else out.push([r]); } return out; };
+        const entries = (name, list) => { const ps = pieces(list); ps.forEach((p, k) => blocks.push(`>${name}${ps.length > 1 ? ` part ${k + 1} of ${ps.length}` : ''} | chain ${chain} | residues ${p[0].n}–${p.at(-1).n} | ${p.length} aa\n${wrap(p.map((r) => r.aa).join(''))}`)); };
+        for (const d of domains) {
+          const mine = res.filter((r) => d.ranges.some(([a, b]) => r.n >= a && r.n <= b)); mine.forEach((r) => used.add(r.n));
+          if (mine.length) entries(d.name, mine); else blocks.push(`>${d.name} | chain ${chain} | no residues`);
+        }
+        const rest = res.filter((r) => !used.has(r.n));
+        if (rest.length) entries('Not in a domain', rest);
+        return blocks.join('\n\n');
+      }
+      function updateSeqOut() {
+        const t = domainFasta(); $('topo-seqText').textContent = t || 'Open a CIF file to list the residues in each domain.';
+        $('topo-seqCopy').disabled = $('topo-seqFasta').disabled = !t;
+      }
+      $('topo-seqCopy').onclick = async () => { const b = $('topo-seqCopy'); try { await navigator.clipboard.writeText(domainFasta()); b.textContent = 'Copied'; } catch (e) { const r = document.createRange(); r.selectNodeContents($('topo-seqText')); const s = getSelection(); s.removeAllRanges(); s.addRange(r); b.textContent = 'Selected · press Ctrl/Cmd+C'; } setTimeout(() => b.textContent = 'Copy', 2000); };
+      $('topo-seqFasta').onclick = () => { const url = URL.createObjectURL(new Blob([domainFasta() + '\n'], { type: 'text/plain' })); const a = document.createElement('a'); a.href = url; a.download = `domains-chain-${$('topo-chain').value}.fasta`; document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000); };
+      window.topoDomainColor = (chain, n) => { if (chain !== $('topo-chain').value) return null; const d = domains.find((d) => d.ranges.some(([a, b]) => n >= a && n <= b)); return d ? d.color : null; };
+      let ssKey = '';
+      function syncSequence(force) {
+        // Re-draw the sequence view only when the chain or the domains change.
+        const key = JSON.stringify([$('topo-chain').value, domains]);
+        if (!force && key === ssKey) return;
+        ssKey = key; updateSeqOut();
+        if (typeof window.refreshPicture === 'function' && $('chain').value) window.refreshPicture();
+      }
+      function syncChain() {
+        const c = $('topo-chain').value, sel = $('chain');
+        if (c && [...sel.options].some((o) => o.value === c) && sel.value !== c) { sel.value = c; sel.onchange?.(); }
+        syncSequence(true);
+      }
       window.topoLoad = load; // used by the test page to preload a sample
       window.topoDebug = { pdbText, viewer: () => v3.viewer };
       render();
