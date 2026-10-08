@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="Sharaf Lab tools: a secondary structure viewer for DSSP-annotated CIF files and a PDF extender that adds space for notes."
+      content="Sharaf Lab tools: a secondary structure viewer for DSSP-annotated CIF files and a PDF extender that adds space for notes, and a protein topology diagram maker."
     />
     <title>Tools | Sharaf Lab</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -127,6 +127,51 @@
 .pdf-track span{display:block;height:100%;width:0;background:#0b6870;transition:width .2s}
 .pdf-message{margin-top:16px;padding:14px 18px;background:#fbeeee;color:#9a2f2f;border:1px solid #efcfcf}
 .pdf-message.success{background:#edf7f6;color:#0b5a60;border-color:#cfe7e4}
+.topo-tool{color:#102a33}
+.topo-bar{display:flex;flex-wrap:wrap;align-items:center;gap:12px 18px;margin-bottom:14px}
+.topo-bar label,.topo-domain label{display:inline-flex;align-items:center;gap:8px;font-size:14px;white-space:nowrap}
+.topo-tool input[type=number],.topo-tool input[type=text],.topo-tool select{font:inherit;padding:8px;border:1px solid #b8c8d5;border-radius:5px;background:#fff;color:#142d44}
+.topo-tool input[type=number]{width:76px}
+.topo-tool input[type=text]{width:200px}
+.topo-tool button,.topo-file{font:inherit;cursor:pointer;padding:9px 14px;border:1px solid #b8c8d5;border-radius:7px;background:#fff;color:#173650}
+.topo-tool button:hover,.topo-file:hover{background:#e7f7f5}
+.topo-tool button:disabled{opacity:.5;cursor:default}
+.topo-file{position:relative}
+.topo-file input{position:absolute;opacity:0;width:1px;height:1px}
+.topo-file:focus-within,.topo-tool button:focus-visible,.topo-tool input:focus-visible,.topo-tool select:focus-visible{outline:3px solid #0b6870;outline-offset:2px}
+.topo-tool .topo-primary{background:#0b6870;border-color:#0b6870;color:#fff;font-weight:600}
+.topo-tool .topo-primary:hover{background:#095a61}
+.topo-size{color:#6b7f83;font-size:13px}
+.topo-message{color:#9a2f2f;font-size:14px;min-height:20px}
+.topo-note{margin:0 0 12px;color:#586e73;font-size:14px}
+.topo-panel,.topo-domains-box{background:#fff;border:1px solid #d8e0e0;border-radius:12px;overflow:hidden;margin-bottom:16px}
+.topo-panel-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px 16px;padding:14px 20px;border-bottom:1px solid #e4ebeb}
+.topo-help{color:#6b7f83;font-size:13px}
+.topo-canvas{padding:16px;overflow:auto;min-height:120px;color:#586e73}
+.topo-canvas svg{display:block;width:100%;height:auto;max-height:720px;touch-action:none;user-select:none}
+.topo-el{cursor:grab}
+.topo-el:focus{outline:none}
+.topo-el.selected polygon,.topo-el.selected path,.topo-el.selected ellipse,.topo-el:focus-visible polygon,.topo-el:focus-visible path{stroke:#e8590c;stroke-width:2.4}
+.topo-sel{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;padding:12px 20px;background:#edf7f6;border-top:1px solid #e4ebeb;font-size:14px}
+.topo-sel span{flex:1;min-width:200px}
+.topo-sel[hidden],.topo-tool [hidden]{display:none}
+.topo-3d-controls{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px}
+.topo-3d-controls label{display:inline-flex;align-items:center;gap:6px;font-size:14px}
+.topo-3d-note{padding:12px 20px 0}
+.topo-3d{position:relative;height:460px;margin:12px 20px 20px;border:1px solid #e4ebeb;border-radius:8px;overflow:hidden;background:#fff}
+@media(max-width:600px){.topo-3d{height:340px;margin:12px}}
+.topo-domains-box .topo-note{padding:12px 20px 0}
+#topo-domains{display:flex;flex-direction:column;gap:10px;padding:8px 20px 18px}
+.topo-domain{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px}
+.topo-domain input[type=color]{width:38px;height:32px;border:0;padding:0;background:transparent}
+.topo-domain input[type=text]{width:150px}
+.topo-domain .topo-dranges{width:220px}
+.topo-domain input[aria-invalid=true]{border-color:#c0392b;background:#fdf1f0}
+.topo-finder{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;padding:14px 20px 0}
+.topo-finder label{display:inline-flex;align-items:center;gap:8px;font-size:14px}
+#topo-domainNote{color:#0b5a60}
+#topo-domainNote:empty{display:none}
+@media(max-width:600px){.topo-tool input[type=text]{width:100%}}
 @media(max-width:800px){.pdf-workspace{grid-template-columns:1fr}.tool-section{padding-top:70px;padding-bottom:76px}.tool-index{margin-top:-30px}}
     </style>
   </head>
@@ -163,6 +208,7 @@
       <nav class="tool-index" aria-label="Tools on this page">
         <a href="#secondary-structure"><span>01</span>Secondary structure viewer</a>
         <a href="#extend-pdf"><span>02</span>Extend PDF for notes</a>
+        <a href="#topology"><span>03</span>Topology diagram</a>
       </nav>
 
       <section class="tool-section" id="secondary-structure" aria-labelledby="ss-title">
@@ -249,6 +295,78 @@
           <div class="pdf-message" id="pdf-message" role="status" hidden></div>
         </div>
       </section>
+      <section class="tool-section" id="topology" aria-labelledby="topo-title-h">
+        <div class="resource-heading">
+          <p class="resource-number">03</p>
+          <div>
+            <p class="eyebrow eyebrow-dark">Sheets · Helices · Topology</p>
+            <h2 id="topo-title-h">Draw a topology diagram.</h2>
+            <p class="tool-lede">
+              Open a CIF file to lay out helices as cylinders and strands as
+              arrows, with strands placed side by side in their β-sheets. Color
+              domains, drag elements into place, and download an SVG.
+            </p>
+          </div>
+        </div>
+
+        <div class="topo-tool">
+          <div class="topo-bar">
+            <label class="topo-file">Open CIF<input id="topo-file" type="file" accept=".cif,.mmcif,.txt"></label>
+            <label>Chain <select id="topo-chain"></select></label>
+            <label>Min helix (res) <input id="topo-minHelix" type="number" min="1" max="30" step="1" value="3"></label>
+            <label>Min strand (res) <input id="topo-minStrand" type="number" min="1" max="30" step="1" value="2"></label>
+            <label>Label font (pt) <input id="topo-font" type="number" min="1" max="72" step="0.5" value="6"></label>
+            <label>SVG width (in) <input id="topo-width" type="number" min="1" max="100" step="0.1" value="5"></label>
+            <span class="topo-size" id="topo-size"></span>
+          </div>
+          <div class="topo-bar">
+            <label>Title <input id="topo-title" type="text" maxlength="80" placeholder="Optional, e.g. E"></label>
+            <button id="topo-reset" type="button">Reset layout</button>
+            <button id="topo-showAll" type="button" hidden>Show hidden</button>
+            <button id="topo-export" class="topo-primary" type="button" disabled>Download SVG</button>
+          </div>
+          <div class="topo-message" id="topo-msg" role="status"></div>
+          <p class="topo-note" id="topo-source"></p>
+
+          <div class="topo-panel">
+            <div class="topo-panel-head">
+              <strong id="topo-stats">No file loaded</strong>
+              <span class="topo-help">Drag to move · click again or Esc to unselect · double-click or F to flip · arrow keys nudge · Delete hides</span>
+            </div>
+            <div class="topo-canvas" id="topo-canvas"></div>
+            <div class="topo-sel" id="topo-sel" hidden>
+              <span id="topo-selText"></span>
+              <button id="topo-flip" type="button">Flip direction</button>
+              <button id="topo-hide" type="button">Hide</button>
+              <button id="topo-unselect" type="button">Unselect</button>
+            </div>
+          </div>
+
+          <div class="topo-panel topo-3d-box">
+            <div class="topo-panel-head">
+              <strong>3D structure</strong>
+              <div class="topo-3d-controls">
+                <button id="topo-3dShow" type="button" disabled>Show 3D structure</button>
+                <button id="topo-3dCenter" type="button" hidden>Center on selection</button>
+                <button id="topo-3dReset" type="button" hidden>Reset view</button>
+                <label id="topo-3dLabelsWrap" hidden><input id="topo-3dLabels" type="checkbox" checked> Labels</label>
+                <label id="topo-3dSpinWrap" hidden><input id="topo-3dSpin" type="checkbox"> Spin</label>
+                <button id="topo-3dPng" type="button" hidden>Save image (PNG)</button>
+              </div>
+            </div>
+            <p class="topo-note topo-3d-note" id="topo-3dNote">Open a CIF file with atom coordinates to view the chain in 3D, colored like the diagram.</p>
+            <div class="topo-3d" id="topo-3d" hidden></div>
+          </div>
+
+          <div class="topo-domains-box">
+            <div class="topo-panel-head"><strong>Domains</strong><button id="topo-addDomain" type="button">Add domain</button></div>
+            <div class="topo-finder"><button id="topo-findDomains" type="button" disabled>Find domains from coordinates</button><label>Number of domains <select id="topo-domainCount"><option value="auto" selected>Automatic</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select></label></div>
+            <p class="topo-note" id="topo-domainNote" role="status"></p>
+            <p class="topo-note">Residue ranges use the file's label numbering; separate pieces with commas (e.g. 1–10, 71–164). Helices take the domain color; strands use a lighter tint.</p>
+            <div id="topo-domains"></div>
+          </div>
+        </div>
+      </section>
     </main>
 
     <footer>© 2026 Sharaf Lab. Hosted on GitHub Pages. Created with the assistance of AI.</footer>
@@ -258,6 +376,8 @@ const $=id=>document.getElementById(id), NS='http://www.w3.org/2000/svg';
 const aa=Object.fromEntries('ALA ARG ASN ASP CYS GLN GLU GLY HIS ILE LEU LYS MET PHE PRO SER THR TRP TYR VAL'.split(' ').map((a,i)=>[a,'ARNDCQEGHILKMFPSTWYV'[i]]));Object.assign(aa,{MSE:'M',SEC:'U',PYL:'O'});
 const names={H:'α-helix',G:'3₁₀ helix',I:'π-helix',E:'β-strand',B:'Isolated β-bridge',T:'Turn',S:'Bend',P:'Polyproline II helix','.':'Unassigned / loop','-':'Unassigned / loop'};
 const kind=s=>'HGI'.includes(s)?'helix':'EB'.includes(s)?'strand':'loop';
+// PDB files write helices as HELX_P with a helix class (1 α, 3 π, 5 3₁₀, 10 polyproline); DSSP writes HELX_RH_AL_P etc.
+const confType=r=>r.conf_type_id==='HELX_P'?({'1':'HELX_RH_AL_P','3':'HELX_RH_PI_P','5':'HELX_RH_3T_P','10':'HELX_LH_PP_P','?':'HELX_RH_AL_P','.':'HELX_RH_AL_P'}[r.pdbx_pdb_helix_class??r.pdbx_PDB_helix_class??'?']||'OTHER'):r.conf_type_id;
 let all=[],current=[],selected=-1,history=[],pendingText="",sizeScale=0.5,numberShift={};
 const shown=r=>r.n+(numberShift[r.chain]||0);
 function parseTable(text){const rows=[];let skipped=0;for(const line of text.split(/\r?\n/)){if(!line.trim()||line.trim().startsWith('#'))continue;const f=line.trim().split(/\s+/);if(f.length<5||!/^[-+]?\d+$/.test(f[2])||!/^([A-Za-z]{3})$/.test(f[3])||!Object.hasOwn(names,f[4])){skipped++;continue}rows.push({chain:f[1],n:Number(f[2]),res:f[3].toUpperCase(),ss:f[4]})}if(!rows.length)throw Error('No readable residues. Please use the table format described below.');return {rows,skipped}}
@@ -303,7 +423,7 @@ function cifCategories(text){
 }
 function attachElementNames(rows,cats){
  for(const range of cats._struct_conf||[]){
-  const id=range.id||'',type=range.conf_type_id||'',number=id.match(/(\d+)$/)?.[1]||'';
+  const id=range.id||'',type=confType(range)||'',number=id.match(/(\d+)$/)?.[1]||'';
   const prefix={HELX_RH_AL_P:'α',HELX_RH_3T_P:'3₁₀-',HELX_RH_PI_P:'π',HELX_LH_PP_P:'PPII-',STRN:'β'}[type];
   if(!prefix)continue;
   for(const r of rows)if(r.chain===range.beg_label_asym_id&&r.chain===range.end_label_asym_id&&r.n>=Number(range.beg_label_seq_id)&&r.n<=Number(range.end_label_seq_id)){r.elementId=id;r.elementName=prefix+number;}
@@ -332,7 +452,7 @@ function parseCif(text){
  const codes={HELX_RH_AL_P:'H',HELX_RH_3T_P:'G',HELX_RH_PI_P:'I',HELX_LH_PP_P:'P',STRN:'E',BEND:'S',OTHER:'.'};
  let assigned=0;
  for(const r of [...conf,...sheets]){
-  const type=r.conf_type_id,ss=type?(codes[type]??(type.startsWith('TURN')?'T':null)):'E';
+  const type=confType(r),ss=type?(codes[type]??(type.startsWith('TURN')?'T':null)):'E';
   if(ss===null)throw Error(`Unsupported secondary-structure type: ${type}. Use a DSSP-annotated CIF.`);
   if(!validNumber(r.beg_label_seq_id)||!validNumber(r.end_label_seq_id)||r.beg_label_asym_id!==r.end_label_asym_id)throw Error('Structure ranges require matching label chain IDs and integer label residue numbers. Use a DSSP-annotated CIF.');
   const first=Number(r.beg_label_seq_id),last=Number(r.end_label_seq_id);
@@ -528,6 +648,510 @@ render();
         clearMessage();
         resetProgress();
       });
+    })();
+    </script>
+    <script>
+    // Topology diagram: helices as cylinders, strands as arrows, laid out by β-sheet order from the CIF file.
+    (() => {
+      const $ = (id) => document.getElementById(id), NS = 'http://www.w3.org/2000/svg';
+      const PALETTE = ['#3a9b9b', '#7a86f0', '#d9825b', '#8b6fc4', '#5c9f4e', '#c45b7d'];
+      const SP = 50, SHEET_GAP = 46, ROW_GAP = 34, HW = { H: 14, G: 12, I: 14, E: 17 };
+      const state = { all: [], orders: {}, ca: {}, sourceName: '', notes: [], manual: new Map(), hidden: new Set(), sel: null, frozenBox: null, lastLayout: null };
+      let domains = [];
+
+      function el(tag, attrs = {}, text) { const n = document.createElementNS(NS, tag); for (const [k, v] of Object.entries(attrs)) n.setAttribute(k, v); if (text !== undefined) n.textContent = text; return n; }
+      function message(text) { $('topo-msg').textContent = text || ''; }
+
+      // ---------- CIF reading ----------
+      const WANT = ['_struct_conf', '_struct_sheet_range', '_struct_sheet_order', '_dssp_struct_summary'];
+      function readCif(text) {
+        const tokens = cifTokens(text), cats = {}, single = {}; let i = 0;
+        const control = (t) => t && !t.quoted && (/^(?:loop_|stop_|global_|data_|save_)/i.test(t.v) || t.v.startsWith('_'));
+        while (i < tokens.length) {
+          const t = tokens[i++]; if (t.quoted) continue; const v = t.v.toLowerCase();
+          if (v === 'loop_') {
+            const keys = []; while (i < tokens.length && !tokens[i].quoted && tokens[i].v.startsWith('_')) keys.push(tokens[i++].v.toLowerCase());
+            const values = []; while (i < tokens.length && !control(tokens[i])) values.push(tokens[i++].v);
+            const cat = keys[0]?.split('.')[0];
+            if (cat === '_atom_site' && keys.length && values.length % keys.length === 0) cats._ca = readCA(keys, values);
+            else if (WANT.includes(cat) && keys.length && values.length % keys.length === 0)
+              for (let k = 0; k < values.length; k += keys.length) { const row = {}; keys.forEach((key, j) => row[key.split('.').slice(1).join('.')] = values[k + j]); (cats[cat] ??= []).push(row); }
+          } else if (v.startsWith('_') && i < tokens.length && !control(tokens[i])) {
+            const cat = v.split('.')[0]; if (WANT.includes(cat)) (single[cat] ??= {})[v.split('.').slice(1).join('.')] = tokens[i].v; i++;
+          }
+        }
+        for (const [cat, row] of Object.entries(single)) (cats[cat] ??= []).push(row);
+        return cats;
+      }
+      // First model, first alternate location, one Cα per residue, grouped by label chain.
+      function readCA(keys, values) {
+        const col = (k) => keys.indexOf('_atom_site.' + k), A = col('label_atom_id'), S = col('label_seq_id'), CH = col('label_asym_id'), X = col('cartn_x'), Y = col('cartn_y'), Z = col('cartn_z'), M = col('pdbx_pdb_model_num');
+        if ([A, S, CH, X, Y, Z].some((c) => c < 0)) return {};
+        const RN = col('label_comp_id'), EL = col('type_symbol');
+        const out = {}, atoms = {}, seen = new Set(), n = keys.length; let model = null;
+        for (let k = 0; k < values.length; k += n) {
+          if (!/^-?\d+$/.test(values[k + S])) continue;
+          if (M >= 0) { if (model === null) model = values[k + M]; if (values[k + M] !== model) continue; }
+          const chain = values[k + CH], name = values[k + A], key = chain + ':' + values[k + S] + ':' + name; if (seen.has(key)) continue; seen.add(key);
+          const atom = { n: Number(values[k + S]), x: Number(values[k + X]), y: Number(values[k + Y]), z: Number(values[k + Z]) };
+          (atoms[chain] ??= []).push({ ...atom, name, resn: RN >= 0 ? values[k + RN] : 'UNK', el: EL >= 0 ? values[k + EL] : name[0] });
+          if (name === 'CA') (out[chain] ??= []).push(atom);
+        }
+        for (const c of Object.values(out)) c.sort((a, b) => a.n - b.n);
+        out._atoms = atoms;
+        return out;
+      }
+      function elementsFrom(cats) {
+        const out = [], num = (s) => /^[-+]?\d+$/.test(s || '') ? Number(s) : NaN;
+        for (const r of cats._struct_conf || []) {
+          const type = { HELX_RH_AL_P: 'H', HELX_RH_3T_P: 'G', HELX_RH_PI_P: 'I' }[confType(r)];
+          const b = num(r.beg_label_seq_id), e = num(r.end_label_seq_id);
+          if (type && r.beg_label_asym_id === r.end_label_asym_id && b <= e) out.push({ type, chain: r.beg_label_asym_id, start: b, end: e, fileId: r.id || '' });
+        }
+        for (const r of cats._struct_sheet_range || []) {
+          const b = num(r.beg_label_seq_id), e = num(r.end_label_seq_id);
+          if (r.beg_label_asym_id === r.end_label_asym_id && b <= e) out.push({ type: 'E', chain: r.beg_label_asym_id, start: b, end: e, sheet: r.sheet_id, rid: r.id, fileId: `sheet ${r.sheet_id}, strand ${r.id}` });
+        }
+        if (!out.length && cats._dssp_struct_summary) {
+          // No element tables: build runs from per-residue DSSP codes.
+          let run = null;
+          const flush = () => { if (run) out.push(run); run = null; };
+          for (const r of cats._dssp_struct_summary) {
+            const ss = r.secondary_structure, n = num(r.label_seq_id), type = 'HGIE'.includes(ss) ? ss : null;
+            if (run && (type !== run.type || r.label_asym_id !== run.chain || n !== run.end + 1)) flush();
+            if (type) { if (!run) run = { type, chain: r.label_asym_id, start: n, end: n, fileId: 'DSSP run' }; else run.end = n; }
+          }
+          flush();
+          state.notes.push('Elements were built from per-residue DSSP codes; this file does not group strands into sheets.');
+        }
+        out.sort((a, b) => a.chain.localeCompare(b.chain, undefined, { numeric: true }) || a.start - b.start);
+        out.forEach((e, i) => e.uid = 'e' + i);
+        return out;
+      }
+
+      // ---------- elements for the current chain ----------
+      function chainElements() {
+        const chain = $('topo-chain').value, minH = Number($('topo-minHelix').value) || 1, minE = Number($('topo-minStrand').value) || 1;
+        const els = state.all.filter((e) => e.chain === chain && (e.end - e.start + 1) >= (e.type === 'E' ? minE : minH));
+        let a = 0, g = 0, p = 0, b = 0;
+        for (const e of els) e.label = e.type === 'H' ? 'α' + (++a) : e.type === 'G' ? 'η' + (++g) : e.type === 'I' ? 'π' + (++p) : 'β' + (++b);
+        return els;
+      }
+      const len = (e) => e.end - e.start + 1;
+      const lengthOf = (e) => e.type === 'E' ? Math.max(30, Math.min(72, 16 + len(e) * 5)) : Math.max(e.type === 'G' ? 22 : 30, Math.min(150, 18 + len(e) * 4.2));
+
+      // ---------- automatic layout ----------
+      function sheetOrder(sheet, strands) {
+        const pairs = (state.orders[sheet] || []).filter((o) => strands.some((s) => s.rid === o.a) && strands.some((s) => s.rid === o.b));
+        const ids = strands.map((s) => s.rid), adj = new Map(ids.map((id) => [id, []]));
+        for (const o of pairs) { adj.get(o.a).push({ to: o.b, parallel: o.parallel }); adj.get(o.b).push({ to: o.a, parallel: o.parallel }); }
+        const dir = new Map(), order = [];
+        if (!pairs.length) {
+          if (strands.length > 1) state.notes.push(`Sheet ${sheet}: the file has no strand order, so strands are shown in sequence order. Drag to fix.`);
+          strands.forEach((s, i) => { order.push(s.rid); dir.set(s.rid, i % 2 ? 'down' : 'up'); });
+        } else {
+          const bySeq = [...strands].sort((x, y) => x.start - y.start).map((s) => s.rid);
+          const remaining = new Set(ids);
+          while (remaining.size) {
+            const pool = bySeq.filter((id) => remaining.has(id));
+            const start = pool.find((id) => adj.get(id).filter((n) => remaining.has(n.to)).length <= 1) ?? pool[0];
+            let cur = start; dir.set(cur, dir.get(cur) || 'up');
+            while (cur) {
+              order.push(cur); remaining.delete(cur);
+              const next = adj.get(cur).find((n) => remaining.has(n.to));
+              if (!next) break;
+              dir.set(next.to, next.parallel ? dir.get(cur) : (dir.get(cur) === 'up' ? 'down' : 'up'));
+              cur = next.to;
+            }
+          }
+          const first = bySeq[0];
+          if (dir.get(first) === 'down') for (const [k, v] of dir) dir.set(k, v === 'up' ? 'down' : 'up');
+        }
+        return { order, dir };
+      }
+      function autoLayout(els) {
+        const pos = new Map(), strands = els.filter((e) => e.type === 'E');
+        const groups = []; const seen = new Map();
+        strands.forEach((s, i) => { const key = s.sheet ?? ('loose' + i); if (!seen.has(key)) { seen.set(key, []); groups.push(key); } seen.get(key).push(s); });
+        let x = 0; const maxHalf = Math.max(20, ...strands.map((s) => lengthOf(s) / 2));
+        for (const key of groups) {
+          const members = seen.get(key);
+          const { order, dir } = members[0].sheet !== undefined ? sheetOrder(key, members) : { order: [members[0].rid], dir: new Map([[members[0].rid, 'up']]) };
+          const byRid = new Map(members.map((s) => [s.rid, s]));
+          (members[0].sheet !== undefined ? order.map((r) => byRid.get(r)) : members).forEach((s, i) => pos.set(s.uid, { x: x + i * SP, y: 0, dir: dir.get(s.rid) || 'up' }));
+          x += members.length * SP + SHEET_GAP;
+        }
+        const rows = { top: [], bottom: [] }, place = (row, want, hw) => {
+          const free = (cx) => rows[row].every(([a, b]) => cx + hw + 8 <= a || cx - hw - 8 >= b);
+          for (let d = 0; d < 4000; d += 4) { if (free(want + d)) return want + d; if (free(want - d)) return want - d; }
+          return want;
+        };
+        els.forEach((e, i) => {
+          if (e.type === 'E') return;
+          const prev = els[i - 1], next = els.slice(i + 1).find((n) => n.type === 'E');
+          const pp = prev && pos.get(prev.uid), np = next && pos.get(next.uid);
+          const prevExit = pp && (pp.dir === 'up' ? 'top' : 'bottom');
+          const row = pp ? (prev.type === 'E' ? prevExit : pp.row) : np ? (np.dir === 'up' ? 'bottom' : 'top') : 'top';
+          const facing = row === 'top' ? 'bottom' : 'top', far = row === 'top' ? 'top' : 'bottom';
+          const entry = !pp ? far : (prev.type === 'E' ? facing : prevExit);
+          const L = lengthOf(e), hw = HW[e.type];
+          let want = pp && np && prev.type === 'E' ? (pp.x + np.x) / 2 : pp ? pp.x + (prev.type === 'E' ? SP * 0.6 : 2 * hw + 12) : np ? np.x - SP : 0;
+          const cx = place(row, want, hw); rows[row].push([cx - hw, cx + hw]);
+          const base = maxHalf + ROW_GAP;
+          pos.set(e.uid, { x: cx, y: row === 'top' ? -(base + L / 2) : base + L / 2, dir: entry === 'bottom' ? 'up' : 'down', row });
+        });
+        return pos;
+      }
+
+      // ---------- drawing ----------
+      const hex = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+      const mix = (h, to, t) => { const a = hex(h), b = hex(to); return '#' + a.map((v, i) => Math.round(v + (b[i] - v) * t).toString(16).padStart(2, '0')).join(''); };
+      function domainColor(e) {
+        const mid = (e.start + e.end) / 2, d = domains.find((d) => d.ranges.some(([a, b]) => mid >= a && mid <= b));
+        const base = d ? d.color : '#9aa5b1';
+        return e.type === 'E' ? mix(base, '#ffffff', 0.42) : base;
+      }
+      function gradient(defs, color) {
+        const id = 'tg' + color.slice(1);
+        if (!defs.querySelector('#' + id)) {
+          const g = el('linearGradient', { id, x1: '0', x2: '1', y1: '0', y2: '0' });
+          g.append(el('stop', { offset: '0', 'stop-color': mix(color, '#000000', 0.12) }), el('stop', { offset: '0.38', 'stop-color': mix(color, '#ffffff', 0.28) }), el('stop', { offset: '1', 'stop-color': mix(color, '#000000', 0.22) }));
+          defs.append(g);
+        }
+        return `url(#${id})`;
+      }
+      function ends(e, p) {
+        const L = lengthOf(e), top = p.y - L / 2, bottom = p.y + L / 2;
+        return p.dir === 'up' ? { entry: { x: p.x, y: bottom, side: 'bottom' }, exit: { x: p.x, y: top, side: 'top' }, top, bottom } : { entry: { x: p.x, y: top, side: 'top' }, exit: { x: p.x, y: bottom, side: 'bottom' }, top, bottom };
+      }
+      function route(a, b, lane, blockers) {
+        const stub = 12 + lane, lo = Math.min(a.x, b.x) - 20, hi = Math.max(a.x, b.x) + 20;
+        const inSpan = blockers.filter((k) => k.x >= lo && k.x <= hi);
+        const over = Math.min(a.y, b.y, ...inSpan.map((k) => k.top)) - stub, under = Math.max(a.y, b.y, ...inSpan.map((k) => k.bottom)) + stub;
+        if (a.side === 'top' && b.side === 'top') return [[a.x, a.y], [a.x, over], [b.x, over], [b.x, b.y]];
+        if (a.side === 'bottom' && b.side === 'bottom') return [[a.x, a.y], [a.x, under], [b.x, under], [b.x, b.y]];
+        // Facing ends (exit points toward the target's entry): a simple step, no loop.
+        if (a.side === 'bottom' && b.side === 'top' && b.y - a.y > 16) { const Y = Math.min(a.y + 10 + lane, b.y - 6); return [[a.x, a.y], [a.x, Y], [b.x, Y], [b.x, b.y]]; }
+        if (a.side === 'top' && b.side === 'bottom' && a.y - b.y > 16) { const Y = Math.max(a.y - 10 - lane, b.y + 6); return [[a.x, a.y], [a.x, Y], [b.x, Y], [b.x, b.y]]; }
+        const Y1 = a.side === 'top' ? Math.min(a.y, ...inSpan.map((k) => k.top)) - stub : Math.max(a.y, ...inSpan.map((k) => k.bottom)) + stub;
+        const Y2 = a.side === 'top' ? b.y + stub : b.y - stub, ylo = Math.min(Y1, Y2), yhi = Math.max(Y1, Y2);
+        // Vertical run beside the target: pick the nearest side that does not pass behind another element.
+        const clear = (X) => blockers.every((k) => Math.abs(X - k.x) > k.hw + 4 || k.bottom < ylo || k.top > yhi);
+        const prefer = b.x >= a.x ? -1 : 1; let X = b.x + prefer * (HW.E + 7 + lane / 2);
+        search: for (let d = HW.E + 7 + lane / 2; d < 200; d += 5) for (const sd of [prefer, -prefer]) if (clear(b.x + sd * d)) { X = b.x + sd * d; break search; }
+        return [[a.x, a.y], [a.x, Y1], [X, Y1], [X, Y2], [b.x, Y2], [b.x, b.y]];
+      }
+      function shape(e, p, defs) {
+        const L = lengthOf(e), top = p.y - L / 2, bottom = p.y + L / 2, color = domainColor(e), stroke = mix(color, '#000000', 0.45), g = [];
+        if (e.type === 'E') {
+          const bw = 20, hw = 34, hl = 13, x = p.x;
+          const pts = p.dir === 'up'
+            ? [[x - bw / 2, bottom], [x - bw / 2, top + hl], [x - hw / 2, top + hl], [x, top], [x + hw / 2, top + hl], [x + bw / 2, top + hl], [x + bw / 2, bottom]]
+            : [[x - bw / 2, top], [x - bw / 2, bottom - hl], [x - hw / 2, bottom - hl], [x, bottom], [x + hw / 2, bottom - hl], [x + bw / 2, bottom - hl], [x + bw / 2, top]];
+          g.push(el('polygon', { points: pts.map((q) => q.join(',')).join(' '), fill: gradient(defs, color), stroke, 'stroke-width': 1, 'stroke-linejoin': 'round' }));
+        } else {
+          const w = HW[e.type] * 2, ry = Math.min(6, w / 4.5), x = p.x;
+          g.push(el('path', { d: `M ${x - w / 2} ${top} L ${x - w / 2} ${bottom} A ${w / 2} ${ry} 0 0 0 ${x + w / 2} ${bottom} L ${x + w / 2} ${top} Z`, fill: gradient(defs, color), stroke, 'stroke-width': 1 }));
+          g.push(el('ellipse', { cx: x, cy: top, rx: w / 2, ry, fill: mix(color, '#ffffff', 0.3), stroke, 'stroke-width': 1 }));
+        }
+        return g;
+      }
+
+      function render() {
+        const box = $('topo-canvas');
+        if (!state.all.length) { box.replaceChildren(); box.textContent = 'Open a CIF file to draw its topology.'; $('topo-export').disabled = true; $('topo-sel').hidden = true; $('topo-stats').textContent = ''; return; }
+        const els = chainElements().filter((e) => !state.hidden.has(e.uid));
+        const hiddenCount = chainElements().length - els.length;
+        $('topo-showAll').hidden = !hiddenCount; $('topo-showAll').textContent = `Show ${hiddenCount} hidden`;
+        if (!els.length) { box.textContent = 'No helices or strands in this chain at the current minimum lengths.'; $('topo-export').disabled = true; return; }
+        const auto = autoLayout(els), pos = new Map(els.map((e) => [e.uid, { ...auto.get(e.uid), ...(state.manual.get(e.uid) || {}) }]));
+        state.lastLayout = pos;
+        const geo = els.map((e) => ({ e, p: pos.get(e.uid), ...ends(e, pos.get(e.uid)), x: pos.get(e.uid).x, hw: HW[e.type] }));
+        const defs = el('defs'), connectors = el('g', { fill: 'none', stroke: '#1f2a33', 'stroke-width': 1.6, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }), shapes = el('g'), labels = el('g');
+        const pts = [];
+        geo.forEach((k, i) => {
+          if (i) { const path = route(geo[i - 1].exit, k.entry, (i % 4) * 5, geo); pts.push(...path); connectors.append(el('polyline', { points: path.map((q) => q.join(',')).join(' ') })); }
+        });
+        // N and C termini
+        const term = (pt, text) => { const out = pt.side === 'top' ? -1 : 1, y = pt.y + out * 24; connectors.append(el('line', { x1: pt.x, y1: pt.y, x2: pt.x, y2: y - out * 8 })); const g = el('g'); g.append(el('rect', { x: pt.x - 8, y: y - 8, width: 16, height: 16, fill: '#ffffff', stroke: '#1f2a33', 'stroke-width': 1 }), el('text', { x: pt.x, y: y + 4.5, 'text-anchor': 'middle', 'font-family': 'Arial, Helvetica, sans-serif', 'font-size': 12, fill: '#1f2a33' }, text)); labels.append(g); pts.push([pt.x - 8, y - 8], [pt.x + 8, y + 8]); };
+        term(geo[0].entry, 'N'); term(geo.at(-1).exit, 'C');
+        for (const k of geo) { pts.push([k.x - 18, k.top - 8], [k.x + 18, k.bottom + 8]); }
+        const minX = Math.min(...pts.map((q) => q[0])) - 24, maxX = Math.max(...pts.map((q) => q[0])) + 24, minY = Math.min(...pts.map((q) => q[1])) - 24 - ($('topo-title').value ? 30 : 0), maxY = Math.max(...pts.map((q) => q[1])) + 24;
+        const vb = state.frozenBox || [minX, minY, maxX - minX, maxY - minY];
+        const inches = Number($('topo-width').value) || 5, font = Number($('topo-font').value) * vb[2] / (inches * 72);
+        for (const k of geo) {
+          const g = el('g', { class: 'topo-el' + (state.sel === k.e.uid ? ' selected' : ''), 'data-uid': k.e.uid, tabindex: '0', role: 'button', 'aria-label': `${k.e.label}, residues ${k.e.start} to ${k.e.end}` });
+          shape(k.e, k.p, defs).forEach((s) => g.append(s));
+          g.append(el('title', {}, `${k.e.label} · residues ${k.e.start}–${k.e.end} (${len(k.e)}) · ${k.e.fileId}`));
+          shapes.append(g);
+          labels.append(el('text', { x: k.x, y: k.p.y + font * 0.35, 'text-anchor': 'middle', 'font-family': 'Arial, Helvetica, sans-serif', 'font-size': font, fill: '#14202b', 'pointer-events': 'none' }, k.e.label));
+        }
+        const svg = el('svg', { xmlns: NS, viewBox: vb.join(' '), role: 'img', 'aria-label': `Topology diagram of chain ${$('topo-chain').value}` });
+        svg.append(defs, el('rect', { x: vb[0], y: vb[1], width: vb[2], height: vb[3], fill: '#ffffff' }));
+        if ($('topo-title').value) svg.append(el('text', { x: vb[0] + 20, y: vb[1] + 28, 'font-family': 'Arial, Helvetica, sans-serif', 'font-size': font * 1.6, 'font-weight': 700, fill: '#14202b' }, $('topo-title').value));
+        svg.append(connectors, shapes, labels);
+        box.replaceChildren(svg);
+        $('topo-export').disabled = false;
+        $('topo-size').textContent = `${inches} × ${(inches * vb[3] / vb[2]).toFixed(2)} in`;
+        const counts = { H: 0, G: 0, I: 0, E: 0 }; els.forEach((e) => counts[e.type]++);
+        const sheets = new Set(els.filter((e) => e.sheet !== undefined).map((e) => e.sheet));
+        const pl = (n, one, many) => `${n} ${n === 1 ? one : many}`;
+        $('topo-stats').textContent = `${pl(counts.H, 'α-helix', 'α-helices')}${counts.G ? ` · ${pl(counts.G, '3₁₀ helix', '3₁₀ helices')} (η)` : ''}${counts.I ? ` · ${pl(counts.I, 'π-helix', 'π-helices')}` : ''} · ${pl(counts.E, 'β-strand', 'β-strands')}${sheets.size ? ` in ${sheets.size} sheet${sheets.size > 1 ? 's' : ''}` : ''}`;
+        showSelection();
+        style3D();
+      }
+
+      // ---------- interaction ----------
+      function showSelection() {
+        const e = chainElements().find((x) => x.uid === state.sel), bar = $('topo-sel');
+        if (!e || state.hidden.has(e.uid)) { bar.hidden = true; return; }
+        bar.hidden = false; $('topo-selText').textContent = `${e.label} · residues ${e.start}–${e.end} · ${e.type === 'E' ? `strand, ${e.fileId}` : e.type === 'G' ? '3₁₀ helix' : e.type === 'I' ? 'π-helix' : 'α-helix'}`;
+      }
+      function select(uid) { state.sel = uid; queueMicrotask(() => style3D()); document.querySelectorAll('#topo-canvas .topo-el').forEach((g) => g.classList.toggle('selected', g.dataset.uid === uid)); showSelection(); }
+      function setManual(uid, patch) { const cur = state.lastLayout.get(uid); state.manual.set(uid, { ...(state.manual.get(uid) || {}), x: cur.x, y: cur.y, dir: cur.dir, ...patch }); }
+      function flip(uid) { const p = state.lastLayout.get(uid); if (!p) return; setManual(uid, { dir: p.dir === 'up' ? 'down' : 'up' }); render(); focusEl(uid); }
+      function focusEl(uid) { document.querySelector(`#topo-canvas .topo-el[data-uid="${uid}"]`)?.focus({ preventScroll: true }); }
+      const canvas = $('topo-canvas');
+      canvas.addEventListener('pointerdown', (ev) => {
+        const g = ev.target.closest('.topo-el');
+        if (!g) { if (state.sel) { document.activeElement?.blur(); select(null); } return; }  // click on empty space: unselect
+        ev.preventDefault(); const uid = g.dataset.uid, svg = canvas.querySelector('svg'), wasSelected = state.sel === uid; select(uid);
+        let moved = false;
+        const ctm = svg.getScreenCTM().inverse(), toSvg = (e) => { const pt = svg.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY; return pt.matrixTransform(ctm); };
+        const start = toSvg(ev), p0 = { ...state.lastLayout.get(uid) }; state.frozenBox = svg.getAttribute('viewBox').split(' ').map(Number);
+        const move = (e) => { const q = toSvg(e); if (!moved && Math.hypot(q.x - start.x, q.y - start.y) < 3) return; moved = true; setManual(uid, { x: Math.round((p0.x + q.x - start.x) / 2) * 2, y: Math.round((p0.y + q.y - start.y) / 2) * 2 }); render(); };
+        const up = () => {
+          window.removeEventListener('pointermove', move); window.removeEventListener('pointerup', up); state.frozenBox = null;
+          if (!moved && wasSelected) { document.activeElement?.blur(); select(null); render(); return; }  // click a selected element again: unselect
+          render(); focusEl(uid);
+        };
+        window.addEventListener('pointermove', move); window.addEventListener('pointerup', up);
+      });
+      canvas.addEventListener('dblclick', (ev) => { const g = ev.target.closest('.topo-el'); if (g) flip(g.dataset.uid); });
+      canvas.addEventListener('focusin', (ev) => { const g = ev.target.closest('.topo-el'); if (g && state.sel !== g.dataset.uid) select(g.dataset.uid); });
+      canvas.addEventListener('keydown', (ev) => {
+        const g = ev.target.closest('.topo-el'); if (!g) return; const uid = g.dataset.uid, p = state.lastLayout.get(uid), step = ev.shiftKey ? 16 : 4;
+        const d = { ArrowLeft: [-step, 0], ArrowRight: [step, 0], ArrowUp: [0, -step], ArrowDown: [0, step] }[ev.key];
+        if (d) { ev.preventDefault(); setManual(uid, { x: p.x + d[0], y: p.y + d[1] }); render(); focusEl(uid); }
+        else if (ev.key === 'f' || ev.key === 'F') { ev.preventDefault(); flip(uid); }
+        else if (ev.key === 'Delete' || ev.key === 'Backspace') { ev.preventDefault(); hide(uid); }
+        else if (ev.key === 'Escape') { ev.preventDefault(); g.blur(); select(null); }
+      });
+      function hide(uid) { state.hidden.add(uid); state.sel = null; render(); }
+      $('topo-flip').onclick = () => state.sel && flip(state.sel);
+      $('topo-hide').onclick = () => state.sel && hide(state.sel);
+      $('topo-unselect').onclick = () => select(null);
+      $('topo-showAll').onclick = () => { state.hidden.clear(); render(); };
+      $('topo-reset').onclick = () => { state.manual.clear(); state.hidden.clear(); render(); };
+
+      // ---------- domains from coordinates ----------
+      // Cα contact map (8 Å), then repeated two-way splits that minimize the normalized cut
+      // (contacts between parts relative to contacts within each part). A split can be one cut
+      // point or two (a domain inserted inside another), so domains may be discontinuous.
+      const CONTACT_2 = 64, MIN_DOMAIN = 40, SPLIT_LIMIT = 0.17, TWO_CUT_PENALTY = 1.1;
+      function contactMap(ca) {
+        const m = ca.length, C = new Uint8Array(m * m);
+        for (let i = 0; i < m; i++) for (let j = i + 3; j < m; j++) {
+          const dx = ca[i].x - ca[j].x, dy = ca[i].y - ca[j].y, dz = ca[i].z - ca[j].z;
+          if (dx * dx + dy * dy + dz * dz < CONTACT_2) C[i * m + j] = C[j * m + i] = 1;
+        }
+        return C;
+      }
+      function bestSplit(idx, C, m0) {
+        const m = idx.length, w = m + 1; if (m < 2 * MIN_DOMAIN) return null;
+        const P = new Int32Array(w * w);
+        for (let a = 0; a < m; a++) { const ra = idx[a] * m0; for (let b = 0; b < m; b++) P[(a + 1) * w + b + 1] = C[ra + idx[b]] + P[a * w + b + 1] + P[(a + 1) * w + b] - P[a * w + b]; }
+        const R = (a0, a1, b0, b1) => P[a1 * w + b1] - P[a0 * w + b1] - P[a1 * w + b0] + P[a0 * w + b0];
+        const total = R(0, m, 0, m); let best = null;
+        for (let i = 0; i <= m - MIN_DOMAIN; i++) for (let j = i + MIN_DOMAIN; j <= m; j++) {
+          if (m - (j - i) < MIN_DOMAIN || (i === 0 && j === m)) continue;
+          const degB = R(i, j, 0, m), degA = total - degB, cut = R(i, j, 0, i) + R(i, j, j, m);
+          if (!degA || !degB) continue;
+          const score = (cut / degA + cut / degB) * (i > 0 && j < m ? TWO_CUT_PENALTY : 1);
+          if (!best || score < best.score) best = { score, i, j };
+        }
+        if (!best) return null;
+        const inner = idx.slice(best.i, best.j), outer = idx.slice(0, best.i).concat(idx.slice(best.j));
+        return { score: best.score, parts: [outer, inner] };
+      }
+      function findDomains(ca, wanted) {
+        const C = contactMap(ca), m0 = ca.length;
+        let doms = [{ idx: ca.map((_, i) => i) }];
+        doms[0].split = bestSplit(doms[0].idx, C, m0);
+        for (;;) {
+          if (wanted && doms.length >= wanted) break;
+          const cand = doms.filter((d) => d.split).sort((a, b) => a.split.score - b.split.score)[0];
+          if (!cand || (!wanted && cand.split.score > SPLIT_LIMIT)) break;
+          doms = doms.filter((d) => d !== cand).concat(cand.split.parts.map((idx) => ({ idx, split: bestSplit(idx, C, m0) })));
+        }
+        // Order domains by their first residue and describe each as residue ranges.
+        return doms.map((d) => {
+          const ns = d.idx.map((i) => ca[i].n).sort((a, b) => a - b), ranges = [];
+          for (const n of ns) { const r = ranges.at(-1); if (r && n - r[1] <= 4) r[1] = n; else ranges.push([n, n]); }
+          return { ranges, size: ns.length, score: d.split?.score };
+        }).sort((a, b) => a.ranges[0][0] - b.ranges[0][0]);
+      }
+      const rangeText = (ranges) => ranges.map(([a, b]) => a === b ? `${a}` : `${a}–${b}`).join(', ');
+      function parseRanges(text) {
+        const out = [];
+        for (const part of text.split(/[,;]+/)) {
+          const m = part.trim().match(/^(-?\d+)\s*(?:[-–—:]|to)\s*(-?\d+)$/i) || part.trim().match(/^(-?\d+)$/);
+          if (!m) { if (part.trim()) return null; continue; }
+          const a = Number(m[1]), b = Number(m[2] ?? m[1]); out.push([Math.min(a, b), Math.max(a, b)]);
+        }
+        return out;
+      }
+      function renderDomains() {
+        const list = $('topo-domains'); list.replaceChildren();
+        domains.forEach((d, i) => {
+          const row = document.createElement('div'); row.className = 'topo-domain';
+          row.innerHTML = `<input type="text" class="topo-dname" aria-label="Domain ${i + 1} name" maxlength="30"><label>Residues <input type="text" class="topo-dranges" aria-label="Domain ${i + 1} residue ranges" placeholder="e.g. 1–10, 71–164"></label><label>Color <input type="color" aria-label="Domain ${i + 1} color"></label><button type="button">Remove</button>`;
+          const name = row.querySelector('.topo-dname'), ranges = row.querySelector('.topo-dranges'), color = row.querySelector('input[type=color]');
+          name.value = d.name; ranges.value = rangeText(d.ranges); color.value = d.color;
+          name.oninput = () => d.name = name.value;
+          ranges.oninput = () => { const r = parseRanges(ranges.value); ranges.setAttribute('aria-invalid', r ? 'false' : 'true'); if (r) { d.ranges = r; render(); } };
+          color.oninput = () => { d.color = color.value; render(); };
+          const rm = row.querySelector('button'); rm.disabled = domains.length === 1; rm.onclick = () => { domains.splice(i, 1); renderDomains(); render(); };
+          list.append(row);
+        });
+      }
+      function chainSpan() { const els = state.all.filter((e) => e.chain === $('topo-chain').value); return els.length ? [Math.min(...els.map((e) => e.start)), Math.max(...els.map((e) => e.end))] : [1, 1]; }
+      function singleDomain() { const [a, b] = chainSpan(); domains = [{ name: 'Domain 1', ranges: [[a, b]], color: PALETTE[0] }]; renderDomains(); }
+      function coordDomains(report) {
+        const ca = state.ca[$('topo-chain').value];
+        $('topo-findDomains').disabled = !ca || ca.length < 2 * MIN_DOMAIN;
+        if (!ca) { $('topo-domainNote').textContent = 'This file has no atom coordinates for this chain, so domains cannot be found automatically. Enter residue ranges below.'; singleDomain(); return; }
+        if (ca.length > 3000) { $('topo-domainNote').textContent = 'This chain is too long for automatic domain finding in the browser. Enter residue ranges below.'; singleDomain(); return; }
+        const want = $('topo-domainCount').value === 'auto' ? 0 : Number($('topo-domainCount').value);
+        const found = findDomains(ca, want);
+        domains = found.map((d, i) => ({ name: `Domain ${i + 1}`, ranges: d.ranges, color: PALETTE[i % PALETTE.length] }));
+        renderDomains();
+        $('topo-domainNote').textContent = `${found.length === 1 ? 'One domain' : `${found.length} domains`} found from Cα contacts (${ca.length} residues with coordinates, 8 Å cutoff)${want ? ', as requested' : ''}. Check the ranges against what you know about the protein and edit them if needed.`;
+        if (report) render();
+      }
+      $('topo-findDomains').onclick = () => coordDomains(true);
+      $('topo-domainCount').onchange = () => coordDomains(true);
+      $('topo-addDomain').onclick = () => {
+        const [, b] = chainSpan(), last = domains.at(-1), [la, lb] = last.ranges.at(-1) || [b, b], cut = Math.round((la + lb) / 2);
+        if (lb > cut) last.ranges.at(-1)[1] = cut;
+        domains.push({ name: `Domain ${domains.length + 1}`, ranges: [[cut + 1, Math.max(cut + 1, lb)]], color: PALETTE[domains.length % PALETTE.length] }); renderDomains(); render();
+      };
+
+      // ---------- 3D structure (3Dmol.js, loaded on demand) ----------
+      const MOL_URL = 'https://cdn.jsdelivr.net/npm/3dmol@2.5.4/build/3Dmol-min.js';
+      const v3 = { lib: null, viewer: null, chain: null, key: '' };
+      function loadLib() {
+        if (window.$3Dmol) return Promise.resolve();
+        return v3.lib ??= new Promise((ok, fail) => { const sc = document.createElement('script'); sc.src = MOL_URL; sc.onload = ok; sc.onerror = () => { v3.lib = null; fail(Error('The 3D viewer could not be loaded. Check your connection and try again.')); }; document.head.append(sc); });
+      }
+      // Write the chain as PDB text with label numbering, plus HELIX/SHEET records from the same elements as the diagram.
+      function pdbText(chain) {
+        const pad = (v, n) => String(v).padStart(n).slice(-n), f = (v) => v.toFixed(3).padStart(8).slice(-8), lines = [];
+        let k = 0;
+        for (const e of state.all.filter((x) => x.chain === chain)) {
+          k++;
+          if (e.type === 'E') lines.push(`SHEET  ${pad(k, 3)} ${pad(String(e.sheet ?? 'X').slice(0, 3), 3)} 1 ALA A${pad(e.start, 4)}  ALA A${pad(e.end, 4)}  0`);
+          else lines.push(`HELIX  ${pad(k, 3)} ${pad(k, 3)} ALA A ${pad(e.start, 4)}  ALA A ${pad(e.end, 4)} ${pad(e.type === 'G' ? 5 : e.type === 'I' ? 3 : 1, 2)}`);
+        }
+        (state.atoms[chain] || []).forEach((a, i) => {
+          const name = a.name.length >= 4 ? a.name.slice(0, 4) : ' ' + a.name.padEnd(3);
+          lines.push(`ATOM  ${pad((i + 1) % 100000, 5)} ${name} ${pad(a.resn.slice(0, 3), 3)} A${pad(a.n, 4)}    ${f(a.x)}${f(a.y)}${f(a.z)}  1.00  0.00          ${pad(a.el.slice(0, 2).toUpperCase(), 2)}`);
+        });
+        // No END record: 3Dmol clears HELIX/SHEET information when it reads END.
+        return lines.join('\n');
+      }
+      function residueColor(resi) {
+        const e = chainElements().find((x) => resi >= x.start && resi <= x.end && !state.hidden.has(x.uid));
+        if (e && e.uid === state.sel) return '#e8590c';
+        const d = domains.find((d) => d.ranges.some(([a, b]) => resi >= a && resi <= b)), base = d ? d.color : '#9aa5b1';
+        return !e ? mix(base, '#c9d1d9', 0.55) : e.type === 'E' ? mix(base, '#ffffff', 0.42) : base;
+      }
+      function style3D(force) {
+        if (!v3.viewer) return;
+        const key = JSON.stringify([$('topo-chain').value, domains, state.sel, [...state.hidden], $('topo-minHelix').value, $('topo-minStrand').value, $('topo-3dLabels').checked, $('topo-font').value]);
+        if (!force && key === v3.key) return; v3.key = key;
+        const cache = new Map(), color = (atom) => { if (!cache.has(atom.resi)) cache.set(atom.resi, residueColor(atom.resi)); return cache.get(atom.resi); };
+        v3.viewer.setStyle({}, { cartoon: v3.caOnly ? { colorfunc: color, style: 'trace', thickness: 0.6 } : { colorfunc: color, thickness: 0.5 } });
+        labels3D();
+        v3.viewer.render();
+      }
+      // Element labels (α1, β2…) placed at the centre of each helix or strand, matching the diagram.
+      function labels3D() {
+        const viewer = v3.viewer; viewer.removeAllLabels();
+        if (!$('topo-3dLabels').checked) return;
+        const ca = state.ca[v3.chain] || [];
+        for (const e of chainElements()) {
+          if (state.hidden.has(e.uid)) continue;
+          const pts = ca.filter((a) => a.n >= e.start && a.n <= e.end); if (!pts.length) continue;
+          const c = pts.reduce((acc, a) => ({ x: acc.x + a.x / pts.length, y: acc.y + a.y / pts.length, z: acc.z + a.z / pts.length }), { x: 0, y: 0, z: 0 });
+          const sel = e.uid === state.sel, bg = sel ? '#e8590c' : mix(residueColor(Math.round((e.start + e.end) / 2)), '#000000', 0.25);
+          viewer.addLabel(e.label, { position: c, inFront: true, fontSize: 13, fontColor: '#ffffff', backgroundColor: bg, backgroundOpacity: 0.9, borderThickness: 0, alignment: 'center', font: 'Arial' });
+        }
+      }
+      async function show3D() {
+        const chain = $('topo-chain').value, box = $('topo-3d');
+        if (!state.atoms[chain]?.length) return;
+        $('topo-3dShow').disabled = true; $('topo-3dNote').textContent = 'Loading the 3D viewer…';
+        try { await loadLib(); } catch (err) { $('topo-3dNote').textContent = err.message; $('topo-3dShow').disabled = false; return; }
+        box.hidden = false;
+        if (!v3.viewer) {
+          try { v3.viewer = $3Dmol.createViewer(box, { backgroundColor: 'white', antialias: true }); } catch (err) { $('topo-3dNote').textContent = 'This browser cannot show 3D graphics (WebGL is unavailable).'; box.hidden = true; return; }
+        }
+        const viewer = v3.viewer; viewer.clear();
+        viewer.addModel(pdbText(chain), 'pdb');
+        viewer.setHoverable({}, true, (atom, view) => { if (!atom.label) atom.label = view.addLabel(`${atom.resn} ${atom.resi}`, { position: atom, backgroundColor: '#14202b', backgroundOpacity: 0.85, fontColor: 'white', fontSize: 12 }); }, (atom, view) => { if (atom.label) { view.removeLabel(atom.label); delete atom.label; } });
+        viewer.setClickable({}, true, (atom) => { const e = chainElements().find((x) => atom.resi >= x.start && atom.resi <= x.end && !state.hidden.has(x.uid)); if (e) { select(e.uid); style3D(); } });
+        v3.chain = chain; v3.caOnly = state.atoms[chain].every((a) => a.name === 'CA'); style3D(true); viewer.zoomTo(); viewer.render();
+        for (const id of ['topo-3dCenter', 'topo-3dReset', 'topo-3dPng', 'topo-3dSpinWrap', 'topo-3dLabelsWrap']) $(id).hidden = false;
+        $('topo-3dShow').textContent = 'Reload 3D'; $('topo-3dShow').disabled = false;
+        const caOnly = v3.caOnly;
+        $('topo-3dNote').textContent = `Chain ${chain} · ${state.atoms[chain].length.toLocaleString()} atoms · cartoon colored by domain (helices in the domain color, strands lighter, loops grey-tinted, selection orange). Drag to rotate, scroll to zoom, click a helix or strand to select it in the diagram.${caOnly ? ' This file has only Cα atoms, so the chain is drawn as a tube instead of a cartoon.' : ''}`;
+      }
+      function update3DAvailability() {
+        const chain = $('topo-chain').value, has = !!state.atoms[chain]?.length;
+        $('topo-3dShow').disabled = !has;
+        if (!has) { $('topo-3d').hidden = true; for (const id of ['topo-3dCenter', 'topo-3dReset', 'topo-3dPng', 'topo-3dSpinWrap', 'topo-3dLabelsWrap']) $(id).hidden = true; $('topo-3dShow').textContent = 'Show 3D structure'; $('topo-3dNote').textContent = state.all.length ? 'This file has no atom coordinates for this chain, so there is nothing to show in 3D.' : 'Open a CIF file with atom coordinates to view the chain in 3D, colored like the diagram.'; return; }
+        if (v3.viewer && !$('topo-3d').hidden && v3.chain !== chain) show3D();
+        else if ($('topo-3d').hidden) $('topo-3dNote').textContent = 'Show the chain as a 3D cartoon colored like the diagram. The viewer (3Dmol.js) loads when you click.';
+      }
+      $('topo-3dShow').onclick = show3D;
+      $('topo-3dReset').onclick = () => { v3.viewer?.zoomTo(); v3.viewer?.render(); };
+      $('topo-3dCenter').onclick = () => { const e = chainElements().find((x) => x.uid === state.sel); if (!e || !v3.viewer) { $('topo-3dNote').textContent = 'Select a helix or strand first.'; return; } v3.viewer.zoomTo({ resi: `${e.start}-${e.end}` }, 600); };
+      $('topo-3dLabels').onchange = () => style3D();
+      $('topo-3dSpin').onchange = () => v3.viewer?.spin($('topo-3dSpin').checked ? 'y' : false);
+      $('topo-3dPng').onclick = () => { if (!v3.viewer) return; const a = document.createElement('a'); a.href = v3.viewer.pngURI(); a.download = `structure-chain-${$('topo-chain').value}.png`; document.body.append(a); a.click(); a.remove(); };
+
+      // ---------- loading and export ----------
+      function load(text, name) {
+        state.notes = []; state.manual.clear(); state.hidden.clear(); state.sel = null; v3.chain = null; state.atoms = {};
+        try {
+          if (!/^\s*(?:#.*\r?\n\s*)?data_/im.test(text)) throw Error('This is not a CIF file. Open a .cif or .mmcif file with secondary-structure annotations.');
+          const cats = readCif(text); state.orders = {}; state.ca = cats._ca || {}; state.atoms = state.ca._atoms || {}; delete state.ca._atoms;
+          for (const o of cats._struct_sheet_order || []) (state.orders[o.sheet_id] ??= []).push({ a: o.range_id_1, b: o.range_id_2, parallel: /^par/i.test(o.sense || '') });
+          state.all = elementsFrom(cats);
+          if (!state.all.length) throw Error('No helices or strands found. Use a CIF with _struct_conf / _struct_sheet_range or DSSP annotations.');
+          const chains = [...new Set(state.all.map((e) => e.chain))]; $('topo-chain').replaceChildren(...chains.map((c) => { const o = document.createElement('option'); o.value = o.textContent = c; return o; }));
+          $('topo-source').textContent = name ? `${name} · label residue numbering` : 'Label residue numbering';
+          coordDomains(false); render(); update3DAvailability();
+          message(state.notes.join(' '));
+        } catch (err) { state.all = []; render(); update3DAvailability(); message(err.message); }
+      }
+      $('topo-file').addEventListener('change', async () => { const f = $('topo-file').files[0]; if (!f) return; if (f.size > 25e6) { message('Files up to 25 MB are supported.'); return; } load(await f.text(), f.name); });
+      $('topo-chain').onchange = () => { state.manual.clear(); state.hidden.clear(); state.sel = null; state.notes = []; coordDomains(false); render(); update3DAvailability(); message(state.notes.join(' ')); };
+      for (const id of ['topo-minHelix', 'topo-minStrand']) $(id).addEventListener('input', () => { state.manual.clear(); render(); });
+      for (const id of ['topo-font', 'topo-width', 'topo-title']) $(id).addEventListener('input', render);
+      $('topo-export').onclick = () => {
+        const svg = $('topo-canvas').querySelector('svg'); if (!svg) return;
+        const inches = Number($('topo-width').value); if (!(inches >= 1 && inches <= 100)) { message('Enter a width between 1 and 100 inches.'); $('topo-width').focus(); return; }
+        const copy = svg.cloneNode(true), vb = copy.viewBox.baseVal;
+        copy.setAttribute('width', inches + 'in'); copy.setAttribute('height', (inches * vb.height / vb.width).toFixed(4) + 'in');
+        copy.querySelectorAll('.topo-el').forEach((g) => { g.removeAttribute('tabindex'); g.removeAttribute('role'); g.removeAttribute('class'); g.removeAttribute('data-uid'); });
+        const url = URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(copy)], { type: 'image/svg+xml' }));
+        const a = document.createElement('a'); a.href = url; a.download = `topology-chain-${$('topo-chain').value}.svg`; document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+      };
+      window.topoLoad = load; // used by the test page to preload a sample
+      window.topoDebug = { pdbText, viewer: () => v3.viewer };
+      render();
     })();
     </script>
   </body>
