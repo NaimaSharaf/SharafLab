@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="Sharaf Lab tools: a browser-based secondary structure viewer for DSSP-annotated CIF files."
+      content="Sharaf Lab tools: a secondary structure viewer for DSSP-annotated CIF files and a PDF extender that adds space for notes."
     />
     <title>Tools | Sharaf Lab</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -71,6 +71,46 @@
 .ss-source{margin:0 0 28px;font-size:14px;color:#586e73}
 .ss-source a{color:#0b6870;font-weight:700;text-underline-offset:4px}
 @media(max-width:600px){.ss-tool{padding:0 16px 60px}}
+.ss-tool{padding:0 0 10px}
+.tool-index{max-width:1180px;margin:-50px auto 0;padding:0 24px 60px;display:flex;flex-wrap:wrap;gap:12px}
+.tool-index a{display:flex;align-items:center;gap:12px;padding:14px 20px;background:#fff;border:1px solid #d8e0e0;color:#102a33;text-decoration:none;font-family:"Montserrat",Arial,sans-serif;font-size:14px;font-weight:600}
+.tool-index a:hover{border-color:#0b6870;color:#0b6870}
+.tool-index span{color:#0b6870;font-size:11px;font-weight:700;letter-spacing:.12em}
+.tool-section{padding:90px max(24px,calc((100vw - 1132px)/2)) 100px;border-top:1px solid #d7dfdf;scroll-margin-top:90px}
+.tool-section-soft{background:#f2f3f4}
+.tool-lede{max-width:740px;margin:18px 0 0;color:#586e73;font-size:17px;line-height:1.75}
+.pdf-tool{color:#102a33}
+.pdf-workspace{display:grid;grid-template-columns:1.5fr 1fr;gap:16px}
+.pdf-drop{min-height:280px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:30px;background:#fff;border:2px dashed #b8c8cc;cursor:pointer;text-align:center;transition:border-color .2s,background .2s}
+.pdf-drop:hover,.pdf-drop:focus-visible,.pdf-drop.is-dragging{border-color:#0b6870;background:#f3faf9;outline:none}
+.pdf-drop strong{font-family:"Montserrat",Arial,sans-serif;font-size:22px;font-weight:500}
+.pdf-drop p{margin:0;color:#586e73}
+.pdf-drop-icon{width:52px;height:52px;display:grid;place-items:center;margin-bottom:10px;border-radius:50%;background:#0b6870;color:#fff;font-size:22px}
+.pdf-browse{color:#0b6870;font-weight:700;text-decoration:underline;text-underline-offset:4px}
+.pdf-limit{margin-top:14px;color:#84979a;font-size:12px}
+.pdf-settings{padding:26px 28px;background:#fff;border:1px solid #d8e0e0}
+.pdf-row{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:14px 0;border-bottom:1px solid #e4ebeb}
+.pdf-row span{display:block;font-weight:600}
+.pdf-row small{display:block;color:#6b7f83;font-size:13px}
+.pdf-row strong{font-family:"Montserrat",Arial,sans-serif;color:#0b6870;white-space:nowrap}
+.pdf-privacy{margin:18px 0 0;color:#586e73;font-size:14px}
+.pdf-file{margin-top:16px;padding:18px 22px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;background:#fff;border:1px solid #d8e0e0}
+.pdf-file[hidden],.pdf-progress[hidden],.pdf-message[hidden]{display:none}
+.pdf-file-icon{width:46px;height:54px;display:grid;place-items:center;background:#0b6870;color:#fff;font-size:11px;font-weight:700;letter-spacing:.08em}
+.pdf-file-details{flex:1;min-width:160px;display:flex;flex-direction:column;overflow-wrap:anywhere}
+.pdf-file-details span{color:#6b7f83;font-size:14px}
+.pdf-text-button,.pdf-primary{font:inherit;cursor:pointer;padding:11px 18px;border-radius:7px}
+.pdf-text-button{border:1px solid #b8c8d5;background:#fff;color:#173650}
+.pdf-primary{border:1px solid #0b6870;background:#0b6870;color:#fff;font-weight:600}
+.pdf-primary:disabled{opacity:.6;cursor:progress}
+.pdf-text-button:focus-visible,.pdf-primary:focus-visible{outline:3px solid #0b6870;outline-offset:3px}
+.pdf-progress{margin-top:16px}
+.pdf-progress-top{display:flex;justify-content:space-between;color:#586e73;font-size:14px;margin-bottom:8px}
+.pdf-track{height:6px;background:#dfe6e6;overflow:hidden}
+.pdf-track span{display:block;height:100%;width:0;background:#0b6870;transition:width .2s}
+.pdf-message{margin-top:16px;padding:14px 18px;background:#fbeeee;color:#9a2f2f;border:1px solid #efcfcf}
+.pdf-message.success{background:#edf7f6;color:#0b5a60;border-color:#cfe7e4}
+@media(max-width:800px){.pdf-workspace{grid-template-columns:1fr}.tool-section{padding-top:70px;padding-bottom:76px}.tool-index{margin-top:-30px}}
     </style>
   </head>
 
@@ -95,15 +135,32 @@
 
     <main>
       <section class="outreach-hero">
-        <p class="eyebrow eyebrow-dark">Sequence · Structure · Figures</p>
-        <h1>Secondary structure, residue by residue.</h1>
+        <p class="eyebrow eyebrow-dark">Structure · Figures · Notes</p>
+        <h1>Lab tools.</h1>
         <p>
-          Open a DSSP-annotated CIF or mmCIF file to draw helices, strands, and
-          loops above the amino acid sequence, adjust the figure, and download
-          it as an SVG. Files are processed in your browser and never uploaded.
+          Small browser-based utilities built by the Sharaf Lab. Files are
+          processed on your own device and are never uploaded.
         </p>
       </section>
 
+      <nav class="tool-index" aria-label="Tools on this page">
+        <a href="#secondary-structure"><span>01</span>Secondary structure viewer</a>
+        <a href="#extend-pdf"><span>02</span>Extend PDF for notes</a>
+      </nav>
+
+      <section class="tool-section" id="secondary-structure" aria-labelledby="ss-title">
+        <div class="resource-heading">
+          <p class="resource-number">01</p>
+          <div>
+            <p class="eyebrow eyebrow-dark">Sequence · Structure</p>
+            <h2 id="ss-title">Secondary structure, residue by residue.</h2>
+            <p class="tool-lede">
+              Open a DSSP-annotated CIF or mmCIF file to draw helices, strands,
+              and loops above the amino acid sequence, adjust the figure, and
+              download it as an SVG.
+            </p>
+          </div>
+        </div>
       <div class="ss-tool">
         <p class="ss-source">
           Source code:
@@ -126,6 +183,54 @@
 <details><summary>Paste CIF or a structure table</summary><p class="note">Open a DSSP-annotated .cif or .mmcif file, or paste its contents below. CIF files with a polymer sequence scheme and supported structure ranges also work. The viewer reads existing annotations; it does not calculate DSSP from atomic coordinates. The original whitespace-separated table format is also supported. Raw PDB and classic fixed-width DSSP files are not supported.</p><textarea id="paste" aria-label="CIF or structure table" placeholder="Paste annotated CIF or residue table here"></textarea><button id="load">Load pasted data</button></details>
 <p class="note">Element labels use CIF identifiers: α1 means alpha helix 1; β1 · A means strand 1 in sheet A. Hover over a label for the full identifier. Edited assignments are marked “Edited”. Coils represent H / G / I helices; arrows represent E strands and B bridges. Other assignments appear as lines. Wrapped segments continue onto the next row; arrows point toward the C terminus. This is a sequence schematic, not a 3D structure.</p><p class="ss-foot">Files are processed in your browser. No upload service or external libraries.</p>
       </div>
+      </section>
+
+      <section class="tool-section tool-section-soft" id="extend-pdf" aria-labelledby="pdf-title">
+        <div class="resource-heading">
+          <p class="resource-number">02</p>
+          <div>
+            <p class="eyebrow eyebrow-dark">PDF · Notes</p>
+            <h2 id="pdf-title">Give your pages room for notes.</h2>
+            <p class="tool-lede">
+              Adds 3 inches of blank space to the right side of every page so
+              you can annotate papers and slides. The original content stays
+              exactly where it is.
+            </p>
+          </div>
+        </div>
+
+        <div class="pdf-tool">
+          <div class="pdf-workspace">
+            <div class="pdf-drop" id="pdf-drop" tabindex="0" role="button" aria-label="Choose a PDF" aria-describedby="pdf-drop-help">
+              <input id="pdf-input" type="file" accept="application/pdf,.pdf" hidden />
+              <div class="pdf-drop-icon" aria-hidden="true">↑</div>
+              <strong>Drop a PDF here</strong>
+              <p id="pdf-drop-help">or <span class="pdf-browse">browse your files</span></p>
+              <span class="pdf-limit">PDF files only · processed locally</span>
+            </div>
+            <aside class="pdf-settings" aria-label="Output settings">
+              <div class="pdf-row"><div><span>Extension</span><small>Blank space added on the right</small></div><strong>+ 3.00 in</strong></div>
+              <div class="pdf-row"><div><span>Placement</span><small>Original content stays at the left</small></div><strong>Right</strong></div>
+              <div class="pdf-row"><div><span>Page height</span><small>Preserved from source</small></div><strong>Same</strong></div>
+              <p class="pdf-privacy">Your file never leaves this device.</p>
+            </aside>
+          </div>
+
+          <div class="pdf-file" id="pdf-file" hidden aria-live="polite">
+            <div class="pdf-file-icon" aria-hidden="true">PDF</div>
+            <div class="pdf-file-details"><strong id="pdf-file-name">document.pdf</strong><span id="pdf-file-meta">Ready to extend</span></div>
+            <button class="pdf-text-button" id="pdf-remove" type="button">Remove</button>
+            <button class="pdf-primary" id="pdf-extend" type="button">Extend PDF →</button>
+          </div>
+
+          <div class="pdf-progress" id="pdf-progress" hidden>
+            <div class="pdf-progress-top"><span id="pdf-progress-label">Extending pages</span><span id="pdf-progress-value">0%</span></div>
+            <div class="pdf-track"><span id="pdf-bar"></span></div>
+          </div>
+
+          <div class="pdf-message" id="pdf-message" role="status" hidden></div>
+        </div>
+      </section>
     </main>
 
     <footer>© 2026 Sharaf Lab. Hosted on GitHub Pages. Created with the assistance of AI.</footer>
@@ -262,5 +367,118 @@ function find(){const n=Number($('find').value),i=current.findIndex(r=>r.n===n);
 $('export').onclick=()=>{const inches=Number($('svgWidth').value);if(!Number.isFinite(inches)||inches<1||inches>100){$('message').textContent='Enter an SVG width between 1 and 100 inches.';$('svgWidth').focus();return}$('message').textContent='';const svg=$('canvas').firstElementChild.cloneNode(true);const box=svg.viewBox.baseVal;svg.setAttribute('width',inches+'in');svg.setAttribute('height',(inches*box.height/box.width).toFixed(4)+'in');svg.querySelectorAll('.residue').forEach(g=>{g.removeAttribute('tabindex');g.removeAttribute('role')});const url=URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(svg)],{type:'image/svg+xml'}));const a=document.createElement('a');a.href=url;a.download='secondary-structure.svg';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000)};
 render();
 </script>
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js" defer></script>
+    <script>
+    // Extend PDF for notes. Source: NaimaSharaf/PDFnotesextend (app.js)
+    (() => {
+      const POINTS_PER_INCH = 72;
+      const EXTENSION_INCHES = 3;
+      const q = (id) => document.getElementById(id);
+      const dropZone = q('pdf-drop'), fileInput = q('pdf-input'), fileCard = q('pdf-file');
+      const fileName = q('pdf-file-name'), fileMeta = q('pdf-file-meta');
+      const extendButton = q('pdf-extend'), removeButton = q('pdf-remove');
+      const progressArea = q('pdf-progress'), progressLabel = q('pdf-progress-label');
+      const progressValue = q('pdf-progress-value'), progressBar = q('pdf-bar'), message = q('pdf-message');
+      let selectedFile = null;
+
+      function showMessage(text, type = 'error') {
+        message.textContent = text;
+        message.className = `pdf-message ${type === 'success' ? 'success' : ''}`;
+        message.hidden = false;
+      }
+      function clearMessage() { message.hidden = true; message.textContent = ''; }
+      function formatBytes(bytes) {
+        if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`;
+        return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+      }
+      function resetProgress() {
+        progressArea.hidden = true;
+        progressBar.style.width = '0%';
+        progressValue.textContent = '0%';
+        progressLabel.textContent = 'Extending pages';
+      }
+      function setProgress(value, label) {
+        progressArea.hidden = false;
+        progressLabel.textContent = label;
+        progressValue.textContent = `${value}%`;
+        progressBar.style.width = `${value}%`;
+      }
+      function chooseFile(file) {
+        clearMessage();
+        resetProgress();
+        if (!file || (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf'))) {
+          showMessage('Please choose a PDF file.');
+          return;
+        }
+        selectedFile = file;
+        fileName.textContent = file.name;
+        fileMeta.textContent = `${formatBytes(file.size)} · ready to extend`;
+        fileCard.hidden = false;
+        dropZone.setAttribute('aria-label', `Selected ${file.name}. Choose another file`);
+      }
+      async function extendPdf() {
+        if (!selectedFile) return;
+        if (!window.PDFLib) {
+          showMessage('The PDF engine is still loading. Check your connection and try again.');
+          return;
+        }
+        clearMessage();
+        extendButton.disabled = true;
+        setProgress(8, 'Reading PDF');
+        try {
+          const sourcePdf = await PDFLib.PDFDocument.load(await selectedFile.arrayBuffer());
+          const pages = sourcePdf.getPages();
+          const extensionPoints = EXTENSION_INCHES * POINTS_PER_INCH;
+          pages.forEach((page, index) => {
+            const { width, height } = page.getSize();
+            page.setSize(width + extensionPoints, height);
+            setProgress(Math.max(10, Math.round(((index + 1) / pages.length) * 90)), `Extending page ${index + 1} of ${pages.length}`);
+          });
+          const outputBytes = await sourcePdf.save();
+          const outputName = selectedFile.name.replace(/\.pdf$/i, '') + '-extended.pdf';
+          const downloadUrl = URL.createObjectURL(new Blob([outputBytes], { type: 'application/pdf' }));
+          const link = document.createElement('a');
+          link.href = downloadUrl;
+          link.download = outputName;
+          document.body.append(link);
+          link.click();
+          link.remove();
+          setTimeout(() => URL.revokeObjectURL(downloadUrl), 1000);
+          setProgress(100, 'Done');
+          showMessage(`${outputName} is ready and has been downloaded.`, 'success');
+        } catch (error) {
+          console.error(error);
+          resetProgress();
+          showMessage('This PDF could not be processed. It may be encrypted or damaged.');
+        } finally {
+          extendButton.disabled = false;
+        }
+      }
+
+      dropZone.addEventListener('click', () => fileInput.click());
+      dropZone.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); fileInput.click(); }
+      });
+      fileInput.addEventListener('change', () => chooseFile(fileInput.files[0]));
+      ['dragenter', 'dragover'].forEach((name) => dropZone.addEventListener(name, (event) => {
+        event.preventDefault();
+        dropZone.classList.add('is-dragging');
+      }));
+      ['dragleave', 'drop'].forEach((name) => dropZone.addEventListener(name, (event) => {
+        event.preventDefault();
+        dropZone.classList.remove('is-dragging');
+      }));
+      dropZone.addEventListener('drop', (event) => chooseFile(event.dataTransfer.files[0]));
+      extendButton.addEventListener('click', extendPdf);
+      removeButton.addEventListener('click', () => {
+        selectedFile = null;
+        fileInput.value = '';
+        fileCard.hidden = true;
+        dropZone.setAttribute('aria-label', 'Choose a PDF');
+        clearMessage();
+        resetProgress();
+      });
+    })();
+    </script>
   </body>
 </html>
