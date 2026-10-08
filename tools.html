@@ -183,15 +183,12 @@
 .topo-tool .ss-tool{padding:0;max-width:none}
 .topo-tool .ss-tool .canvas svg{width:100%;height:auto;max-width:100%}
 .topo-tool .ss-tool .ss-source{margin:0 0 14px}
-.topo-3d-controls{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px}
-.topo-3d-controls input[type=number]{width:64px;padding:6px}
-.topo-3d-controls label{display:inline-flex;align-items:center;gap:6px;font-size:14px}
-.topo-3d-note{padding:12px 20px 0}
+.topo-wrap{display:contents}
+.topo-3d-box .topo-panel-bar:not(:has(> :not([hidden]))){display:none}
 .topo-pair{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:16px;align-items:stretch;margin-bottom:16px}
 .topo-col{display:flex;flex-direction:column;min-width:0}
 .topo-col>.topo-sub{margin-top:40px}
 .topo-col>.topo-panel{margin-bottom:0;display:flex;flex-direction:column;flex:1}
-.topo-3d-box .topo-panel-head{justify-content:flex-start}
 .topo-col .topo-canvas{flex:1;display:flex;align-items:center}
 .topo-pair .topo-3d-box .topo-3d{flex:1;min-height:420px}
 .topo-3d-empty{position:absolute;inset:0;display:grid;place-items:center;margin:0;color:#8a9ba0;font-size:14px}
@@ -355,18 +352,30 @@
           <h3 class="topo-sub" id="structure-3d">3D structure</h3>
           <div class="topo-panel topo-3d-box">
             <div class="topo-panel-head">
-              <div class="topo-3d-controls">
-                <button id="topo-3dShow" type="button" disabled>Show 3D structure</button>
-                <button id="topo-3dCenter" type="button" hidden>Center on selection</button>
-                <button id="topo-3dReset" type="button" hidden>Reset view</button>
-                <label id="topo-3dLabelsWrap" hidden><input id="topo-3dLabels" type="checkbox" checked> Labels</label>
-                <label id="topo-3dSpinWrap" hidden><input id="topo-3dSpin" type="checkbox"> Spin</label>
-                <label id="topo-3dSizeWrap" hidden>Width <input id="topo-3dIn" type="number" min="1" max="30" step="0.25" value="4" aria-label="Image width in inches"> in at <input id="topo-3dDpi" type="number" min="72" max="1200" step="1" value="200" aria-label="Resolution in dots per inch"> dpi</label>
-                <button id="topo-3dPng" class="topo-primary" type="button" hidden>Download PNG</button>
-                <button id="topo-3dSvg" class="topo-primary" type="button" hidden title="Structure as an image, with the labels as separate text you can move in Illustrator or Inkscape">Download SVG</button>
-              </div>
+              <strong id="topo-3dStats">No structure loaded</strong>
+              <span class="topo-help" id="topo-3dNote">Open a CIF file with atom coordinates to view the chain in 3D, colored like the diagram.</span>
             </div>
-            <p class="topo-note topo-3d-note" id="topo-3dNote">Open a CIF file with atom coordinates to view the chain in 3D, colored like the diagram.</p>
+            <div class="topo-bar topo-panel-bar">
+              <label id="topo-3dLabelsWrap" hidden><input id="topo-3dLabels" type="checkbox" checked> Labels</label>
+              <label id="topo-3dSpinWrap" hidden><input id="topo-3dSpin" type="checkbox"> Spin</label>
+            </div>
+            <div class="topo-bar topo-panel-bar">
+              <label id="topo-3dFontWrap" hidden>Label font (pt) <input id="topo-3dFont" type="number" min="2" max="48" step="0.5" value="7" aria-label="3D label font size in points"></label>
+              <span class="topo-wrap" id="topo-3dSizeWrap" hidden>
+                <label>Width (in) <input id="topo-3dIn" type="number" min="1" max="30" step="0.25" value="4"></label>
+                <label>dpi <input id="topo-3dDpi" type="number" min="72" max="1200" step="1" value="200"></label>
+              </span>
+            </div>
+            <div class="topo-bar topo-panel-bar">
+              <button id="topo-3dShow" type="button" disabled>Show 3D structure</button>
+              <button id="topo-3dCenter" type="button" hidden>Center on selection</button>
+              <button id="topo-3dReset" type="button" hidden>Reset view</button>
+            </div>
+            <div class="topo-bar topo-panel-bar">
+              <button id="topo-3dPng" class="topo-primary" type="button" hidden>Download PNG</button>
+              <button id="topo-3dSvg" class="topo-primary" type="button" hidden title="Structure as an image, with the labels as separate text you can move in Illustrator or Inkscape">Download SVG</button>
+              <span class="topo-size" id="topo-3dSize"></span>
+            </div>
             <div class="topo-3d" id="topo-3d"><p class="topo-3d-empty" id="topo-3dEmpty">The 3D structure appears here.</p></div>
           </div>
           </div>
@@ -1302,7 +1311,7 @@ render();
       }
       function style3D(force) {
         if (!v3.viewer) return;
-        const key = JSON.stringify([$('topo-chain').value, domains, state.sel, [...state.hidden], $('topo-minHelix').value, $('topo-minStrand').value, $('topo-3dLabels').checked, $('topo-font').value]);
+        const key = JSON.stringify([$('topo-chain').value, domains, state.sel, [...state.hidden], $('topo-minHelix').value, $('topo-minStrand').value, $('topo-3dLabels').checked, $('topo-font').value, $('topo-3dFont').value, $('topo-3dIn').value, v3.viewer.WIDTH]);
         if (!force && key === v3.key) return; v3.key = key;
         const cache = new Map(), color = (atom) => { if (!cache.has(atom.resi)) cache.set(atom.resi, residueColor(atom.resi)); return cache.get(atom.resi); };
         v3.viewer.setStyle({}, { cartoon: v3.caOnly ? { colorfunc: color, style: 'trace', thickness: 0.6 } : { colorfunc: color, thickness: 0.5 } });
@@ -1310,6 +1319,16 @@ render();
         v3.viewer.render();
       }
       // Element labels (α1, β2…) placed at the centre of each helix or strand, matching the diagram.
+      // Label size in screen pixels so that, at the chosen export width, the text prints at the chosen point size.
+      function label3DPx() {
+        const pt = Number($('topo-3dFont').value), inches = Number($('topo-3dIn').value);
+        return ((pt >= 2 && pt <= 48 ? pt : 7) / 72) * ((v3.viewer?.WIDTH || 400) / (inches >= 1 && inches <= 30 ? inches : 4));
+      }
+      function size3D() {
+        const inches = Number($('topo-3dIn').value), v = v3.viewer;
+        $('topo-3dSize').textContent = v && inches >= 1 && inches <= 30 ? `${+inches.toFixed(2)} × ${(inches * v.HEIGHT / v.WIDTH).toFixed(2)} in` : '';
+      }
+      if (window.ResizeObserver) new ResizeObserver(() => requestAnimationFrame(size3D)).observe($('topo-3d'));
       function labels3D() {
         const viewer = v3.viewer; viewer.removeAllLabels();
         if (!$('topo-3dLabels').checked) return;
@@ -1319,7 +1338,7 @@ render();
           const pts = ca.filter((a) => a.n >= e.start && a.n <= e.end); if (!pts.length) continue;
           const c = pts.reduce((acc, a) => ({ x: acc.x + a.x / pts.length, y: acc.y + a.y / pts.length, z: acc.z + a.z / pts.length }), { x: 0, y: 0, z: 0 });
           const sel = e.uid === state.sel, bg = sel ? '#e8590c' : mix(residueColor(Math.round((e.start + e.end) / 2)), '#000000', 0.25);
-          viewer.addLabel(e.label, { position: c, inFront: true, fontSize: 13, fontColor: '#ffffff', backgroundColor: bg, backgroundOpacity: 0.9, borderThickness: 0, alignment: 'center', font: 'Arial' });
+          viewer.addLabel(e.label, { position: c, inFront: true, fontSize: label3DPx(), fontColor: '#ffffff', backgroundColor: bg, backgroundOpacity: 0.9, borderThickness: 0, alignment: 'center', font: 'Arial' });
         }
       }
       async function show3D() {
@@ -1339,15 +1358,15 @@ render();
         viewer.setHoverable({}, true, (atom, view) => { if (!atom.label) atom.label = view.addLabel(`${atom.resn} ${atom.resi}`, { position: atom, backgroundColor: '#14202b', backgroundOpacity: 0.85, fontColor: 'white', fontSize: 12 }); }, (atom, view) => { if (atom.label) { view.removeLabel(atom.label); delete atom.label; } });
         viewer.setClickable({}, true, (atom) => { const e = chainElements().find((x) => atom.resi >= x.start && atom.resi <= x.end && !state.hidden.has(x.uid)); if (e) { select(e.uid); style3D(); } });
         v3.chain = chain; v3.caOnly = state.atoms[chain].every((a) => a.name === 'CA'); style3D(true); viewer.zoomTo(); viewer.render();
-        for (const id of ['topo-3dCenter', 'topo-3dReset', 'topo-3dPng', 'topo-3dSpinWrap', 'topo-3dLabelsWrap', 'topo-3dSizeWrap', 'topo-3dSvg']) $(id).hidden = false;
+        for (const id of ['topo-3dCenter', 'topo-3dReset', 'topo-3dPng', 'topo-3dSpinWrap', 'topo-3dLabelsWrap', 'topo-3dSizeWrap', 'topo-3dFontWrap', 'topo-3dSvg']) $(id).hidden = false;
         $('topo-3dShow').textContent = 'Reload 3D'; $('topo-3dShow').disabled = false;
         const caOnly = v3.caOnly;
-        $('topo-3dNote').textContent = `Chain ${chain} · ${state.atoms[chain].length.toLocaleString()} atoms${caOnly ? ' (Cα only, drawn as a tube)' : ''} · left-drag rotates · right-drag moves · scroll zooms · click a helix or strand to select it`;
+        $('topo-3dStats').textContent = `Chain ${chain} · ${state.atoms[chain].length.toLocaleString()} atoms${caOnly ? ' (Cα only, drawn as a tube)' : ''}`; $('topo-3dNote').textContent = 'Left-drag rotates · right-drag moves · scroll zooms · click a helix or strand to select it'; size3D();
       }
       function update3DAvailability() {
         const chain = $('topo-chain').value, has = !!state.atoms[chain]?.length;
         $('topo-3dShow').disabled = !has;
-        if (!has) { v3.shown = false; if (v3.viewer) { v3.viewer.clear(); v3.viewer.render(); } $('topo-3dEmpty').hidden = false; $('topo-3dEmpty').textContent = state.all.length ? 'No atom coordinates for this chain.' : 'The 3D structure appears here.'; for (const id of ['topo-3dCenter', 'topo-3dReset', 'topo-3dPng', 'topo-3dSpinWrap', 'topo-3dLabelsWrap', 'topo-3dSizeWrap', 'topo-3dSvg']) $(id).hidden = true; $('topo-3dShow').textContent = 'Show 3D structure'; $('topo-3dNote').textContent = state.all.length ? 'This file has no atom coordinates for this chain, so there is nothing to show in 3D.' : 'Open a CIF file with atom coordinates to view the chain in 3D, colored like the diagram.'; return; }
+        if (!has) { v3.shown = false; if (v3.viewer) { v3.viewer.clear(); v3.viewer.render(); } $('topo-3dEmpty').hidden = false; $('topo-3dEmpty').textContent = state.all.length ? 'No atom coordinates for this chain.' : 'The 3D structure appears here.'; for (const id of ['topo-3dCenter', 'topo-3dReset', 'topo-3dPng', 'topo-3dSpinWrap', 'topo-3dLabelsWrap', 'topo-3dSizeWrap', 'topo-3dFontWrap', 'topo-3dSvg']) $(id).hidden = true; $('topo-3dShow').textContent = 'Show 3D structure'; $('topo-3dStats').textContent = state.all.length ? 'No coordinates' : 'No structure loaded'; $('topo-3dNote').textContent = state.all.length ? 'This file has no atom coordinates for this chain, so there is nothing to show in 3D.' : 'Open a CIF file with atom coordinates to view the chain in 3D, colored like the diagram.'; return; }
         // Side by side with the diagram, so open the 3D view as soon as there are coordinates.
         if (!v3.shown || v3.chain !== chain) show3D();
       }
@@ -1355,6 +1374,7 @@ render();
       $('topo-3dReset').onclick = () => { v3.viewer?.zoomTo(); v3.viewer?.render(); };
       $('topo-3dCenter').onclick = () => { const e = chainElements().find((x) => x.uid === state.sel); if (!e || !v3.viewer) { $('topo-3dNote').textContent = 'Select a helix or strand first.'; return; } v3.viewer.zoomTo({ resi: `${e.start}-${e.end}` }, 600); };
       $('topo-3dLabels').onchange = () => style3D();
+      for (const id of ['topo-3dFont', 'topo-3dIn']) $(id).addEventListener('input', () => { style3D(); size3D(); });
       $('topo-3dSpin').onchange = () => v3.viewer?.spin($('topo-3dSpin').checked ? 'y' : false);
       // Exports at a set physical size: width in inches × dpi gives the pixel width. The view is rendered once at that
       // size (labels and lines scale with it) and the on-screen viewer is restored afterwards.
@@ -1392,28 +1412,56 @@ render();
         return new Blob([out], { type: 'image/png' });
       }
       function saveBlob(blob, name) { const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = name; document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000); }
+      // Label boxes in viewer (CSS pixel) coordinates. Exports draw these themselves, as sharp vectors or at full
+      // resolution, instead of using 3Dmol's labels, which are small bitmaps that turn blurry when enlarged.
+      function exportLabels() {
+        const viewer = v3.viewer, off = viewer.canvasOffset(), ca = state.ca[v3.chain] || [], out = [];
+        const fpx = label3DPx(), k = fpx / 13;
+        if (!$('topo-3dLabels').checked) return out;
+        for (const e of chainElements()) {
+          if (state.hidden.has(e.uid)) continue;
+          const pts = ca.filter((a) => a.n >= e.start && a.n <= e.end); if (!pts.length) continue;
+          const c = pts.reduce((acc, a) => ({ x: acc.x + a.x / pts.length, y: acc.y + a.y / pts.length, z: acc.z + a.z / pts.length }), { x: 0, y: 0, z: 0 });
+          const sp = viewer.modelToScreen(c);
+          out.push({ text: e.label, x: sp.x - off.left, y: sp.y - off.top, w: (e.label.length * 7.6 + 10) * k, h: 18 * k, r: 3 * k, base: 4.5 * k, fpx,
+            bg: e.uid === state.sel ? '#e8590c' : mix(residueColor(Math.round((e.start + e.end) / 2)), '#000000', 0.25) });
+        }
+        return out;
+      }
+      // Structure without 3Dmol labels at the export size; the viewer's labels are restored afterwards.
+      function structureShot(size) {
+        const viewer = v3.viewer; viewer.removeAllLabels();
+        try { return hiResPNG(size.scale, size.px); } finally { labels3D(); viewer.render(); }
+      }
       $('topo-3dPng').onclick = () => {
         if (!v3.viewer) return; const size = exportSize(); if (!size) return;
-        let shot; try { shot = hiResPNG(size.scale, size.px); } catch (err) { shot = { uri: v3.viewer.pngURI() }; }
-        saveBlob(pngWithDpi(shot.uri, size.dpi), labFileName('3d', 'png'));
-        if (shot.width) message(`3D image saved: ${shot.width} × ${shot.height} px, ${size.inches} × ${(size.inches * shot.height / shot.width).toFixed(2)} in at ${size.dpi} dpi.`);
+        const labels = exportLabels(), W = v3.viewer.WIDTH;
+        let shot; try { shot = structureShot(size); } catch (err) { message('Could not render the 3D image at that size. Try a smaller width or dpi.'); return; }
+        const img = new Image();
+        img.onload = () => {
+          const cv = document.createElement('canvas'); cv.width = img.width; cv.height = img.height;
+          const g = cv.getContext('2d'), f = img.width / W; g.drawImage(img, 0, 0); g.scale(f, f);
+          g.textAlign = 'center'; g.textBaseline = 'alphabetic';
+          for (const L of labels) {
+            g.globalAlpha = 0.9; g.fillStyle = L.bg; g.beginPath();
+            if (g.roundRect) g.roundRect(L.x - L.w / 2, L.y - L.h / 2, L.w, L.h, L.r); else g.rect(L.x - L.w / 2, L.y - L.h / 2, L.w, L.h);
+            g.fill(); g.globalAlpha = 1; g.fillStyle = '#ffffff'; g.font = `${L.fpx}px Arial, Helvetica, sans-serif`; g.fillText(L.text, L.x, L.y + L.base);
+          }
+          cv.toBlob((blob) => blob.arrayBuffer().then((buf) => {
+            const bytes = new Uint8Array(buf); let bin = ''; for (let i = 0; i < bytes.length; i += 32768) bin += String.fromCharCode(...bytes.subarray(i, i + 32768));
+            saveBlob(pngWithDpi('data:image/png;base64,' + btoa(bin), size.dpi), labFileName('3d', 'png'));
+            message(`3D image saved: ${cv.width} × ${cv.height} px, ${size.inches} × ${(size.inches * cv.height / cv.width).toFixed(2)} in at ${size.dpi} dpi.`);
+          }), 'image/png');
+        };
+        img.src = shot.uri;
       };
       // SVG: the rendered structure as an embedded image, with each label as its own editable text group on top.
       $('topo-3dSvg').onclick = () => {
         if (!v3.viewer) return; const size = exportSize(); if (!size) return;
-        const viewer = v3.viewer, W = viewer.WIDTH, H = viewer.HEIGHT, off = viewer.canvasOffset(), ca = state.ca[v3.chain] || [];
+        const viewer = v3.viewer, W = viewer.WIDTH, H = viewer.HEIGHT;
         const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
-        const labels = [];
-        if ($('topo-3dLabels').checked) for (const e of chainElements()) {
-          if (state.hidden.has(e.uid)) continue;
-          const pts = ca.filter((a) => a.n >= e.start && a.n <= e.end); if (!pts.length) continue;
-          const c = pts.reduce((acc, a) => ({ x: acc.x + a.x / pts.length, y: acc.y + a.y / pts.length, z: acc.z + a.z / pts.length }), { x: 0, y: 0, z: 0 });
-          const sp = viewer.modelToScreen(c), x = sp.x - off.left, y = sp.y - off.top;
-          const bg = e.uid === state.sel ? '#e8590c' : mix(residueColor(Math.round((e.start + e.end) / 2)), '#000000', 0.25), w = e.label.length * 7.6 + 10;
-          labels.push(`<g id="label-${esc(e.label)}"><rect x="${(x - w / 2).toFixed(1)}" y="${(y - 9).toFixed(1)}" width="${w.toFixed(1)}" height="18" rx="3" fill="${bg}" fill-opacity="0.9"/><text x="${x.toFixed(1)}" y="${(y + 4.5).toFixed(1)}" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#ffffff">${esc(e.label)}</text></g>`);
-        }
-        viewer.removeAllLabels();
-        let shot; try { shot = hiResPNG(size.scale, size.px); } finally { labels3D(); viewer.render(); }
+        const labels = exportLabels().map((L) => `<g id="label-${esc(L.text)}"><rect x="${(L.x - L.w / 2).toFixed(1)}" y="${(L.y - L.h / 2).toFixed(1)}" width="${L.w.toFixed(1)}" height="${L.h.toFixed(1)}" rx="${L.r.toFixed(1)}" fill="${L.bg}" fill-opacity="0.9"/><text x="${L.x.toFixed(1)}" y="${(L.y + L.base).toFixed(1)}" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="${L.fpx.toFixed(2)}" fill="#ffffff">${esc(L.text)}</text></g>`);
+        const shot = structureShot(size);
         const hIn = (size.inches * H / W).toFixed(4);
         const svg = `<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${size.inches}in" height="${hIn}in" viewBox="0 0 ${W} ${H}">\n<g id="structure"><image width="${W}" height="${H}" preserveAspectRatio="none" xlink:href="${shot.uri}" href="${shot.uri}"/></g>\n<g id="labels">\n${labels.join('\n')}\n</g>\n</svg>\n`;
         saveBlob(new Blob([svg], { type: 'image/svg+xml' }), labFileName('3d', 'svg'));
@@ -1498,7 +1546,7 @@ render();
       // ---------- sessions: everything needed to pick up where you left off ----------
       const SEQ_INPUTS = ['svgWidth', 'figureTitle', 'alphaColor', 'helix310Color', 'strandColor', 'loopColor', 'fontSize', 'labelFont', 'spacing', 'rowSpace', 'wrap'];
       const SEQ_CHECKS = ['elementNames', 'numbers', 'domainShade'];
-      const TOPO_INPUTS = ['topo-minHelix', 'topo-minStrand', 'topo-font', 'topo-width', 'topo-title', 'topo-3dIn', 'topo-3dDpi'];
+      const TOPO_INPUTS = ['topo-minHelix', 'topo-minStrand', 'topo-font', 'topo-width', 'topo-title', 'topo-3dIn', 'topo-3dDpi', 'topo-3dFont'];
       function sessionData() {
         const seqRows = typeof all !== 'undefined' ? all : [];
         return {
@@ -1543,7 +1591,7 @@ render();
       }
       $('topo-openSession').addEventListener('change', async () => { const f = $('topo-openSession').files[0]; $('topo-openSession').value = ''; if (f) openSession(f); });
       // ---------- your defaults: export sizes are remembered in this browser ----------
-      const PREF_KEY = 'sharaflab-tools-prefs', PREF_IDS = ['topo-3dIn', 'topo-3dDpi', 'topo-width', 'topo-font', 'svgWidth', 'fontSize', 'labelFont'];
+      const PREF_KEY = 'sharaflab-tools-prefs', PREF_IDS = ['topo-3dIn', 'topo-3dDpi', 'topo-3dFont', 'topo-width', 'topo-font', 'svgWidth', 'fontSize', 'labelFont'];
       function savePrefs() { try { localStorage.setItem(PREF_KEY, JSON.stringify(Object.fromEntries(PREF_IDS.map((id) => [id, $(id).value])))); } catch (err) { /* storage unavailable: defaults just aren't remembered */ } }
       function loadPrefs() {
         let p = null; try { p = JSON.parse(localStorage.getItem(PREF_KEY) || 'null'); } catch (err) { return; }
