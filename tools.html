@@ -151,6 +151,7 @@
 .topo-file:focus-within,.topo-tool button:focus-visible,.topo-tool input:focus-visible,.topo-tool select:focus-visible{outline:3px solid #0b6870;outline-offset:2px}
 .topo-tool .topo-primary{background:#0b6870;border-color:#0b6870;color:#fff;font-weight:600}
 .topo-tool .topo-primary:hover{background:#095a61}
+.topo-session{display:inline-flex;gap:8px;margin-left:auto;flex-wrap:wrap}
 .topo-size{color:#6b7f83;font-size:13px}
 .topo-message{color:#9a2f2f;font-size:14px;min-height:20px}
 .topo-note{margin:0 0 12px;color:#586e73;font-size:14px}
@@ -276,6 +277,10 @@
           <div class="topo-bar">
             <label class="topo-file">Open CIF<input id="topo-file" type="file" accept=".cif,.mmcif,.txt"></label>
             <label>Chain <select id="topo-chain"></select></label>
+            <span class="topo-session">
+              <button id="topo-saveSession" type="button" disabled title="Save the file, domains, layout and settings so you can continue later">Save session</button>
+              <label class="topo-file">Open session<input id="topo-openSession" type="file" accept=".json,application/json"></label>
+            </span>
           </div>
           <div class="topo-message" id="topo-msg" role="status"></div>
           <p class="topo-note" id="topo-source"></p>
@@ -429,6 +434,9 @@ const $=id=>document.getElementById(id), NS='http://www.w3.org/2000/svg';
 const aa=Object.fromEntries('ALA ARG ASN ASP CYS GLN GLU GLY HIS ILE LEU LYS MET PHE PRO SER THR TRP TYR VAL'.split(' ').map((a,i)=>[a,'ARNDCQEGHILKMFPSTWYV'[i]]));Object.assign(aa,{MSE:'M',SEC:'U',PYL:'O'});
 const names={H:'α-helix',G:'3₁₀ helix',I:'π-helix',E:'β-strand',B:'Isolated β-bridge',T:'Turn',S:'Bend',P:'Polyproline II helix','.':'Unassigned / loop','-':'Unassigned / loop'};
 const kind=s=>'HGI'.includes(s)?'helix':'EB'.includes(s)?'strand':'loop';
+// Download names: YYMMDD_filename_module.ext (e.g. 261009_2lzm_topology.svg). The file name comes from the opened CIF.
+window.labFileBase='structure';
+function labFileName(module,ext){const d=new Date(),p=n=>String(n).padStart(2,'0');return `${p(d.getFullYear()%100)}${p(d.getMonth()+1)}${p(d.getDate())}_${window.labFileBase||'structure'}_${module}.${ext}`}
 // PDB files write helices as HELX_P with a helix class (1 α, 3 π, 5 3₁₀, 10 polyproline); DSSP writes HELX_RH_AL_P etc.
 const confType=r=>r.conf_type_id==='HELX_P'?({'1':'HELX_RH_AL_P','3':'HELX_RH_PI_P','5':'HELX_RH_3T_P','10':'HELX_LH_PP_P','?':'HELX_RH_AL_P','.':'HELX_RH_AL_P'}[r.pdbx_pdb_helix_class??r.pdbx_PDB_helix_class??'?']||'OTHER'):r.conf_type_id;
 let all=[],current=[],selected=-1,history=[],pendingText="",sizeScale=0.5,numberShift={};
@@ -590,7 +598,7 @@ function showSourcePart(){const part=sourceParts[Number($('sourcePart').value)||
 $('sourcePart').onchange=showSourcePart;$('sourceWrap').onchange=()=>$('sourceText').classList.toggle('wrap',$('sourceWrap').checked);
 $('copySource').onclick=async()=>{const t=$('sourceText').textContent;try{await navigator.clipboard.writeText(t);$('copySource').textContent='Copied'}catch(e){const r=document.createRange();r.selectNodeContents($('sourceText'));const s=getSelection();s.removeAllRanges();s.addRange(r);$('copySource').textContent='Selected · press Ctrl/Cmd+C'}setTimeout(()=>$('copySource').textContent='Copy',2000)};
 function find(){const n=Number($('find').value),i=current.findIndex(r=>shown(r)===n);if($('find').value===''||i<0){$('message').textContent='That residue is not present in this chain.';return}$('message').textContent='';inspect(i,true)}$('go').onclick=find;$('find').onkeydown=e=>{if(e.key==='Enter')find()};
-$('export').onclick=()=>{const inches=Number($('svgWidth').value);if(!Number.isFinite(inches)||inches<1||inches>100){$('message').textContent='Enter an SVG width between 1 and 100 inches.';$('svgWidth').focus();return}$('message').textContent='';const svg=$('canvas').firstElementChild.cloneNode(true);const box=svg.viewBox.baseVal;svg.setAttribute('width',inches+'in');svg.setAttribute('height',(inches*box.height/box.width).toFixed(4)+'in');svg.querySelectorAll('.residue').forEach(g=>{g.removeAttribute('tabindex');g.removeAttribute('role')});const url=URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(svg)],{type:'image/svg+xml'}));const a=document.createElement('a');a.href=url;a.download='secondary-structure.svg';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000)};
+$('export').onclick=()=>{const inches=Number($('svgWidth').value);if(!Number.isFinite(inches)||inches<1||inches>100){$('message').textContent='Enter an SVG width between 1 and 100 inches.';$('svgWidth').focus();return}$('message').textContent='';const svg=$('canvas').firstElementChild.cloneNode(true);const box=svg.viewBox.baseVal;svg.setAttribute('width',inches+'in');svg.setAttribute('height',(inches*box.height/box.width).toFixed(4)+'in');svg.querySelectorAll('.residue').forEach(g=>{g.removeAttribute('tabindex');g.removeAttribute('role')});const url=URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(svg)],{type:'image/svg+xml'}));const a=document.createElement('a');a.href=url;a.download=labFileName('sequence','svg');document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000)};
 render();
 </script>
     <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js" defer></script>
@@ -1335,10 +1343,12 @@ render();
       $('topo-3dCenter').onclick = () => { const e = chainElements().find((x) => x.uid === state.sel); if (!e || !v3.viewer) { $('topo-3dNote').textContent = 'Select a helix or strand first.'; return; } v3.viewer.zoomTo({ resi: `${e.start}-${e.end}` }, 600); };
       $('topo-3dLabels').onchange = () => style3D();
       $('topo-3dSpin').onchange = () => v3.viewer?.spin($('topo-3dSpin').checked ? 'y' : false);
-      $('topo-3dPng').onclick = () => { if (!v3.viewer) return; const a = document.createElement('a'); a.href = v3.viewer.pngURI(); a.download = `structure-chain-${$('topo-chain').value}.png`; document.body.append(a); a.click(); a.remove(); };
+      $('topo-3dPng').onclick = () => { if (!v3.viewer) return; const a = document.createElement('a'); a.href = v3.viewer.pngURI(); a.download = labFileName('3d', 'png'); document.body.append(a); a.click(); a.remove(); };
 
       // ---------- loading and export ----------
       function load(text, name) {
+        state.text = text; state.name = name || 'structure';
+        window.labFileBase = String(name || 'structure').replace(/\.(cif|mmcif|txt)$/i, '').replace(/[^\w.-]+/g, '_') || 'structure';
         state.notes = []; state.manual.clear(); state.hidden.clear(); state.sel = null; v3.chain = null; state.atoms = {};
         try {
           if (!/^\s*(?:#.*\r?\n\s*)?data_/im.test(text)) throw Error('This is not a CIF file. Process your structure at pdb-redo.eu/dssp and open the .cif file it returns.');
@@ -1348,10 +1358,10 @@ render();
           if (!state.all.length) throw Error('No helices or strands found in this file. Process it with DSSP at pdb-redo.eu/dssp first, then open the CIF file it returns.');
           const chains = [...new Set(state.all.map((e) => e.chain))]; $('topo-chain').replaceChildren(...chains.map((c) => { const o = document.createElement('option'); o.value = o.textContent = c; return o; }));
           $('topo-source').textContent = name ? `${name} · label residue numbering` : 'Label residue numbering';
-          coordDomains(false); render(); update3DAvailability();
+          coordDomains(false); render(); update3DAvailability(); $('topo-saveSession').disabled = false;
           window.load?.(text); syncChain();  // the sequence view reads the same file
           message(state.notes.join(' '));
-        } catch (err) { state.all = []; render(); update3DAvailability(); message(err.message); }
+        } catch (err) { state.all = []; state.text = ''; $('topo-saveSession').disabled = true; render(); update3DAvailability(); message(err.message); }
       }
       $('topo-file').addEventListener('change', async () => { const f = $('topo-file').files[0]; if (!f) return; if (f.size > 25e6) { message('Files up to 25 MB are supported.'); return; } load(await f.text(), f.name); });
       $('topo-chain').onchange = () => { state.manual.clear(); state.hidden.clear(); state.sel = null; state.notes = []; coordDomains(false); render(); update3DAvailability(); syncChain(); message(state.notes.join(' ')); };
@@ -1365,7 +1375,7 @@ render();
         copy.querySelectorAll('.topo-hit').forEach((h) => h.remove());
         copy.querySelectorAll('.topo-el, .topo-loop').forEach((g) => { g.removeAttribute('tabindex'); g.removeAttribute('role'); g.removeAttribute('class'); g.removeAttribute('data-uid'); });
         const url = URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(copy)], { type: 'image/svg+xml' }));
-        const a = document.createElement('a'); a.href = url; a.download = `topology-chain-${$('topo-chain').value}.svg`; document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+        const a = document.createElement('a'); a.href = url; a.download = labFileName('topology', 'svg'); document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000);
       };
       // Residues of each domain as one-letter sequences (FASTA). Uses the full sequence from the sequence view when available.
       const ONE = { ALA: 'A', ARG: 'R', ASN: 'N', ASP: 'D', CYS: 'C', GLN: 'Q', GLU: 'E', GLY: 'G', HIS: 'H', ILE: 'I', LEU: 'L', LYS: 'K', MET: 'M', PHE: 'F', PRO: 'P', SER: 'S', THR: 'T', TRP: 'W', TYR: 'Y', VAL: 'V', MSE: 'M', SEC: 'U', PYL: 'O' };
@@ -1395,7 +1405,7 @@ render();
         $('topo-seqCopy').disabled = $('topo-seqFasta').disabled = !t;
       }
       $('topo-seqCopy').onclick = async () => { const b = $('topo-seqCopy'); try { await navigator.clipboard.writeText(domainFasta()); b.textContent = 'Copied'; } catch (e) { const r = document.createRange(); r.selectNodeContents($('topo-seqText')); const s = getSelection(); s.removeAllRanges(); s.addRange(r); b.textContent = 'Selected · press Ctrl/Cmd+C'; } setTimeout(() => b.textContent = 'Copy', 2000); };
-      $('topo-seqFasta').onclick = () => { const url = URL.createObjectURL(new Blob([domainFasta() + '\n'], { type: 'text/plain' })); const a = document.createElement('a'); a.href = url; a.download = `domains-chain-${$('topo-chain').value}.fasta`; document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000); };
+      $('topo-seqFasta').onclick = () => { const url = URL.createObjectURL(new Blob([domainFasta() + '\n'], { type: 'text/plain' })); const a = document.createElement('a'); a.href = url; a.download = labFileName('domains', 'fasta'); document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000); };
       window.topoDomainColor = (chain, n) => { if (chain !== $('topo-chain').value) return null; const d = domains.find((d) => d.ranges.some(([a, b]) => n >= a && n <= b)); return d ? d.color : null; };
       let ssKey = '';
       function syncSequence(force) {
@@ -1410,6 +1420,53 @@ render();
         if (c && [...sel.options].some((o) => o.value === c) && sel.value !== c) { sel.value = c; sel.onchange?.(); }
         syncSequence(true);
       }
+      // ---------- sessions: everything needed to pick up where you left off ----------
+      const SEQ_INPUTS = ['svgWidth', 'figureTitle', 'alphaColor', 'helix310Color', 'strandColor', 'loopColor', 'fontSize', 'labelFont', 'spacing', 'rowSpace', 'wrap'];
+      const SEQ_CHECKS = ['elementNames', 'numbers', 'domainShade'];
+      const TOPO_INPUTS = ['topo-minHelix', 'topo-minStrand', 'topo-font', 'topo-width', 'topo-title'];
+      function sessionData() {
+        const seqRows = typeof all !== 'undefined' ? all : [];
+        return {
+          app: 'sharaflab-structure-tools', version: 1, saved: new Date().toISOString(),
+          fileName: state.name, cif: state.text, chain: $('topo-chain').value,
+          domains, manual: [...state.manual], hidden: [...state.hidden],
+          topology: Object.fromEntries(TOPO_INPUTS.map((id) => [id, $(id).value])), labels3D: $('topo-3dLabels').checked,
+          sequence: {
+            inputs: Object.fromEntries(SEQ_INPUTS.map((id) => [id, $(id).value])),
+            checks: Object.fromEntries(SEQ_CHECKS.map((id) => [id, $(id).checked])),
+            overrides: seqRows.filter((r) => r.ss !== r.originalSS).map((r) => [r.chain, r.n, r.ss]),
+            numberShift: typeof numberShift !== 'undefined' ? numberShift : {},
+          },
+        };
+      }
+      $('topo-saveSession').onclick = () => {
+        if (!state.text) return;
+        const url = URL.createObjectURL(new Blob([JSON.stringify(sessionData())], { type: 'application/json' }));
+        const a = document.createElement('a'); a.href = url; a.download = labFileName('session', 'json'); document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+        message('Session saved. Open it later with “Open session” to continue where you left off.');
+      };
+      async function openSession(file) {
+        let data;
+        try { data = JSON.parse(await file.text()); } catch (err) { message('This is not a session file. Choose a .json file saved with “Save session”.'); return; }
+        if (data?.app !== 'sharaflab-structure-tools' || typeof data.cif !== 'string') { message('This is not a session file. Choose a .json file saved with “Save session”.'); return; }
+        for (const [id, v] of Object.entries(data.topology || {})) if (TOPO_INPUTS.includes(id)) $(id).value = v;
+        if (typeof data.labels3D === 'boolean') $('topo-3dLabels').checked = data.labels3D;
+        load(data.cif, data.fileName);
+        if (!state.all.length) return;
+        if (data.chain && data.chain !== $('topo-chain').value && [...$('topo-chain').options].some((o) => o.value === data.chain)) { $('topo-chain').value = data.chain; $('topo-chain').onchange(); }
+        if (Array.isArray(data.domains) && data.domains.length) { domains = data.domains.map((d, i) => ({ name: String(d.name || `Domain ${i + 1}`), ranges: (d.ranges || []).map(([a, b]) => [Number(a), Number(b)]), color: /^#[0-9a-f]{6}$/i.test(d.color) ? d.color : PALETTE[i % PALETTE.length] })); renderDomains(); $('topo-domainNote').textContent = 'Domains restored from your session.'; }
+        state.manual = new Map(data.manual || []); state.hidden = new Set(data.hidden || []);
+        // Sequence view: size first (it rescales fonts and spacing), then the exact saved values.
+        const seq = data.sequence || {};
+        if (seq.inputs?.svgWidth) { $('svgWidth').value = seq.inputs.svgWidth; if (typeof syncSizeControls === 'function') syncSizeControls(); }
+        for (const [id, v] of Object.entries(seq.inputs || {})) if (SEQ_INPUTS.includes(id) && id !== 'svgWidth') { $(id).value = v; if ($(id + 'Value')) $(id + 'Value').textContent = Number(Number(v).toFixed(2)); }
+        for (const [id, v] of Object.entries(seq.checks || {})) if (SEQ_CHECKS.includes(id)) $(id).checked = !!v;
+        if (typeof all !== 'undefined') for (const [c, n, ss] of seq.overrides || []) { const r = all.find((x) => x.chain === c && x.n === n); if (r) r.ss = ss; }
+        if (typeof numberShift !== 'undefined') { for (const k of Object.keys(numberShift)) delete numberShift[k]; Object.assign(numberShift, seq.numberShift || {}); }
+        render(); syncSequence(true);
+        message(`Session restored: ${data.fileName || 'structure'}, saved ${data.saved ? new Date(data.saved).toLocaleString() : 'earlier'}.`);
+      }
+      $('topo-openSession').addEventListener('change', async () => { const f = $('topo-openSession').files[0]; $('topo-openSession').value = ''; if (f) openSession(f); });
       window.topoLoad = load; // used by the test page to preload a sample
       window.topoDebug = { pdbText, viewer: () => v3.viewer };
       render();
