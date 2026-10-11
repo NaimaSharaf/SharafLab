@@ -1,0 +1,453 @@
+<!doctype html>
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="Sharaf Lab tool: add blank space to every page of a PDF for notes. Files are processed on your own device."
+    />
+    <meta
+      name="description"
+      content="Sharaf Lab tools: a secondary structure viewer for DSSP-annotated CIF files and a PDF extender that adds space for notes, and a protein topology diagram maker."
+    />
+    <title>Extend PDF for Notes | Sharaf Lab Tools</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600&family=Montserrat:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../../styles.css" />
+    <!-- Secondary Structure viewer styles, scoped to .ss-tool.
+         Source: https://github.com/NaimaSharaf/Second-Structure -->
+    <style>
+.ss-tool{font-family:"Manrope",Arial,sans-serif;color:#142d44;background:transparent}
+.ss-tool{max-width:1500px;margin:auto;padding:24px 4vw}
+.ss-tool button,.ss-tool .file{border:1px solid #b8c8d5;background:white;border-radius:7px;padding:10px 14px;font:inherit;cursor:pointer;color:#173650}
+.ss-tool button:hover,.ss-tool .file:hover{background:#e7f7f5}
+.ss-tool button:focus-visible,.ss-tool select:focus-visible,.ss-tool input:focus-visible,.ss-tool textarea:focus-visible{outline:3px solid #0b6870;outline-offset:3px}
+.ss-tool .primary{background:#0b6870;color:white;border-color:#0b6870}
+.ss-tool .toolbar{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.ss-tool .toolbar label{display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+.ss-tool label{font-size:14px}
+.ss-tool select,.ss-tool input[type=number]{font:inherit;padding:8px;border:1px solid #b8c8d5;border-radius:5px;background:white}
+.ss-tool input[type=number]{width:90px}
+.ss-tool .file input{position:absolute;opacity:0;width:1px;height:1px}
+.ss-tool .file:focus-within{outline:3px solid #0b6870}
+.ss-tool .stats{display:flex;gap:30px;flex-wrap:wrap;margin:24px 0;color:#52687a}
+.ss-tool .stats b{font-size:25px;display:block;color:#142d44;margin-bottom:4px}
+.ss-tool .panel{background:white;border:1px solid #d8e1e9;border-radius:12px;overflow:hidden}
+.ss-tool .panelhead{padding:18px 22px;border-bottom:1px solid #e4ebf0;display:flex;justify-content:space-between;gap:15px;flex-wrap:wrap}
+.ss-tool .legend{display:flex;gap:20px;font-size:14px}
+.ss-tool .legend span:before{content:'';display:inline-block;width:20px;height:5px;background:var(--c);vertical-align:middle;margin-right:7px}
+.ss-tool .canvas{overflow-x:auto;padding:15px}
+.ss-tool svg{display:block;max-width:none}
+.ss-tool .detail{padding:16px 22px;background:#edf7f6;min-height:54px;font-size:15px;line-height:1.5}
+.ss-tool details{margin-top:20px}
+.ss-tool summary{cursor:pointer;font-size:15px}
+.ss-tool textarea{display:block;width:100%;height:160px;margin:12px 0;padding:12px;font:13px monospace;border:1px solid #b8c8d5;border-radius:6px}
+.ss-tool .note{color:#5f7283;font-size:14px;line-height:1.6}
+.ss-tool #message{color:#aa3030;min-height:20px;margin-top:12px}
+.ss-tool .residue{cursor:pointer}
+.ss-tool .residue:hover rect,.ss-tool .residue:focus rect,.ss-tool .residue.selected rect{fill:#d4f0eb;stroke:#0b6870}
+.ss-tool .residue:focus{outline:none}
+.ss-tool footer{margin-top:18px;font-size:13px;color:#627689}
+@media(max-width:600px){
+.ss-tool{padding:18px}
+.ss-tool .stats{gap:20px}
+.ss-tool .toolbar{gap:10px}
+}
+.ss-tool .editor{background:white;border:1px solid #d8e1e9;border-radius:12px;padding:18px 22px;margin:0 0 20px}
+.ss-tool .editor h2{font-size:18px;margin:0 0 14px}
+.ss-tool .editor-grid{display:flex;align-items:center;flex-wrap:wrap;gap:16px 24px}
+.ss-tool .editor-grid label{display:flex;align-items:center;gap:8px}
+.ss-tool .editor input[type=text]{padding:9px;border:1px solid #b8c8d5;border-radius:5px;font:inherit;width:230px}
+.ss-tool .editor input[type=color]{width:38px;height:32px;border:0;padding:0;background:transparent}
+.ss-tool .editor input[type=range]{width:100px;accent-color:#0b6870}
+.ss-tool .editor output{min-width:25px}
+.ss-tool .edit-status{font-size:14px;color:#607589;margin-top:12px}
+.ss-tool .range-editor{margin-top:16px;padding-top:16px;border-top:1px solid #e4ebf0}
+.ss-tool .summary{background:white;border:1px solid #d8e1e9;border-radius:12px;padding:18px 22px;margin:0 0 20px}
+.ss-tool .summary h2{font-size:18px;margin:0 0 10px}
+.ss-tool .summary-row{display:grid;grid-template-columns:130px 90px 1fr;gap:6px 16px;align-items:baseline;padding:9px 0;border-bottom:1px solid #e4ebf0}
+.ss-tool .summary-row span{font-size:14px;color:#52687a}
+.ss-tool .summary-row strong{font-size:20px;color:#142d44}
+.ss-tool .summary-row small{font-size:14px;color:#0b6870}
+.ss-tool .summary .note{margin:12px 0 0;font-size:13px}
+@media(max-width:600px){.ss-tool .summary-row{grid-template-columns:1fr auto}.ss-tool .summary-row small{grid-column:1/-1}}
+.ss-tool .source-view{background:white;border:1px solid #d8e1e9;border-radius:12px;padding:18px 22px;margin:20px 0 0}
+.ss-tool .source-head{display:flex;justify-content:space-between;align-items:center;gap:12px 20px;flex-wrap:wrap}
+.ss-tool .source-head h2{font-size:18px;margin:0}
+.ss-tool .source-controls{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.ss-tool .source-controls label{display:inline-flex;align-items:center;gap:8px}
+.ss-tool .source-view .note{margin:10px 0}
+.ss-tool #sourceText{margin:0;max-height:420px;overflow:auto;padding:14px 16px;background:#f4f7f9;border:1px solid #e1e8ee;border-radius:8px;font:12px/1.55 ui-monospace,Menlo,Consolas,monospace;color:#142d44;white-space:pre;tab-size:4}
+.ss-tool #sourceText.wrap{white-space:pre-wrap;overflow-wrap:anywhere}
+.ss-tool .range-editor p{font-size:14px;color:#607589;margin:0 0 12px}
+.ss-tool{max-width:1180px;padding:0 24px 90px;line-height:normal}
+.ss-tool h2{font-family:"Montserrat",Arial,sans-serif}
+.ss-tool .ss-foot{margin-top:18px;font-size:13px;color:#627689}
+.ss-source{margin:0 0 28px;font-size:14px;color:#586e73}
+.ss-source a{color:#0b6870;font-weight:700;text-underline-offset:4px}
+@media(max-width:600px){.ss-tool{padding:0 16px 60px}}
+.ss-tool{padding:0 0 10px}
+.tool-caution{max-width:1132px;margin:-60px auto 70px;padding:16px 20px;background:#fff7ec;border:1px solid #f0d2a8;border-left:4px solid #d9822b;border-radius:8px;color:#5c3b12;font-size:15px;line-height:1.6}
+.tool-caution strong{color:#8a4b0f}
+@media(max-width:1180px){.tool-caution{margin-left:24px;margin-right:24px}}
+@media(max-width:800px){.tool-caution{margin-top:-40px;margin-bottom:50px}}
+.tool-index{max-width:1180px;margin:-50px auto 0;padding:0 24px 60px;display:flex;flex-wrap:wrap;gap:12px}
+.tool-index a{display:flex;align-items:center;gap:12px;padding:14px 20px;background:#fff;border:1px solid #d8e0e0;color:#102a33;text-decoration:none;font-family:"Montserrat",Arial,sans-serif;font-size:14px;font-weight:600}
+.tool-index a:hover{border-color:#0b6870;color:#0b6870}
+.tool-index span{color:#0b6870;font-size:11px;font-weight:700;letter-spacing:.12em}
+.tool-section{padding:90px max(24px,calc((100vw - 1132px)/2)) 100px;border-top:1px solid #d7dfdf;scroll-margin-top:90px}
+.tool-section-soft{background:#f2f3f4}
+.tool-lede{max-width:740px;margin:18px 0 0;color:#586e73;font-size:17px;line-height:1.75}
+.pdf-tool{color:#102a33}
+.pdf-workspace{display:grid;grid-template-columns:1.5fr 1fr;gap:16px}
+.pdf-drop{min-height:280px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:30px;background:#fff;border:2px dashed #b8c8cc;cursor:pointer;text-align:center;transition:border-color .2s,background .2s}
+.pdf-drop:hover,.pdf-drop:focus-visible,.pdf-drop.is-dragging{border-color:#0b6870;background:#f3faf9;outline:none}
+.pdf-drop strong{font-family:"Montserrat",Arial,sans-serif;font-size:22px;font-weight:500}
+.pdf-drop p{margin:0;color:#586e73}
+.pdf-drop-icon{width:52px;height:52px;display:grid;place-items:center;margin-bottom:10px;border-radius:50%;background:#0b6870;color:#fff;font-size:22px}
+.pdf-browse{color:#0b6870;font-weight:700;text-decoration:underline;text-underline-offset:4px}
+.pdf-limit{margin-top:14px;color:#84979a;font-size:12px}
+.pdf-settings{padding:26px 28px;background:#fff;border:1px solid #d8e0e0}
+.pdf-row{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:14px 0;border-bottom:1px solid #e4ebeb}
+.pdf-row span{display:block;font-weight:600}
+.pdf-row small{display:block;color:#6b7f83;font-size:13px}
+.pdf-row label{display:block;font-weight:600}
+.pdf-field{display:inline-flex;align-items:center;gap:6px;color:#586e73;white-space:nowrap}
+.pdf-settings input,.pdf-settings select{font:inherit;padding:7px 8px;border:1px solid #b8c8d5;border-radius:5px;background:#fff;color:#102a33}
+.pdf-settings input{width:78px}
+.pdf-settings input:focus-visible,.pdf-settings select:focus-visible{outline:3px solid #0b6870;outline-offset:2px}
+.pdf-settings [hidden]{display:none}
+.pdf-row strong{font-family:"Montserrat",Arial,sans-serif;color:#0b6870;white-space:nowrap}
+.pdf-privacy{margin:18px 0 0;color:#586e73;font-size:14px}
+.pdf-file{margin-top:16px;padding:18px 22px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;background:#fff;border:1px solid #d8e0e0}
+.pdf-file[hidden],.pdf-progress[hidden],.pdf-message[hidden]{display:none}
+.pdf-file-icon{width:46px;height:54px;display:grid;place-items:center;background:#0b6870;color:#fff;font-size:11px;font-weight:700;letter-spacing:.08em}
+.pdf-file-details{flex:1;min-width:160px;display:flex;flex-direction:column;overflow-wrap:anywhere}
+.pdf-file-details span{color:#6b7f83;font-size:14px}
+.pdf-text-button,.pdf-primary{font:inherit;cursor:pointer;padding:11px 18px;border-radius:7px}
+.pdf-text-button{border:1px solid #b8c8d5;background:#fff;color:#173650}
+.pdf-primary{border:1px solid #0b6870;background:#0b6870;color:#fff;font-weight:600}
+.pdf-primary:disabled{opacity:.6;cursor:progress}
+.pdf-text-button:focus-visible,.pdf-primary:focus-visible{outline:3px solid #0b6870;outline-offset:3px}
+.pdf-progress{margin-top:16px}
+.pdf-progress-top{display:flex;justify-content:space-between;color:#586e73;font-size:14px;margin-bottom:8px}
+.pdf-track{height:6px;background:#dfe6e6;overflow:hidden}
+.pdf-track span{display:block;height:100%;width:0;background:#0b6870;transition:width .2s}
+.pdf-message{margin-top:16px;padding:14px 18px;background:#fbeeee;color:#9a2f2f;border:1px solid #efcfcf}
+.pdf-message.success{background:#edf7f6;color:#0b5a60;border-color:#cfe7e4}
+.topo-tool{color:#102a33}
+.topo-bar{display:flex;flex-wrap:wrap;align-items:center;gap:12px 18px;margin-bottom:14px}
+.topo-bar label,.topo-domain label{display:inline-flex;align-items:center;gap:8px;font-size:14px;white-space:nowrap}
+.topo-tool input[type=number],.topo-tool input[type=text],.topo-tool select{font:inherit;padding:8px;border:1px solid #b8c8d5;border-radius:5px;background:#fff;color:#142d44}
+.topo-tool input[type=number]{width:76px}
+.topo-tool input[type=text]{width:200px}
+.topo-tool button,.topo-file{font:inherit;cursor:pointer;padding:9px 14px;border:1px solid #b8c8d5;border-radius:7px;background:#fff;color:#173650}
+.topo-tool button:hover,.topo-file:hover{background:#e7f7f5}
+.topo-tool button:disabled{opacity:.5;cursor:default}
+.topo-file{position:relative}
+.topo-file input{position:absolute;opacity:0;width:1px;height:1px}
+.topo-file:focus-within,.topo-tool button:focus-visible,.topo-tool input:focus-visible,.topo-tool select:focus-visible{outline:3px solid #0b6870;outline-offset:2px}
+.topo-tool .topo-primary{background:#0b6870;border-color:#0b6870;color:#fff;font-weight:600}
+.topo-tool .topo-primary:hover{background:#095a61}
+.topo-panel-bar{margin:0;padding:12px 20px 0}
+.topo-panel-bar+.topo-panel-bar{padding-top:10px}
+.topo-panel-bar input[type=text]{width:150px}
+.topo-session{display:inline-flex;gap:8px;margin-left:auto;flex-wrap:wrap}
+.topo-size{color:#6b7f83;font-size:13px}
+.topo-message{color:#9a2f2f;font-size:14px;min-height:20px}
+.topo-note{margin:0 0 12px;color:#586e73;font-size:14px}
+.topo-panel,.topo-domains-box{background:#fff;border:1px solid #d8e0e0;border-radius:12px;overflow:hidden;margin-bottom:16px}
+.topo-panel-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px 16px;padding:14px 20px;border-bottom:1px solid #e4ebeb}
+.topo-help{color:#6b7f83;font-size:13px}
+.topo-canvas{padding:16px;overflow:auto;min-height:120px;color:#586e73}
+.topo-canvas svg{display:block;width:100%;height:auto;max-height:720px;touch-action:none;user-select:none}
+.topo-el{cursor:grab}
+.topo-loop{cursor:pointer;outline:none}
+.topo-loop .topo-hit{pointer-events:stroke}
+.topo-loop:hover .topo-vis{stroke:#0b6870;stroke-width:2.4}
+.topo-loop.selected .topo-vis,.topo-loop:focus-visible .topo-vis{stroke:#e8590c;stroke-width:3}
+.topo-el:focus{outline:none}
+.topo-el.selected polygon,.topo-el.selected path,.topo-el.selected ellipse,.topo-el:focus-visible polygon,.topo-el:focus-visible path{stroke:#e8590c;stroke-width:2.4}
+.topo-sel{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;padding:12px 20px;background:#edf7f6;border-top:1px solid #e4ebeb;font-size:14px}
+.topo-sel span{flex:1 1 140px;min-width:0}
+.topo-sel.idle span{color:#6b7f83}
+.topo-sel #topo-jiggle{margin-left:auto}
+.topo-sel[hidden],.topo-tool [hidden]{display:none}
+.topo-tool [hidden]{display:none!important}
+.topo-steps{margin:0 0 18px;padding:14px 20px 14px 40px;background:#edf7f6;border:1px solid #cfe7e4;border-radius:10px;color:#173650;font-size:15px;line-height:1.6}
+.topo-steps li+li{margin-top:4px}
+.topo-steps a{color:#0b6870;font-weight:700;text-underline-offset:3px}
+.topo-sub{margin:40px 0 14px;font-size:20px;font-weight:600;letter-spacing:-.01em;scroll-margin-top:90px}
+.topo-tool .ss-tool{padding:0;max-width:none}
+.topo-tool .ss-tool .canvas svg{width:100%;height:auto;max-width:100%}
+.topo-tool .ss-tool .ss-source{margin:0 0 14px}
+.topo-wrap{display:contents}
+.topo-3d-box .topo-panel-bar:not(:has(> :not([hidden]))){display:none}
+.topo-pair{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:16px;align-items:stretch;margin-bottom:16px}
+.topo-col{display:flex;flex-direction:column;min-width:0}
+.topo-col>.topo-sub{margin-top:40px}
+.topo-col>.topo-panel{margin-bottom:0;display:flex;flex-direction:column;flex:1}
+.topo-col .topo-canvas{flex:1;display:flex;align-items:center}
+.topo-pair .topo-3d-box .topo-3d{flex:1;min-height:420px}
+.topo-3d-empty{position:absolute;inset:0;display:grid;place-items:center;margin:0;color:#8a9ba0;font-size:14px}
+@media(max-width:1000px){.topo-pair{grid-template-columns:1fr}}
+.topo-3d{position:relative;height:460px;margin:12px 20px 20px;border:1px solid #e4ebeb;border-radius:8px;overflow:hidden;background:#fff}
+@media(max-width:600px){.topo-3d{height:340px;margin:12px}}
+.topo-domains-box .topo-note{padding:12px 20px 0}
+.topo-seqout{border-top:1px solid #e4ebeb;padding:14px 0 18px}
+.topo-seqout-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px 16px;padding:0 20px}
+.topo-seqout-actions{display:flex;gap:8px;flex-wrap:wrap}
+.topo-seqout .topo-note{padding:6px 20px 0}
+#topo-seqText{margin:10px 20px 0;max-height:320px;overflow:auto;padding:12px 14px;background:#f4f7f9;border:1px solid #e1e8ee;border-radius:8px;font:12px/1.6 ui-monospace,Menlo,Consolas,monospace;color:#142d44;white-space:pre-wrap;overflow-wrap:anywhere}
+#topo-domains{display:flex;flex-direction:column;gap:10px;padding:8px 20px 18px}
+.topo-domain{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px}
+.topo-domain input[type=color]{width:38px;height:32px;border:0;padding:0;background:transparent}
+.topo-domain input[type=text]{width:150px}
+.topo-domain .topo-dranges{width:220px}
+.topo-domain input[aria-invalid=true]{border-color:#c0392b;background:#fdf1f0}
+.topo-finder{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;padding:14px 20px 0}
+.topo-finder label{display:inline-flex;align-items:center;gap:8px;font-size:14px}
+#topo-domainNote{color:#0b5a60}
+#topo-domainNote:empty{display:none}
+@media(max-width:600px){.topo-tool input[type=text]{width:100%}}
+@media(max-width:800px){.pdf-workspace{grid-template-columns:1fr}.tool-section{padding-top:70px;padding-bottom:76px}.tool-index{margin-top:-30px}}
+    </style>
+    <style>.tool-back{display:inline-block;margin:0 0 22px;color:#0b6870;font-weight:600;text-decoration:none}.tool-back:hover{text-decoration:underline;text-underline-offset:4px}.tool-section{border-top:0;padding-top:0}</style>
+  </head>
+
+  <body class="outreach-body">
+    <header>
+      <div class="nav">
+        <a class="brand" href="../../index.html" aria-label="Sharaf Lab home"
+          ><img src="../../00%20Github%20assets/sharaf-lab-logo.png" alt="Sharaf Lab"
+        /></a>
+        <nav aria-label="Primary navigation">
+          <a href="../../index.html">Home</a>
+          <a href="../../philosophy.html">Philosophy</a>
+          <a href="../../research.html">Research</a>
+          <a href="../../members.html">Lab Members</a>
+          <a href="../../photos.html">Photos</a>
+          <a href="../../links.html">Links of Interest</a>
+          <a class="active" href="../../tools.html" aria-current="page">Tools</a>
+          <a href="../../join.html">Join the Lab</a>
+        </nav>
+      </div>
+    </header>
+    <main>
+      <section class="outreach-hero">
+        <a class="tool-back" href="../../tools.html">← All lab tools</a>
+        <p class="eyebrow eyebrow-dark">Lab tools · PDF · Notes</p>
+        <h1>Give your pages room for notes.</h1>
+        <p>
+          Adds blank space to every page so you can annotate papers and slides. Choose how much space, which side it goes on, and the page height. The original content is never changed.
+        </p>
+      </section>
+
+      <div class="tool-caution" role="note">
+        <strong>Check every result.</strong> These tools were vibe coded: built
+        quickly with AI assistance and not independently validated. Compare
+        their output with your own data and standard software before using it
+        in figures, analyses or publications.
+      </div>
+
+      <section class="tool-section tool-section-soft" id="extend-pdf" aria-labelledby="pdf-title">
+
+        <div class="pdf-tool">
+          <div class="pdf-workspace">
+            <div class="pdf-drop" id="pdf-drop" tabindex="0" role="button" aria-label="Choose a PDF" aria-describedby="pdf-drop-help">
+              <input id="pdf-input" type="file" accept="application/pdf,.pdf" hidden />
+              <div class="pdf-drop-icon" aria-hidden="true">↑</div>
+              <strong>Drop a PDF here</strong>
+              <p id="pdf-drop-help">or <span class="pdf-browse">browse your files</span></p>
+              <span class="pdf-limit">PDF files only · processed locally</span>
+            </div>
+            <aside class="pdf-settings" aria-label="Output settings">
+              <div class="pdf-row"><div><label for="pdf-ext">Extension</label><small id="pdf-extHint">Blank space added on the right</small></div><span class="pdf-field"><input id="pdf-ext" type="number" min="0" max="30" step="0.25" value="3"> in</span></div>
+              <div class="pdf-row"><div><label for="pdf-place">Placement</label><small id="pdf-placeHint">Original content stays at the left</small></div><select id="pdf-place"><option value="right" selected>Right</option><option value="left">Left</option><option value="both">Both sides</option><option value="bottom">Bottom</option><option value="top">Top</option></select></div>
+              <div class="pdf-row"><div><label for="pdf-height">Page height</label><small id="pdf-heightHint">Preserved from source</small></div><span class="pdf-field"><select id="pdf-height"><option value="same" selected>Same</option><option value="11">US Letter (11 in)</option><option value="11.69">A4 (11.69 in)</option><option value="custom">Custom</option></select><input id="pdf-heightCustom" type="number" min="1" max="100" step="0.25" value="11" aria-label="Custom page height in inches" hidden></span></div>
+              <p class="pdf-privacy">Your file never leaves this device.</p>
+            </aside>
+          </div>
+
+          <div class="pdf-file" id="pdf-file" hidden aria-live="polite">
+            <div class="pdf-file-icon" aria-hidden="true">PDF</div>
+            <div class="pdf-file-details"><strong id="pdf-file-name">document.pdf</strong><span id="pdf-file-meta">Ready to extend</span></div>
+            <button class="pdf-text-button" id="pdf-remove" type="button">Remove</button>
+            <button class="pdf-primary" id="pdf-extend" type="button">Extend PDF →</button>
+          </div>
+
+          <div class="pdf-progress" id="pdf-progress" hidden>
+            <div class="pdf-progress-top"><span id="pdf-progress-label">Extending pages</span><span id="pdf-progress-value">0%</span></div>
+            <div class="pdf-track"><span id="pdf-bar"></span></div>
+          </div>
+
+          <div class="pdf-message" id="pdf-message" role="status" hidden></div>
+        </div>
+      </section>
+    </main>
+
+    <footer>© 2026 Sharaf Lab. Hosted on GitHub Pages. Created with the assistance of AI.</footer>
+
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js" defer></script>
+    <script>
+    // Extend PDF for notes. Source: NaimaSharaf/PDFnotesextend (app.js)
+    (() => {
+      const POINTS_PER_INCH = 72;
+      const q = (id) => document.getElementById(id);
+      const dropZone = q('pdf-drop'), fileInput = q('pdf-input'), fileCard = q('pdf-file');
+      const fileName = q('pdf-file-name'), fileMeta = q('pdf-file-meta');
+      const extendButton = q('pdf-extend'), removeButton = q('pdf-remove');
+      const progressArea = q('pdf-progress'), progressLabel = q('pdf-progress-label');
+      const progressValue = q('pdf-progress-value'), progressBar = q('pdf-bar'), message = q('pdf-message');
+      let selectedFile = null;
+
+      // ---------- settings ----------
+      const place = q('pdf-place'), heightSel = q('pdf-height'), heightCustom = q('pdf-heightCustom'), extIn = q('pdf-ext');
+      function updateHints() {
+        const p = place.value, inches = Number(extIn.value) || 0, vertical = p === 'top' || p === 'bottom';
+        q('pdf-extHint').textContent = `Blank space added ${({ right: 'on the right', left: 'on the left', both: 'split between left and right', bottom: 'below the content', top: 'above the content' })[p]}`;
+        q('pdf-placeHint').textContent = ({ right: 'Original content stays at the left', left: 'Original content stays at the right', both: 'Original content stays centred', bottom: 'Original content stays at the top', top: 'Original content stays at the bottom' })[p];
+        heightSel.disabled = heightCustom.disabled = vertical;
+        heightCustom.hidden = heightSel.value !== 'custom';
+        q('pdf-heightHint').textContent = vertical ? `Grows by ${inches.toFixed(2)} in from the extension` : heightSel.value === 'same' ? 'Preserved from source' : 'Content stays at the top; shorter pages shrink the content to fit';
+      }
+      for (const c of [place, heightSel, heightCustom, extIn]) c.addEventListener('input', updateHints);
+      updateHints();
+      function readSettings() {
+        const inches = Number(extIn.value), vertical = place.value === 'top' || place.value === 'bottom';
+        if (!(inches >= 0 && inches <= 30)) { showMessage('Enter an extension between 0 and 30 inches.'); extIn.focus(); return null; }
+        let height = null;
+        if (!vertical && heightSel.value !== 'same') {
+          height = heightSel.value === 'custom' ? Number(heightCustom.value) : Number(heightSel.value);
+          if (!(height >= 1 && height <= 100)) { showMessage('Enter a page height between 1 and 100 inches.'); heightCustom.focus(); return null; }
+        }
+        if (inches === 0 && !height) { showMessage('Set an extension above 0 or choose a page height.'); extIn.focus(); return null; }
+        return { inches, place: place.value, height };
+      }
+
+      function showMessage(text, type = 'error') {
+        message.textContent = text;
+        message.className = `pdf-message ${type === 'success' ? 'success' : ''}`;
+        message.hidden = false;
+      }
+      function clearMessage() { message.hidden = true; message.textContent = ''; }
+      function formatBytes(bytes) {
+        if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`;
+        return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+      }
+      function resetProgress() {
+        progressArea.hidden = true;
+        progressBar.style.width = '0%';
+        progressValue.textContent = '0%';
+        progressLabel.textContent = 'Extending pages';
+      }
+      function setProgress(value, label) {
+        progressArea.hidden = false;
+        progressLabel.textContent = label;
+        progressValue.textContent = `${value}%`;
+        progressBar.style.width = `${value}%`;
+      }
+      function chooseFile(file) {
+        clearMessage();
+        resetProgress();
+        if (!file || (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf'))) {
+          showMessage('Please choose a PDF file.');
+          return;
+        }
+        selectedFile = file;
+        fileName.textContent = file.name;
+        fileMeta.textContent = `${formatBytes(file.size)} · ready to extend`;
+        fileCard.hidden = false;
+        dropZone.setAttribute('aria-label', `Selected ${file.name}. Choose another file`);
+      }
+      async function extendPdf() {
+        if (!selectedFile) return;
+        if (!window.PDFLib) {
+          showMessage('The PDF engine is still loading. Check your connection and try again.');
+          return;
+        }
+        clearMessage();
+        extendButton.disabled = true;
+        setProgress(8, 'Reading PDF');
+        try {
+          const sourcePdf = await PDFLib.PDFDocument.load(await selectedFile.arrayBuffer());
+          const pages = sourcePdf.getPages();
+          const opt = readSettings();
+          if (!opt) { resetProgress(); extendButton.disabled = false; return; }
+          const ext = opt.inches * POINTS_PER_INCH, { PDFName, PDFDict, PDFArray } = PDFLib;
+          pages.forEach((page, index) => {
+            const box = page.getMediaBox(), w = box.width, h = box.height;
+            let newW = w, newH = h, dx = 0, dy = 0, scale = 1;
+            if (opt.place === 'top' || opt.place === 'bottom') { newH = h + ext; if (opt.place === 'bottom') dy = ext; }
+            else {
+              const H = opt.height ? opt.height * POINTS_PER_INCH : h;
+              if (H < h) scale = H / h;  // shorter page: shrink the content to fit instead of cutting it
+              newH = H; dy = H - h * scale;  // content stays at the top; extra height goes below it
+              newW = w * scale + ext; dx = opt.place === 'left' ? ext : opt.place === 'both' ? ext / 2 : 0;
+            }
+            if (scale !== 1) page.scaleContent(scale, scale);
+            if (dx || dy) page.translateContent(dx, dy);
+            page.setMediaBox(box.x, box.y, newW, newH);
+            page.setCropBox(box.x, box.y, newW, newH);
+            // Keep links and other annotations over the content they belong to.
+            try {
+              const annots = page.node.Annots();
+              if (annots && (dx || dy || scale !== 1)) for (let a = 0; a < annots.size(); a++) {
+                const dict = annots.lookup(a, PDFDict), rect = dict.lookupMaybe(PDFName.of('Rect'), PDFArray); if (!rect) continue;
+                const v = rect.asArray().map((n) => n.asNumber());
+                dict.set(PDFName.of('Rect'), sourcePdf.context.obj([v[0] * scale + dx, v[1] * scale + dy, v[2] * scale + dx, v[3] * scale + dy]));
+              }
+            } catch (err) { /* annotations stay where they were */ }
+            setProgress(Math.max(10, Math.round(((index + 1) / pages.length) * 90)), `Extending page ${index + 1} of ${pages.length}`);
+          });
+          const outputBytes = await sourcePdf.save();
+          const outputName = selectedFile.name.replace(/\.pdf$/i, '') + '-extended.pdf';
+          const downloadUrl = URL.createObjectURL(new Blob([outputBytes], { type: 'application/pdf' }));
+          const link = document.createElement('a');
+          link.href = downloadUrl;
+          link.download = outputName;
+          document.body.append(link);
+          link.click();
+          link.remove();
+          setTimeout(() => URL.revokeObjectURL(downloadUrl), 1000);
+          setProgress(100, 'Done');
+          showMessage(`${outputName} is ready and has been downloaded.`, 'success');
+        } catch (error) {
+          console.error(error);
+          resetProgress();
+          showMessage('This PDF could not be processed. It may be encrypted or damaged.');
+        } finally {
+          extendButton.disabled = false;
+        }
+      }
+
+      dropZone.addEventListener('click', () => fileInput.click());
+      dropZone.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); fileInput.click(); }
+      });
+      fileInput.addEventListener('change', () => chooseFile(fileInput.files[0]));
+      ['dragenter', 'dragover'].forEach((name) => dropZone.addEventListener(name, (event) => {
+        event.preventDefault();
+        dropZone.classList.add('is-dragging');
+      }));
+      ['dragleave', 'drop'].forEach((name) => dropZone.addEventListener(name, (event) => {
+        event.preventDefault();
+        dropZone.classList.remove('is-dragging');
+      }));
+      dropZone.addEventListener('drop', (event) => chooseFile(event.dataTransfer.files[0]));
+      extendButton.addEventListener('click', extendPdf);
+      removeButton.addEventListener('click', () => {
+        selectedFile = null;
+        fileInput.value = '';
+        fileCard.hidden = true;
+        dropZone.setAttribute('aria-label', 'Choose a PDF');
+        clearMessage();
+        resetProgress();
+      });
+    })();
+    </script>
+  </body>
+</html>
