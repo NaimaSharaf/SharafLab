@@ -178,6 +178,8 @@
 .topo-tool [hidden]{display:none!important}
 .topo-steps{margin:0 0 18px;padding:14px 20px 14px 40px;background:#edf7f6;border:1px solid #cfe7e4;border-radius:10px;color:#173650;font-size:15px;line-height:1.6}
 .topo-steps li+li{margin-top:4px}
+.topo-example-note{margin:-6px 0 16px;font-size:14px;color:#3d5566}
+.topo-example-note a{color:#0b6870}
 .topo-steps a{color:#0b6870;font-weight:700;text-underline-offset:3px}
 .topo-sub{margin:40px 0 14px;font-size:20px;font-weight:600;letter-spacing:-.01em;scroll-margin-top:90px}
 .topo-tool .ss-tool{padding:0;max-width:none}
@@ -259,8 +261,10 @@
             <li><strong>Process your structure with DSSP first.</strong> Upload your .cif (or PDB) file to <a href="https://pdb-redo.eu/dssp" target="_blank" rel="noopener noreferrer">pdb-redo.eu/dssp</a> and download the annotated mmCIF it returns.</li>
             <li><strong>Open that DSSP-processed .cif file here.</strong> The sequence, domains, topology diagram and 3D view all read from it.</li>
           </ol>
+          <p class="topo-example-note">New here? Click <strong>Try example</strong> to load hen egg-white lysozyme (PDB <a href="https://www.rcsb.org/structure/1AKI" target="_blank" rel="noopener noreferrer">1AKI</a>), already processed with DSSP, and explore every panel before using your own file.</p>
           <div class="topo-bar">
             <label class="topo-file">Open CIF<input id="topo-file" type="file" accept=".cif,.mmcif,.txt"></label>
+            <button id="topo-example" type="button" title="Load hen egg-white lysozyme (PDB 1AKI), processed with DSSP">Try example</button>
             <label>Chain <select id="topo-chain"></select></label>
             <span class="topo-session">
               <button id="topo-saveSession" type="button" disabled title="Save the file, domains, layout and settings so you can continue later">Save session</button>
@@ -1278,6 +1282,16 @@ render();
         } catch (err) { state.all = []; state.text = ''; $('topo-saveSession').disabled = true; render(); update3DAvailability(); message(err.message); }
       }
       $('topo-file').addEventListener('change', async () => { const f = $('topo-file').files[0]; if (!f) return; if (f.size > 25e6) { message('Files up to 25 MB are supported.'); return; } load(await f.text(), f.name); });
+      $('topo-example').addEventListener('click', async () => {
+        const btn = $('topo-example'); btn.disabled = true; message('Loading the lysozyme example…');
+        try {
+          const r = await fetch('examples/1aki_dssp.cif');
+          if (!r.ok) throw Error();
+          load(await r.text(), '1aki_dssp.cif');
+          if (!$('topo-msg').textContent) message('Example loaded: hen egg-white lysozyme (PDB 1AKI), secondary structure from DSSP. Open your own CIF any time to replace it.');
+        } catch { message('Could not load the example. Check your connection and try again.'); }
+        btn.disabled = false;
+      });
       $('topo-chain').onchange = () => { state.manual.clear(); state.hidden.clear(); state.sel = null; state.notes = []; coordDomains(false); render(); update3DAvailability(); syncChain(); message(state.notes.join(' ')); };
       for (const id of ['topo-minHelix', 'topo-minStrand']) $(id).addEventListener('input', () => { state.manual.clear(); render(); });
       for (const id of ['topo-font', 'topo-width', 'topo-title']) $(id).addEventListener('input', render);
