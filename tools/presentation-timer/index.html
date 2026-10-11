@@ -42,33 +42,32 @@
 .timer-start{width:100%;margin-top:20px;padding:18px;border:0;border-radius:10px;background:#0b6870;color:#fff;font:600 20px "Montserrat",Arial,sans-serif;cursor:pointer}
 .timer-start:hover{background:#09565d}
 .timer-preview{display:flex;gap:10px;margin:4px 0 0}
-.timer-preview span{flex:1;padding:12px 10px;border-radius:8px;color:#fff;font:600 13px "Manrope",Arial,sans-serif;text-align:center}
+.timer-preview span{flex:1;padding:12px 10px;border-radius:8px;border:1px solid rgba(0,0,0,.08);font:600 13px "Manrope",Arial,sans-serif;text-align:center}
 .timer-tips{margin:0;padding-left:18px;color:#586e73;font-size:15px;line-height:1.7}
 .timer-tips li+li{margin-top:8px}
 .timer-wake{margin:18px 0 0;padding:12px 14px;border-radius:8px;font-size:14px;line-height:1.5;background:#eef6f5;color:#0b4f55}
 .timer-wake.warn{background:#fff7ec;color:#5c3b12}
 @media(max-width:800px){.timer-setup{grid-template-columns:1fr}}
 /* Running view */
-.run{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;background:var(--run-bg,#0b2a33);color:#fff;padding:max(16px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(16px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));font-family:"Manrope",Arial,sans-serif;transition:background .6s ease;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+.run{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;background:var(--run-bg,#0b4f4a);color:var(--run-fg,#fff);padding:max(16px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(16px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));font-family:"Manrope",Arial,sans-serif;transition:background .6s ease;user-select:none;-webkit-user-select:none;touch-action:manipulation}
 .run[hidden]{display:none}
-.run.state-ok{--run-bg:#0b4f4a}.run.state-warn{--run-bg:#a86500}.run.state-red{--run-bg:#b3261e}.run.state-over{--run-bg:#7a0f0a}
 .run.state-over .run-time{animation:pulse 1s ease-in-out infinite}
 .run.paused .run-time{opacity:.55}
 @keyframes pulse{50%{opacity:.45}}
 @media(prefers-reduced-motion:reduce){.run.state-over .run-time{animation:none}.run{transition:none}}
 .run-top{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:15px;opacity:.9}
 .run-title{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.run-wake{flex:none;font-size:13px;padding:5px 10px;border-radius:999px;background:rgba(255,255,255,.16)}
+.run-wake{flex:none;font-size:13px;padding:5px 10px;border-radius:999px;background:color-mix(in srgb,currentColor 16%,transparent)}
 .run-main{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:0}
 .run-label{font-size:clamp(16px,4vw,26px);letter-spacing:.14em;text-transform:uppercase;font-weight:600;opacity:.85}
 .run-time{font-family:"Montserrat",Arial,sans-serif;font-weight:600;font-variant-numeric:tabular-nums;line-height:1;font-size:min(30vw,42vh);letter-spacing:-.02em}
 .run-sub{font-size:clamp(15px,3.6vw,22px);opacity:.85;font-variant-numeric:tabular-nums}
-.run-bar{height:10px;border-radius:999px;background:rgba(255,255,255,.2);overflow:hidden;margin:10px 0 16px}
-.run-bar span{display:block;height:100%;width:0;background:#fff;border-radius:999px;transition:width .25s linear}
+.run-bar{height:10px;border-radius:999px;background:color-mix(in srgb,currentColor 20%,transparent);overflow:hidden;margin:10px 0 16px}
+.run-bar span{display:block;height:100%;width:0;background:currentColor;border-radius:999px;transition:width .25s linear}
 .run-controls{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-.run-controls button{padding:16px 6px;border:1px solid rgba(255,255,255,.45);border-radius:12px;background:rgba(255,255,255,.12);color:#fff;font:600 17px "Manrope",Arial,sans-serif;cursor:pointer}
-.run-controls button.primary{background:#fff;color:#102a33;border-color:#fff}
-.run-controls button:focus-visible{outline:3px solid #fff;outline-offset:2px}
+.run-controls button{padding:16px 6px;border:1px solid color-mix(in srgb,currentColor 45%,transparent);border-radius:12px;background:color-mix(in srgb,currentColor 12%,transparent);color:inherit;font:600 17px "Manrope",Arial,sans-serif;cursor:pointer}
+.run-controls button.primary{background:var(--run-fg,#fff);color:var(--run-bg,#102a33);border-color:var(--run-fg,#fff)}
+.run-controls button:focus-visible{outline:3px solid currentColor;outline-offset:2px}
 @media(orientation:landscape) and (max-height:500px){.run-time{font-size:min(22vw,52vh)}.run-controls button{padding:10px 6px}}
     </style>
   </head>
@@ -122,7 +121,8 @@
           <input id="title" type="text" maxlength="60" placeholder="e.g. Lab meeting" />
           <div class="timer-row"><div><label for="vibrate">Vibrate at yellow, red and time up</label><small>Android phones; iPhones do not allow web pages to vibrate</small></div><input id="vibrate" type="checkbox" checked></div>
           <div class="timer-row"><div><label for="beep">Soft beep at yellow, red and time up</label><small>Follows your phone’s volume and silent switch</small></div><input id="beep" type="checkbox"></div>
-          <div class="timer-preview" aria-hidden="true"><span style="background:#0b4f4a">On time</span><span style="background:#a86500">Yellow</span><span style="background:#b3261e">Red</span><span style="background:#7a0f0a">Over time</span></div>
+          <div class="timer-row"><div><label for="scheme">Color scheme</label><small>How the screen looks while the timer runs</small></div><select id="scheme" style="font:inherit;padding:8px;border:1px solid #b8c8d5;border-radius:6px;background:#fff;color:#102a33;max-width:52%"></select></div>
+          <div class="timer-preview" id="schemePreview" aria-hidden="true"><span>On time</span><span>Yellow</span><span>Red</span><span>Over time</span></div>
           <button class="timer-start" id="start" type="button">Start timer</button>
           <p class="timer-wake" id="wakeSupport" role="status"></p>
         </section>
@@ -161,15 +161,28 @@
 (() => {
   const $ = id => document.getElementById(id);
   const PRESETS = [5, 10, 12, 15, 20, 30, 45, 60];
+  const SCHEMES = {
+    teal: ['Lab teal', [['#0b4f4a','#ffffff'],['#a86500','#ffffff'],['#b3261e','#ffffff'],['#7a0f0a','#ffffff']]],
+    dusk: ['Dusk', [['#24304f','#fdf6ec'],['#9a6a2f','#fdf6ec'],['#a8463f','#fdf6ec'],['#6e2a3d','#fdf6ec']]],
+    sage: ['Sage and clay', [['#3f5e4e','#fbf7f0'],['#a07a35','#fbf7f0'],['#a5543b','#fbf7f0'],['#6f3326','#fbf7f0']]],
+    ocean: ['Ocean', [['#164a63','#ffffff'],['#b08a3e','#ffffff'],['#b4534e','#ffffff'],['#7a2f45','#ffffff']]],
+    lavender: ['Lavender', [['#3b3a63','#f7f3fb'],['#a3743f','#f7f3fb'],['#a8484f','#f7f3fb'],['#6b2a4a','#f7f3fb']]],
+    midnight: ['Midnight (dark screen)', [['#121519','#e8edf2'],['#121519','#f2c14e'],['#121519','#ff7b6b'],['#121519','#ff7b6b']]],
+    paper: ['Paper (light screen)', [['#f4f1ea','#1d2a30'],['#f7e6bd','#4a3510'],['#f6cdc4','#5a1d14'],['#ec9f92','#4a120c']]]
+  };
+  const STATE_INDEX = { ok: 0, warn: 1, red: 2, over: 3 };
+  for (const [k, [name]] of Object.entries(SCHEMES)) { const o = document.createElement('option'); o.value = k; o.textContent = name; $('scheme').append(o); }
+  function scheme() { return SCHEMES[$('scheme').value] || SCHEMES.teal; }
+  function renderSchemePreview() { scheme()[1].forEach(([bg, fg], i) => { const s = $('schemePreview').children[i]; s.style.background = bg; s.style.color = fg; }); }
   const KEY = 'sharafLabTalkTimer';
   let total = 0, startedAt = 0, pausedAt = 0, pausedFor = 0, running = false, paused = false, tick = null, lastState = '', wakeLock = null, audio = null;
 
   // ---------- settings ----------
-  function load() { try { const s = JSON.parse(localStorage.getItem(KEY) || '{}'); for (const id of ['mins','secs','warn','red','title']) if (s[id] !== undefined) $(id).value = s[id]; for (const id of ['vibrate','beep']) if (s[id] !== undefined) $(id).checked = !!s[id]; } catch {} }
-  function save() { try { const s = {}; for (const id of ['mins','secs','warn','red','title']) s[id] = $(id).value; for (const id of ['vibrate','beep']) s[id] = $(id).checked; localStorage.setItem(KEY, JSON.stringify(s)); } catch {} }
+  function load() { try { const s = JSON.parse(localStorage.getItem(KEY) || '{}'); for (const id of ['mins','secs','warn','red','title','scheme']) if (s[id] !== undefined) $(id).value = s[id]; if (!SCHEMES[$('scheme').value]) $('scheme').value = 'teal'; for (const id of ['vibrate','beep']) if (s[id] !== undefined) $(id).checked = !!s[id]; } catch {} }
+  function save() { try { const s = {}; for (const id of ['mins','secs','warn','red','title','scheme']) s[id] = $(id).value; for (const id of ['vibrate','beep']) s[id] = $(id).checked; localStorage.setItem(KEY, JSON.stringify(s)); } catch {} }
   function setupSeconds() { const m = Math.max(0, Math.floor(Number($('mins').value) || 0)), s = Math.max(0, Math.min(59, Math.floor(Number($('secs').value) || 0))); return m * 60 + s; }
   function renderPresets() { const box = $('presets'); box.replaceChildren(); const cur = setupSeconds(); for (const p of PRESETS) { const b = document.createElement('button'); b.type = 'button'; b.textContent = p + ' min'; b.setAttribute('aria-pressed', cur === p * 60); b.onclick = () => { $('mins').value = p; $('secs').value = 0; if (Number($('warn').value) >= p) $('warn').value = Math.max(0.5, Math.round(p / 3)); if (Number($('red').value) >= Number($('warn').value)) $('red').value = Math.min(1, Number($('warn').value) / 2); renderPresets(); save(); }; box.append(b); } }
-  for (const id of ['mins','secs','warn','red','title','vibrate','beep']) $(id).addEventListener('input', () => { renderPresets(); save(); });
+  for (const id of ['mins','secs','warn','red','title','vibrate','beep','scheme']) $(id).addEventListener(id === 'scheme' ? 'change' : 'input', () => { renderPresets(); renderSchemePreview(); save(); });
 
   // ---------- keeping the screen on ----------
   const wakeSupported = 'wakeLock' in navigator;
@@ -190,7 +203,7 @@
   function update() {
     const el = elapsed(), left = total - el, warn = (Number($('warn').value) || 0) * 60, red = (Number($('red').value) || 0) * 60;
     let state = left <= 0 ? 'over' : left <= red ? 'red' : left <= warn ? 'warn' : 'ok';
-    const run = $('run'); run.className = 'run state-' + state + (paused ? ' paused' : '');
+    const run = $('run'); run.className = 'run state-' + state + (paused ? ' paused' : ''); const [bg, fg] = scheme()[1][STATE_INDEX[state]]; run.style.setProperty('--run-bg', bg); run.style.setProperty('--run-fg', fg); document.querySelector('meta[name=theme-color]')?.setAttribute('content', bg);
     $('runLabel').textContent = paused ? 'Paused' : state === 'over' ? 'Over time' : 'Remaining';
     $('runTime').textContent = left <= 0 ? '+' + fmt(-left) : fmt(Math.ceil(left));
     $('runSub').textContent = `Elapsed ${fmt(Math.floor(el))} of ${fmt(total)}`;
@@ -213,7 +226,7 @@
   $('start').onclick = start; $('pause').onclick = togglePause; let endArmed = null; $('stop').onclick = () => { if (endArmed) { clearTimeout(endArmed); endArmed = null; $('stop').textContent = 'End'; stop(); return; } $('stop').textContent = 'Tap again'; endArmed = setTimeout(() => { endArmed = null; $('stop').textContent = 'End'; }, 3000); }; $('plus').onclick = () => adjust(60); $('minus').onclick = () => adjust(-60);
   document.addEventListener('keydown', e => { if (!running) return; if (e.key === ' ' || e.key === 'Enter') { if (e.target.tagName !== 'BUTTON') { e.preventDefault(); togglePause(); } } else if (e.key === 'Escape') stop(); });
   window.addEventListener('beforeunload', e => { if (running) { e.preventDefault(); e.returnValue = ''; } });
-  load(); renderPresets();
+  load(); renderPresets(); renderSchemePreview();
 })();
     </script>
   </body>
