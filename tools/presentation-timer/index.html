@@ -1,0 +1,220 @@
+<!doctype html>
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Sharaf Lab tool: a presentation timer for your phone that keeps the screen on and changes color as time runs out."
+    />
+    <title>Presentation Timer | Sharaf Lab Tools</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600&family=Montserrat:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../../styles.css" />
+    <meta name="theme-color" content="#0b2a33" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Talk timer" />
+    <style>
+.tool-caution{max-width:1132px;margin:-60px auto 70px;padding:16px 20px;background:#fff7ec;border:1px solid #f0d2a8;border-left:4px solid #d9822b;border-radius:8px;color:#5c3b12;font-size:15px;line-height:1.6}
+.tool-caution strong{color:#8a4b0f}
+.tool-back{display:inline-block;margin:0 0 22px;color:#0b6870;font-weight:600;text-decoration:none}.tool-back:hover{text-decoration:underline;text-underline-offset:4px}
+.timer-setup{max-width:1132px;margin:0 auto 90px;padding:0 24px;display:grid;grid-template-columns:1.3fr 1fr;gap:16px;color:#102a33}
+.timer-card{background:#fff;border:1px solid #d8e0e0;padding:26px 28px}
+.timer-card h2{margin:0 0 6px;font-family:"Montserrat",Arial,sans-serif;font-size:20px;font-weight:600}
+.timer-card>p{margin:0 0 18px;color:#586e73;font-size:15px;line-height:1.6}
+.timer-presets{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
+.timer-presets button{min-width:58px;padding:10px 12px;border:1px solid #b8c8d5;background:#fff;border-radius:999px;font:600 15px "Manrope",Arial,sans-serif;color:#102a33;cursor:pointer}
+.timer-presets button[aria-pressed=true]{background:#0b6870;border-color:#0b6870;color:#fff}
+.timer-row{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:14px 0;border-bottom:1px solid #e4ebeb}
+.timer-row:last-of-type{border-bottom:0}
+.timer-row label{font-weight:600}.timer-row small{display:block;color:#6b7f83;font-size:13px;font-weight:400}
+.timer-field{display:inline-flex;align-items:center;gap:6px;color:#586e73;white-space:nowrap}
+.timer-card input[type=number],.timer-card input[type=text]{font:inherit;padding:9px 10px;border:1px solid #b8c8d5;border-radius:6px;background:#fff;color:#102a33;width:76px;font-size:16px}
+.timer-card input[type=text]{width:100%}
+.timer-card input[type=checkbox]{width:20px;height:20px;accent-color:#0b6870}
+.timer-card input:focus-visible,.timer-presets button:focus-visible,.timer-start:focus-visible{outline:3px solid #0b6870;outline-offset:2px}
+.timer-start{width:100%;margin-top:20px;padding:18px;border:0;border-radius:10px;background:#0b6870;color:#fff;font:600 20px "Montserrat",Arial,sans-serif;cursor:pointer}
+.timer-start:hover{background:#09565d}
+.timer-preview{display:flex;gap:10px;margin:4px 0 0}
+.timer-preview span{flex:1;padding:12px 10px;border-radius:8px;color:#fff;font:600 13px "Manrope",Arial,sans-serif;text-align:center}
+.timer-tips{margin:0;padding-left:18px;color:#586e73;font-size:15px;line-height:1.7}
+.timer-tips li+li{margin-top:8px}
+.timer-wake{margin:18px 0 0;padding:12px 14px;border-radius:8px;font-size:14px;line-height:1.5;background:#eef6f5;color:#0b4f55}
+.timer-wake.warn{background:#fff7ec;color:#5c3b12}
+@media(max-width:800px){.timer-setup{grid-template-columns:1fr}}
+/* Running view */
+.run{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;background:var(--run-bg,#0b2a33);color:#fff;padding:max(16px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(16px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));font-family:"Manrope",Arial,sans-serif;transition:background .6s ease;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+.run[hidden]{display:none}
+.run.state-ok{--run-bg:#0b4f4a}.run.state-warn{--run-bg:#a86500}.run.state-red{--run-bg:#b3261e}.run.state-over{--run-bg:#7a0f0a}
+.run.state-over .run-time{animation:pulse 1s ease-in-out infinite}
+.run.paused .run-time{opacity:.55}
+@keyframes pulse{50%{opacity:.45}}
+@media(prefers-reduced-motion:reduce){.run.state-over .run-time{animation:none}.run{transition:none}}
+.run-top{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:15px;opacity:.9}
+.run-title{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.run-wake{flex:none;font-size:13px;padding:5px 10px;border-radius:999px;background:rgba(255,255,255,.16)}
+.run-main{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:0}
+.run-label{font-size:clamp(16px,4vw,26px);letter-spacing:.14em;text-transform:uppercase;font-weight:600;opacity:.85}
+.run-time{font-family:"Montserrat",Arial,sans-serif;font-weight:600;font-variant-numeric:tabular-nums;line-height:1;font-size:min(30vw,42vh);letter-spacing:-.02em}
+.run-sub{font-size:clamp(15px,3.6vw,22px);opacity:.85;font-variant-numeric:tabular-nums}
+.run-bar{height:10px;border-radius:999px;background:rgba(255,255,255,.2);overflow:hidden;margin:10px 0 16px}
+.run-bar span{display:block;height:100%;width:0;background:#fff;border-radius:999px;transition:width .25s linear}
+.run-controls{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.run-controls button{padding:16px 6px;border:1px solid rgba(255,255,255,.45);border-radius:12px;background:rgba(255,255,255,.12);color:#fff;font:600 17px "Manrope",Arial,sans-serif;cursor:pointer}
+.run-controls button.primary{background:#fff;color:#102a33;border-color:#fff}
+.run-controls button:focus-visible{outline:3px solid #fff;outline-offset:2px}
+@media(orientation:landscape) and (max-height:500px){.run-time{font-size:min(22vw,52vh)}.run-controls button{padding:10px 6px}}
+    </style>
+  </head>
+  <body class="outreach-body">
+    <header>
+      <div class="nav">
+        <a class="brand" href="../../index.html" aria-label="Sharaf Lab home"
+          ><img src="../../00%20Github%20assets/sharaf-lab-logo.png" alt="Sharaf Lab"
+        /></a>
+        <nav aria-label="Primary navigation">
+          <a href="../../index.html">Home</a>
+          <a href="../../philosophy.html">Philosophy</a>
+          <a href="../../research.html">Research</a>
+          <a href="../../members.html">Lab Members</a>
+          <a href="../../photos.html">Photos</a>
+          <a href="../../links.html">Links of Interest</a>
+          <a class="active" href="../../tools.html" aria-current="page">Tools</a>
+          <a href="../../join.html">Join the Lab</a>
+        </nav>
+      </div>
+    </header>
+    <main>
+      <section class="outreach-hero">
+        <a class="tool-back" href="../../tools.html">← All lab tools</a>
+        <p class="eyebrow eyebrow-dark">Lab tools · Talks · Phone</p>
+        <h1>Presentation timer.</h1>
+        <p>
+          Open this page on your phone, set the length of your talk, and press
+          Start. The screen stays on while the timer runs, and the color
+          changes as time runs out.
+        </p>
+      </section>
+
+
+      <div class="tool-caution" role="note">
+        <strong>Check every result.</strong> These tools were vibe coded: built
+        quickly with AI assistance and not independently validated. Compare
+        their output with your own data and standard software before using it
+        in figures, analyses or publications.
+      </div>
+
+      <div class="timer-setup">
+        <section class="timer-card" aria-labelledby="setup-title">
+          <h2 id="setup-title">Set up your talk</h2>
+          <p>Pick a length, or type minutes and seconds.</p>
+          <div class="timer-presets" id="presets" role="group" aria-label="Talk length presets"></div>
+          <div class="timer-row"><div><label for="mins">Talk length</label><small>Minutes and seconds</small></div><span class="timer-field"><input id="mins" type="number" min="0" max="600" step="1" value="15" inputmode="numeric" aria-label="Minutes"> min <input id="secs" type="number" min="0" max="59" step="1" value="0" inputmode="numeric" aria-label="Seconds"> s</span></div>
+          <div class="timer-row"><div><label for="warn">Yellow when</label><small>Minutes left</small></div><span class="timer-field"><input id="warn" type="number" min="0" max="600" step="0.5" value="5" inputmode="decimal"> min left</span></div>
+          <div class="timer-row"><div><label for="red">Red when</label><small>Minutes left</small></div><span class="timer-field"><input id="red" type="number" min="0" max="600" step="0.5" value="1" inputmode="decimal"> min left</span></div>
+          <div class="timer-row"><div><label for="title">Talk title</label><small>Optional, shown at the top</small></div></div>
+          <input id="title" type="text" maxlength="60" placeholder="e.g. Lab meeting" />
+          <div class="timer-row"><div><label for="vibrate">Vibrate at yellow, red and time up</label><small>Android phones; iPhones do not allow web pages to vibrate</small></div><input id="vibrate" type="checkbox" checked></div>
+          <div class="timer-row"><div><label for="beep">Soft beep at yellow, red and time up</label><small>Follows your phone’s volume and silent switch</small></div><input id="beep" type="checkbox"></div>
+          <div class="timer-preview" aria-hidden="true"><span style="background:#0b4f4a">On time</span><span style="background:#a86500">Yellow</span><span style="background:#b3261e">Red</span><span style="background:#7a0f0a">Over time</span></div>
+          <button class="timer-start" id="start" type="button">Start timer</button>
+          <p class="timer-wake" id="wakeSupport" role="status"></p>
+        </section>
+        <aside class="timer-card" aria-labelledby="tips-title">
+          <h2 id="tips-title">Using it on your phone</h2>
+          <ul class="timer-tips">
+            <li><strong>Open this page on your phone</strong> and keep it in front while you talk. The screen stays on only while this page is showing.</li>
+            <li><strong>Add it to your home screen</strong> for one-tap access: on iPhone, tap Share, then Add to Home Screen; on Android, open the browser menu, then Add to Home screen.</li>
+            <li>After time is up, the timer keeps counting how far over you are.</li>
+            <li>Use <strong>+1 min</strong> or <strong>−1 min</strong> if the session runs late or the chair asks you to shorten.</li>
+            <li>Your settings are remembered on this device.</li>
+          </ul>
+        </aside>
+      </div>
+    </main>
+
+    <div class="run state-ok" id="run" hidden role="timer" aria-live="off">
+      <div class="run-top"><span class="run-title" id="runTitle"></span><span class="run-wake" id="runWake">Screen stays on</span></div>
+      <div class="run-main">
+        <div class="run-label" id="runLabel">Remaining</div>
+        <div class="run-time" id="runTime">15:00</div>
+        <div class="run-sub" id="runSub">Elapsed 0:00 of 15:00</div>
+      </div>
+      <div class="run-bar" aria-hidden="true"><span id="runBar"></span></div>
+      <div class="run-controls">
+        <button id="minus" type="button" aria-label="Remove one minute">−1 min</button>
+        <button id="pause" class="primary" type="button">Pause</button>
+        <button id="plus" type="button" aria-label="Add one minute">+1 min</button>
+        <button id="stop" type="button">End</button>
+      </div>
+    </div>
+
+    <footer>© 2026 Sharaf Lab. Hosted on GitHub Pages. Created with the assistance of AI.</footer>
+
+    <script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const PRESETS = [5, 10, 12, 15, 20, 30, 45, 60];
+  const KEY = 'sharafLabTalkTimer';
+  let total = 0, startedAt = 0, pausedAt = 0, pausedFor = 0, running = false, paused = false, tick = null, lastState = '', wakeLock = null, audio = null;
+
+  // ---------- settings ----------
+  function load() { try { const s = JSON.parse(localStorage.getItem(KEY) || '{}'); for (const id of ['mins','secs','warn','red','title']) if (s[id] !== undefined) $(id).value = s[id]; for (const id of ['vibrate','beep']) if (s[id] !== undefined) $(id).checked = !!s[id]; } catch {} }
+  function save() { try { const s = {}; for (const id of ['mins','secs','warn','red','title']) s[id] = $(id).value; for (const id of ['vibrate','beep']) s[id] = $(id).checked; localStorage.setItem(KEY, JSON.stringify(s)); } catch {} }
+  function setupSeconds() { const m = Math.max(0, Math.floor(Number($('mins').value) || 0)), s = Math.max(0, Math.min(59, Math.floor(Number($('secs').value) || 0))); return m * 60 + s; }
+  function renderPresets() { const box = $('presets'); box.replaceChildren(); const cur = setupSeconds(); for (const p of PRESETS) { const b = document.createElement('button'); b.type = 'button'; b.textContent = p + ' min'; b.setAttribute('aria-pressed', cur === p * 60); b.onclick = () => { $('mins').value = p; $('secs').value = 0; if (Number($('warn').value) >= p) $('warn').value = Math.max(0.5, Math.round(p / 3)); if (Number($('red').value) >= Number($('warn').value)) $('red').value = Math.min(1, Number($('warn').value) / 2); renderPresets(); save(); }; box.append(b); } }
+  for (const id of ['mins','secs','warn','red','title','vibrate','beep']) $(id).addEventListener('input', () => { renderPresets(); save(); });
+
+  // ---------- keeping the screen on ----------
+  const wakeSupported = 'wakeLock' in navigator;
+  $('wakeSupport').textContent = wakeSupported ? 'This browser can keep your screen on while the timer runs.' : 'This browser cannot keep the screen on by itself. While presenting, turn off auto-lock (iPhone: Settings → Display & Brightness → Auto-Lock → Never), or use Safari 16.4 or later, or Chrome.';
+  if (!wakeSupported) $('wakeSupport').classList.add('warn');
+  async function lockScreen() { if (wakeLock) return showWake(); if (!wakeSupported || document.visibilityState !== 'visible') return showWake(); try { wakeLock = await navigator.wakeLock.request('screen'); wakeLock.addEventListener('release', () => { wakeLock = null; showWake(); }); } catch (e) { wakeLock = null; } showWake(); }
+  async function unlockScreen() { try { if (wakeLock) await wakeLock.release(); } catch {} wakeLock = null; }
+  function showWake() { const el = $('runWake'); if (wakeLock) { el.textContent = 'Screen stays on'; el.title = ''; } else { el.textContent = wakeSupported ? 'Screen may turn off' : 'Turn off auto-lock'; el.title = 'Keep your phone’s auto-lock off while presenting.'; } }
+  document.addEventListener('visibilitychange', () => { if (running && document.visibilityState === 'visible' && !wakeLock) lockScreen(); });
+
+  // ---------- alerts ----------
+  function buzz(pattern) { if ($('vibrate').checked && navigator.vibrate) try { navigator.vibrate(pattern); } catch {} }
+  function beep(times) { if (!$('beep').checked) return; try { audio = audio || new (window.AudioContext || window.webkitAudioContext)(); for (let i = 0; i < times; i++) { const o = audio.createOscillator(), g = audio.createGain(), t = audio.currentTime + i * 0.35; o.frequency.value = 880; g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.25, t + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.25); o.connect(g).connect(audio.destination); o.start(t); o.stop(t + 0.3); } } catch {} }
+
+  // ---------- timing ----------
+  const fmt = s => { s = Math.max(0, Math.floor(s + 1e-6)); const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), x = s % 60; return (h ? h + ':' + String(m).padStart(2, '0') : m) + ':' + String(x).padStart(2, '0'); };
+  function elapsed() { const now = paused ? pausedAt : Date.now(); return (now - startedAt - pausedFor) / 1000; }
+  function update() {
+    const el = elapsed(), left = total - el, warn = (Number($('warn').value) || 0) * 60, red = (Number($('red').value) || 0) * 60;
+    let state = left <= 0 ? 'over' : left <= red ? 'red' : left <= warn ? 'warn' : 'ok';
+    const run = $('run'); run.className = 'run state-' + state + (paused ? ' paused' : '');
+    $('runLabel').textContent = paused ? 'Paused' : state === 'over' ? 'Over time' : 'Remaining';
+    $('runTime').textContent = left <= 0 ? '+' + fmt(-left) : fmt(Math.ceil(left));
+    $('runSub').textContent = `Elapsed ${fmt(Math.floor(el))} of ${fmt(total)}`;
+    $('runBar').style.width = Math.min(100, el / Math.max(1, total) * 100) + '%';
+    document.title = (left <= 0 ? '+' + fmt(-left) : fmt(Math.ceil(left))) + ' · Presentation Timer';
+    if (running && !paused && lastState && state !== lastState) { if (state === 'warn') { buzz(200); beep(1); } else if (state === 'red') { buzz([200, 120, 200]); beep(2); } else if (state === 'over') { buzz([400, 150, 400, 150, 400]); beep(3); } }
+    lastState = state;
+  }
+  async function start() {
+    total = setupSeconds(); if (total <= 0) { $('mins').focus(); $('wakeSupport').textContent = 'Set a talk length longer than zero.'; $('wakeSupport').classList.add('warn'); return; }
+    save(); startedAt = Date.now(); pausedFor = 0; paused = false; running = true; lastState = '';
+    $('runTitle').textContent = $('title').value.trim(); $('run').hidden = false; $('pause').textContent = 'Pause'; document.body.style.overflow = 'hidden';
+    try { if (document.documentElement.requestFullscreen && !document.fullscreenElement) await document.documentElement.requestFullscreen({ navigationUI: 'hide' }); } catch {}
+    try { if ($('beep').checked) { audio = audio || new (window.AudioContext || window.webkitAudioContext)(); audio.resume(); } } catch {}
+    await lockScreen(); update(); clearInterval(tick); tick = setInterval(update, 250); $('pause').focus();
+  }
+  function togglePause() { if (!running) return; if (paused) { pausedFor += Date.now() - pausedAt; paused = false; $('pause').textContent = 'Pause'; lockScreen(); } else { pausedAt = Date.now(); paused = true; $('pause').textContent = 'Resume'; } update(); }
+  async function stop() { running = false; paused = false; clearInterval(tick); $('run').hidden = true; document.body.style.overflow = ''; document.title = 'Presentation Timer | Sharaf Lab Tools'; await unlockScreen(); try { if (document.fullscreenElement) await document.exitFullscreen(); } catch {} $('start').focus(); }
+  function adjust(sec) { if (!running) return; total = Math.max(60, total + sec); lastState = ''; update(); }
+  $('start').onclick = start; $('pause').onclick = togglePause; let endArmed = null; $('stop').onclick = () => { if (endArmed) { clearTimeout(endArmed); endArmed = null; $('stop').textContent = 'End'; stop(); return; } $('stop').textContent = 'Tap again'; endArmed = setTimeout(() => { endArmed = null; $('stop').textContent = 'End'; }, 3000); }; $('plus').onclick = () => adjust(60); $('minus').onclick = () => adjust(-60);
+  document.addEventListener('keydown', e => { if (!running) return; if (e.key === ' ' || e.key === 'Enter') { if (e.target.tagName !== 'BUTTON') { e.preventDefault(); togglePause(); } } else if (e.key === 'Escape') stop(); });
+  window.addEventListener('beforeunload', e => { if (running) { e.preventDefault(); e.returnValue = ''; } });
+  load(); renderPresets();
+})();
+    </script>
+  </body>
+</html>
