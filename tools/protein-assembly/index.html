@@ -1,0 +1,1414 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Protein Assembly</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2311263d'/%3E%3Ccircle cx='16' cy='16' r='4' fill='%23e8a33d'/%3E%3Ccircle cx='16' cy='7' r='3.4' fill='%235cddd0'/%3E%3Ccircle cx='16' cy='25' r='3.4' fill='%235cddd0'/%3E%3Ccircle cx='7' cy='16' r='3.4' fill='%235cddd0'/%3E%3Ccircle cx='25' cy='16' r='3.4' fill='%235cddd0'/%3E%3C/svg%3E">
+<style>
+:root{font-family:Arial,sans-serif;color:#142d44;background:#f1f5f8}*{box-sizing:border-box}body{margin:0}
+header{background:#11263d;color:white;padding:28px 5vw}header small{color:#72ddd4;letter-spacing:3px;font-size:12px}h1{font-size:30px;margin:12px 0 8px;font-weight:600}header p{color:#c2d1df;margin:0;font-size:16px;max-width:900px;line-height:1.5}
+header .back-link{display:block;color:#c2d1df;font-size:14px;text-decoration:none;margin-bottom:14px}header .back-link:hover{color:#fff;text-decoration:underline}header .back-link:focus-visible{outline:3px solid #72ddd4;outline-offset:3px}
+main{max-width:1500px;margin:auto;padding:24px 4vw}
+.vibe-caution{margin:0 0 20px;padding:14px 18px;background:#fff7ec;border:1px solid #f0d2a8;border-left:4px solid #d9822b;border-radius:8px;color:#5c3b12;font-size:15px;line-height:1.6}.vibe-caution strong{color:#8a4b0f}
+button,.file{border:1px solid #b8c8d5;background:white;border-radius:7px;padding:10px 14px;font:inherit;font-size:15px;cursor:pointer;color:#173650}button:hover,.file:hover{background:#e7f7f5}button:disabled{opacity:.5;cursor:default;background:white}
+button:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid #078c85;outline-offset:3px}
+.primary{background:#087f79;color:white;border-color:#087f79}.primary:hover{background:#066b66}.primary:disabled{background:#087f79}
+.toolbar{display:flex;gap:12px 14px;align-items:center;flex-wrap:wrap}label{font-size:14px}
+select,input[type=number],input[type=text],textarea{font:inherit;font-size:15px;padding:8px;border:1px solid #b8c8d5;border-radius:5px;background:white;color:#142d44}input[type=number]{width:90px}
+.file{position:relative;display:inline-block}.file input{position:absolute;opacity:0;width:1px;height:1px}.file:focus-within{outline:3px solid #078c85}
+.workspace{display:grid;grid-template-columns:minmax(0,1fr);gap:20px;align-items:start}
+@media(min-width:1150px){.workspace{grid-template-columns:minmax(0,.9fr) minmax(0,1.25fr)}}
+[hidden]{display:none!important}
+.col{display:flex;flex-direction:column;gap:20px;min-width:0}
+.panel{background:white;border:1px solid #d8e1e9;border-radius:12px;overflow:hidden}
+.panelhead{padding:16px 22px;border-bottom:1px solid #e4ebf0}.panelhead h2{font-size:19px;margin:0;font-weight:600}.panelhead p{margin:6px 0 0;color:#52687a;font-size:14px;line-height:1.5}
+.step{display:inline-block;width:26px;height:26px;border-radius:50%;background:#11263d;color:#72ddd4;text-align:center;line-height:26px;font-size:14px;margin-right:8px}
+.pbody{padding:16px 22px;display:flex;flex-direction:column;gap:14px}
+.note{color:#52687a;font-size:13px;line-height:1.55;margin:0}
+.msg{font-size:14px;line-height:1.5;margin:0}.msg:empty{display:none}.msg.err{color:#aa3030}.msg.ok{color:#0b6b52}.msg.warn{color:#8a4b0f}
+.info{font-size:14px;color:#142d44;line-height:1.5}.info:empty{display:none}
+.radio-row{display:flex;gap:18px;flex-wrap:wrap}.radio-row label{display:flex;gap:6px;align-items:center;font-size:15px;cursor:pointer}
+.subpanel{border:1px solid #e4ebf0;border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:10px}.subpanel[hidden]{display:none}
+textarea{width:100%;min-height:62px;font-family:Menlo,Consolas,'Courier New',monospace;font-size:14px;resize:vertical}
+.seqstrip{display:flex;flex-wrap:wrap;gap:8px 12px;font-family:Menlo,Consolas,'Courier New',monospace;font-size:14px;max-height:230px;overflow:auto;padding:4px 2px}
+.seqstrip .grp{display:inline-flex;flex-direction:column}.seqstrip .num{font:11px Arial,sans-serif;color:#607589;height:15px}
+.seqstrip .res{display:flex}.seqstrip .res span{display:inline-block;width:1.15em;text-align:center;line-height:1.55;cursor:pointer;border-radius:2px}
+.seqstrip .res span:hover{outline:1px solid #078c85}.seqstrip .res span{border-bottom:3px solid transparent}.seqstrip .res span.tail{background:#f6c77d}.seqstrip .res span.anchor{background:#087f79;color:#fff}
+.seq-legend{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:#52687a}.sw{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin-right:5px}
+.pred-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.pred-grid div{background:#f6f9fb;border-radius:8px;padding:10px 12px;font-size:13px;color:#52687a}.pred-grid b{display:block;font-size:19px;color:#142d44;margin-bottom:3px}
+.verdict{background:#e9f6f4;border-left:4px solid #087f79;border-radius:6px;padding:12px 14px;font-size:15px;line-height:1.55}.verdict:empty{display:none}
+.pscale{position:relative;height:30px;margin:4px 0 20px;border-radius:6px;background:linear-gradient(90deg,#cfe9e6 0 33.3%,#d9e4f2 33.3% 50%,#f3e3cc 50% 100%);font-size:11px;color:#3a5266}
+.pscale span{position:absolute;top:8px;transform:translateX(-50%);white-space:nowrap}.pscale .tick{position:absolute;bottom:-17px;transform:translateX(-50%)}.pscale .marker{position:absolute;top:-4px;width:3px;height:38px;background:#c4302b;border-radius:2px;transform:translateX(-50%)}
+.viewer3d{position:relative;width:100%;height:min(62vh,600px);min-height:340px;background:#ffffff;border-bottom:1px solid #e4ebf0;touch-action:none}
+.viewer3d canvas{display:block;width:100%;height:100%}
+.viewer-empty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;margin:0;color:#607589;font-size:15px;padding:20px;text-align:center;pointer-events:none}.viewer-empty:empty{display:none}
+.stats{display:flex;gap:26px;flex-wrap:wrap;color:#52687a;font-size:13px}.stats b{font-size:22px;display:block;color:#142d44;margin-bottom:2px}
+.ctrl-grid{display:flex;flex-wrap:wrap;gap:12px 18px;align-items:center}
+.ctrl-grid label{display:flex;gap:8px;align-items:center}
+input[type=range]{accent-color:#087f79}
+.check{display:flex;gap:6px;align-items:center;font-size:14px;cursor:pointer}
+table{border-collapse:collapse;width:100%;font-size:14px}th,td{text-align:left;padding:8px 10px;border-bottom:1px solid #e4ebf0;vertical-align:top}th{color:#52687a;font-weight:600;font-size:13px}
+.tablewrap{overflow-x:auto}
+.cdot{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:6px;vertical-align:-1px}
+footer{color:#52687a;font-size:13px;line-height:1.6;margin-top:26px}
+.calc{border-top:1px solid #e4ebf0;margin-top:8px;padding-top:16px;display:flex;flex-direction:column;gap:12px}.calc h3{margin:0;font-size:17px;font-weight:600}td .mini{padding:6px 10px;font-size:13px}.prog{color:#52687a}
+.mol-list{display:flex;flex-direction:column;gap:10px}.mol-list:empty{display:none}.mol-row{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;border:1px solid #e4ebf0;border-radius:8px;padding:10px 12px}.mol-row input[type=text]{width:130px}.mInfo{flex-basis:100%;display:flex;gap:12px;align-items:center;font-size:13px;line-height:1.5;color:#2b4459}.mInfo:empty{display:none}.mInfo img{border:1px solid #e4ebf0;border-radius:6px;background:#fff}.mol-row input[type=number]{width:80px}.mol-row input[type=color]{width:34px;height:34px;padding:0;border:1px solid #b8c8d5;border-radius:6px;background:none;cursor:pointer}
+details{font-size:14px;line-height:1.6;color:#2b4459}details summary{cursor:pointer;font-weight:600;color:#142d44}
+</style></head><body>
+<header><a class="back-link" href="../../tools.html">← Sharaf Lab tools</a><small>PROTEIN / ASSEMBLY</small><h1>Pack proteins into micelles</h1><p>Load a protein with a globular head and a hydrophobic tail, choose how many copies you want, and watch the tails bury themselves together while the heads crowd at the surface.</p></header>
+<main>
+<div class="vibe-caution" role="note"><strong>Check every result.</strong> This tool was vibe coded: built quickly with AI assistance and not independently validated. It is a coarse geometric model, not a physics-grade simulation. Compare its output with your own data and standard software before using it in figures, analyses or publications.</div>
+
+<div class="workspace">
+<div class="col">
+
+<section class="panel" aria-labelledby="h-load">
+<div class="panelhead"><h2 id="h-load"><span class="step">1</span>Load a protein</h2><p>Open a PDB or mmCIF file, or fetch one by PDB ID (for example 1AKI), AlphaFold code (for example AF-P28635-F1) or UniProt accession.</p></div>
+<div class="pbody">
+<div class="toolbar"><label class="file">Open structure<input id="file" type="file" accept=".pdb,.ent,.cif,.mmcif,.txt"></label>
+<input id="fetchId" type="text" placeholder="1AKI or AF-P28635-F1" aria-label="PDB ID, AlphaFold code or UniProt accession" size="20"><button id="fetchBtn">Fetch</button><button id="saveModel" hidden>Download model file</button></div>
+<div class="toolbar"><label class="file">Import AlphaFold model<input id="afFile" type="file" accept=".pdb,.ent,.cif,.mmcif,.zip"></label><label id="afPickWrap" hidden>Model <select id="afPick"></select></label></div>
+<p class="note">Takes a model file from the AlphaFold Database (.pdb or .cif), or the whole .zip download from AlphaFold Server or ColabFold (it picks model 0 or rank 1; you can switch). Confidence (pLDDT) is read from the B-factor column and shown under the sequence.</p>
+<div class="toolbar"><span class="note">Try an example:</span><button id="exDefault" class="primary">Load example: MetQ (AF-P28635-F1) + Rose Bengal (632-69-9)</button><button id="exLys">Lysozyme + synthetic tail</button><button id="exB5">Cytochrome b5 (AlphaFold)</button></div>
+<label id="chainWrap" hidden>Chain <select id="chain"></select></label>
+<p id="loadMsg" class="msg"></p>
+<div id="protInfo" class="info"></div>
+</div></section>
+
+<section class="panel" aria-labelledby="h-mol">
+<div class="panelhead"><h2 id="h-mol"><span class="step">+</span>Add molecules (optional)</h2><p>Other molecules, such as a drug, a dye or a small protein, drawn as spheres sized from their diameter. They never overlap anything. Changes apply the next time you press Build and run or Calculate (step 4).</p></div>
+<div class="pbody"><div id="molList" class="mol-list"></div><div class="toolbar"><button id="addMol">Add a molecule</button></div>
+<p class="note">Enter a CAS number and press Look up to fill in the name, diameter and behavior from PubChem; you can still edit them. Rough diameters by hand: small drug or dye 0.8–1.5 nm; peptide 1.5–2 nm; for a globular protein, diameter ≈ 0.132 × (mass in Da)<sup>1/3</sup> nm, so 10 kDa ≈ 2.8 nm and 50 kDa ≈ 4.9 nm. <b>Hydrophobicity</b> sets how strongly a molecule is drawn to the tails: 0 is inert (it only takes up space), 1 is as sticky as a tail residue, 2 is twice as sticky.</p></div></section>
+
+<section class="panel" aria-labelledby="h-tail">
+<div class="panelhead"><h2 id="h-tail"><span class="step">2</span>Choose the hydrophobic tail</h2><p>The tail must run to one end of the chain. Everything else is treated as the rigid globular head.</p></div>
+<div class="pbody">
+<div class="radio-row" role="radiogroup" aria-label="Tail source"><label><input type="radio" name="tailMode" value="struct" checked> Residues in the structure</label><label><input type="radio" name="tailMode" value="seq"> Type a tail sequence</label></div>
+<div id="tailStructBox" class="subpanel">
+<div class="toolbar"><label>From residue <input id="tailStart" type="number"></label><label>to <input id="tailEnd" type="number"></label><button id="autoTail">Auto-detect</button></div>
+<p class="note">Auto-detect looks for a terminal stretch that sticks out from the folded head (few long-range contacts) or, in AlphaFold models, has low confidence (pLDDT below 50). You can also click a residue below: the tail then runs from that residue to the nearest chain end.</p>
+</div>
+<div id="tailSeqBox" class="subpanel" hidden>
+<label for="tailSeq">Tail sequence (one-letter code, written N→C)</label><textarea id="tailSeq" spellcheck="false" placeholder="e.g. GSLLVALLVAILLVAFL"></textarea>
+<label>Attach at <select id="attachAt"><option value="C">C-terminus (after the last residue)</option><option value="N">N-terminus (before the first residue)</option></select></label>
+<p class="note">Useful when the tail is missing from a crystal structure. The typed tail replaces nothing; the whole chain becomes the head.</p>
+</div>
+<label>Stickiness <select id="hydroMode"><option value="uniform" selected>Uniform: every tail residue is equally hydrophobic</option><option value="kd">By sequence: Kyte–Doolittle hydrophobicity</option></select></label>
+<div class="seq-legend"><span><i class="sw" style="background:#f6c77d"></i>Tail</span><span><i class="sw" style="background:#087f79"></i>Anchor (head residue the tail is attached to)</span></div>
+<div id="plddtLegend" class="seq-legend" hidden><span>Underline = AlphaFold pLDDT:</span><span><i class="sw" style="background:#0053d6"></i>&gt; 90</span><span><i class="sw" style="background:#65cbf3"></i>70–90</span><span><i class="sw" style="background:#ffdb13"></i>50–70</span><span><i class="sw" style="background:#ff7d45"></i>&lt; 50</span></div>
+<div id="seqStrip" class="seqstrip" aria-label="Chain sequence"></div>
+<p id="tailMsg" class="msg"></p>
+</div></section>
+
+<section class="panel" aria-labelledby="h-pred">
+<div class="panelhead"><h2 id="h-pred"><span class="step">3</span>Predicted shape</h2><p>The surfactant packing parameter <i>p</i> = <i>v</i> / (<i>a</i>₀ · <i>l</i>) compares tail volume with head area and tail length.</p></div>
+<div class="pbody">
+<label>Tail length assumes <select id="conf"><option value="ext" selected>Flexible chain (0.8 × 3.5 Å per residue)</option><option value="helix">α-helix (1.5 Å per residue)</option></select></label>
+<div id="pred"><p class="note">Load a protein and choose a tail to see the prediction.</p></div>
+</div></section>
+</div>
+<div class="col right">
+
+<section class="panel" aria-labelledby="h-run">
+<div class="panelhead"><h2 id="h-run"><span class="step">4</span>Assemble</h2></div>
+<div class="pbody">
+<div class="ctrl-grid">
+<label>Copies <input id="copies" type="number" min="2" max="200" value="20"><input id="copiesRange" type="range" min="2" max="200" value="20" aria-label="Number of copies"></label>
+<label>Start <select id="mode"><option value="build" selected>Build a micelle directly</option><option value="self">Self-assembly from random positions</option></select></label>
+<label id="phiWrap" hidden>Crowding <select id="phi"><option value="0.08">Dilute (8% of volume)</option><option value="0.15" selected>Moderate (15%)</option><option value="0.25">Crowded (25%)</option></select></label>
+<label>Stop after <input id="stepLimit" type="number" min="100" step="1000" value="5000"> steps</label>
+<label>Hydrophobic strength <input id="eps" type="range" min="0.5" max="4" step="0.1" value="1.6"><output id="epsOut">1.6 kT</output></label>
+</div>
+<div class="toolbar"><button id="runBtn" class="primary" disabled>Build and run</button><button id="pauseBtn" disabled>Pause</button><button id="blowBtn" disabled title="Scatter every protein copy and molecule outward, then let them reassemble">Blow up</button><button id="restartBtn" hidden>Restart from the beginning</button><button id="moreBtn" hidden>Keep going (+5,000 steps)</button><button id="fitBtn" disabled>Recenter view</button></div>
+<p id="simMsg" class="msg"></p>
+</div>
+<div id="viewer" class="viewer3d"><p id="viewerEmpty" class="viewer-empty">Load a protein to begin. Drag to rotate, scroll to zoom, right-drag to pan.</p></div>
+<div class="pbody">
+<div class="stats"><div><b id="stSteps">0</b>Steps</div><div><b id="stClusters">–</b>Assemblies</div><div><b id="stLargest">–</b>Largest (copies)</div><div><b id="stFree">–</b>Unassembled copies</div><div><b id="stOverlap">–</b>Deepest overlap (Å)</div></div>
+<div class="ctrl-grid">
+<label>Display <select id="display"><option value="surface" selected>Surface</option><option value="beads">Beads (one per residue)</option></select></label>
+<label>Color heads <select id="colorBy"><option value="copy">By copy</option><option value="cluster">By assembly</option></select></label>
+<label>Tails <select id="tailColor"><option value="hydro">By hydrophobicity</option><option value="head">Match head</option><option value="hide">Hide</option></select></label>
+<label class="check"><input id="cut" type="checkbox"> Cut away the front half</label>
+</div>
+<div class="toolbar"><button id="pngBtn" disabled>Save picture (PNG)</button><button id="svgBtn" disabled>Export SVG (1 inch wide, transparent)</button><label>Resolution <select id="svgDpi"><option value="200">200 dpi</option><option value="300" selected>300 dpi</option></select></label><button id="pdbBtn" disabled>Export PDB</button></div>
+</div></section>
+
+
+
+</div></div>
+
+<section class="panel" style="margin-top:20px" aria-labelledby="h-res">
+<div class="panelhead"><h2 id="h-res">Assemblies</h2><p>Live run shown in the 3D view. Copies whose tails touch are counted as one assembly. Shape comes from the gyration tensor of all beads in the assembly.</p></div>
+<div class="pbody"><div class="tablewrap"><table><thead><tr><th>#</th><th>Copies</th><th>Shape</th><th>Axes (nm)</th><th>Diameter (nm)</th><th>Core radius (nm)</th><th>κ²</th><th>Molecules (core / surface)</th></tr></thead><tbody id="results"><tr><td colspan="8" class="note">No assembly yet.</td></tr></tbody></table></div>
+<p id="resSummary" class="note"></p>
+<div class="calc" aria-labelledby="h-calc">
+<h3 id="h-calc">Calculate without 3D</h3>
+<p class="note">Runs one or more copy numbers in the background with no drawing, so it is faster and keeps going if you switch tabs. It uses the start mode, crowding, hydrophobic strength and step limit from step 4. Runs share your processor cores, so several go at once.</p>
+<div class="toolbar"><label>Copies <input id="calcCopies" type="text" value="10, 20, 40" size="16" aria-describedby="calcHint"></label><button id="calcBtn" class="primary" disabled>Calculate</button><button id="calcStop" disabled>Stop</button><button id="calcCsv" disabled>Download CSV</button><button id="calcClear" disabled>Clear</button></div>
+<p id="calcHint" class="note">One number, or several separated by commas (2–200 each, up to 12 runs).</p>
+<p id="calcMsg" class="msg"></p>
+<div class="tablewrap"><table><thead><tr><th>Copies</th><th>Start</th><th>Steps</th><th>Assemblies</th><th>Copies per assembly</th><th>Largest: shape</th><th>Largest: axes (nm)</th><th>Largest: diameter (nm)</th><th>Largest: core radius (nm)</th><th>Mean diameter (nm)</th><th>κ²</th><th>Molecules (core / surface / free)</th><th></th></tr></thead><tbody id="calcRows"><tr><td colspan="13" class="note">No calculations yet.</td></tr></tbody></table></div>
+</div>
+</div>
+</section>
+
+<section class="panel" style="margin-top:20px" aria-labelledby="h-how"><div class="panelhead"><h2 id="h-how">How the model works</h2></div><div class="pbody">
+<details><summary>Beads, forces and moves</summary>
+<p>The head keeps its real shape from the structure and moves as a rigid body (it can slide and rotate). The tail is rebuilt as a flexible chain of beads 3.8 Å apart, starting at the anchor residue, so its pose in the file does not matter.</p>
+<p>Tail beads attract one another with a short-range well (an implicit-solvent model in the style of Cooke, Kremer and Deserno, 2005), which stands in for the hydrophobic effect. With the "By sequence" setting the strength between two residues scales with the Kyte–Doolittle hydrophobicity of both, so charged or polar residues in the tail stick less. Heads only repel, so they stay hydrated on the outside. Water is not modeled explicitly.</p>
+<p><b>No overlaps.</b> Each head is represented by beads that enclose all of its atoms and its drawn surface, and each tail residue is a 2.8 Å sphere. After the forces move everything, an overlap check pushes apart anything still overlapping (tails move directly, heads move as rigid bodies) until the deepest overlap is under 0.02 Å; the 3D view, the tables and the PDB export are all taken after this check. The only contact allowed is between a tail's first residue and its own head, where the chain leaves the surface, and between neighboring residues along the tail, which form one continuous tube. The "Deepest overlap" readout shows the check is working.</p>
+<p>Moves follow overdamped Langevin dynamics at a temperature of 1 kT. The hydrophobic strength slider sets the depth of the tail–tail well in kT; stronger values make assemblies form faster but anneal less.</p></details>
+<details><summary>Added molecules</summary><p>Each added molecule is a rigid sphere with the diameter you give. Its hydrophobicity h scales the same short-range attraction the tail residues feel: the well depth with a tail residue is the hydrophobic strength × √h (× √ of that residue's own stickiness), and between two molecules it is the strength × √(h₁h₂). h = 0 means it only repels; h = 1 matches a tail residue. When a micelle is built directly, molecules with h ≥ 0.5 start in the core. A molecule counts as part of an assembly when it is within 2 Å of one of its beads, and as "core" when that contact is a tail. With a CAS number, the name, mass, formula and XLogP come from PubChem, and h is set to XLogP ÷ 4 (0 to 2); the diameter is that of a sphere with the PubChem 3D conformer volume (or 1.25 Å³ per dalton when there is no 3D conformer). The PDB export writes each molecule as one HETATM pseudo-atom (chain Z) with its radius in the B-factor column.</p></details>
+<details><summary>Packing parameter and copy limits</summary>
+<p><i>v</i> is the summed residue volume of the tail (Zamyatnin volumes), <i>l</i> is the tail length from the setting above, and <i>a</i>₀ is the cross-section of a sphere with the head's volume. Classic ranges: <i>p</i> &lt; ⅓ spherical micelles, ⅓–½ rods or worm-like micelles, ½–1 bilayers or vesicles.</p>
+<p>The core limit is how many tails fit in a sphere of radius <i>l</i>. The shell limit is how many heads fit around that core when packed hexagonally. The smaller of the two is the predicted maximum copies per micelle; with more copies you should expect several assemblies or non-spherical ones.</p></details>
+<details><summary>What it does not capture</summary>
+<p>No specific head–head interfaces, charges, salt, pH or concentration effects, no secondary structure in the tail and no explicit water. Treat the shapes as geometrically plausible arrangements, not predictions of a real complex.</p></details>
+</div></section>
+
+<footer>Files are processed in your browser and are never uploaded. Structures fetched by ID come from the RCSB PDB or the AlphaFold Protein Structure Database. The 3D view uses the open-source three.js library, loaded from jsDelivr.</footer>
+</main>
+
+<script id="simcore" type="text/plain">
+function d3(a,b){const x=a[0]-b[0],y=a[1]-b[1],z=a[2]-b[2];return Math.sqrt(x*x+y*y+z*z)}
+const RT=2.8,STT=2*RT,WC=5.0,KREP=6,KB=8,B0=3.8,MU=0.04,KW=2;
+function quatMat(q,o,R){const w=q[o],x=q[o+1],y=q[o+2],z=q[o+3];
+  R[0]=1-2*(y*y+z*z);R[1]=2*(x*y-w*z);R[2]=2*(x*z+w*y);R[3]=2*(x*y+w*z);R[4]=1-2*(x*x+z*z);R[5]=2*(y*z-w*x);R[6]=2*(x*z-w*y);R[7]=2*(y*z+w*x);R[8]=1-2*(x*x+y*y)}
+let gSpare=null;function gauss(){if(gSpare!==null){const s=gSpare;gSpare=null;return s}let u,v,s;do{u=Math.random()*2-1;v=Math.random()*2-1;s=u*u+v*v}while(s>=1||s===0);const m=Math.sqrt(-2*Math.log(s)/s);gSpare=v*m;return u*m}
+function randQuat(){const u1=Math.random(),u2=Math.random()*2*Math.PI,u3=Math.random()*2*Math.PI,a=Math.sqrt(1-u1),b=Math.sqrt(u1);return [a*Math.cos(u2),a*Math.sin(u2),b*Math.cos(u3),b*Math.sin(u3)]}
+function qmul(a,b){return [a[0]*b[0]-a[1]*b[1]-a[2]*b[2]-a[3]*b[3],a[0]*b[1]+a[1]*b[0]+a[2]*b[3]-a[3]*b[2],a[0]*b[2]-a[1]*b[3]+a[2]*b[0]+a[3]*b[1],a[0]*b[3]+a[1]*b[2]-a[2]*b[1]+a[3]*b[0]]}
+function qnorm(q){const n=Math.hypot(q[0],q[1],q[2],q[3]);return q.map(x=>x/n)}
+function qFromTo(u,v){const d=u[0]*v[0]+u[1]*v[1]+u[2]*v[2];if(d<-0.99999){let ax=Math.abs(u[0])<0.9?[0,-u[2],u[1]]:[-u[2],0,u[0]];const n=Math.hypot(...ax);return [0,ax[0]/n,ax[1]/n,ax[2]/n]}return qnorm([1+d,u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]])}
+function qAxis(ax,ang){const s=Math.sin(ang/2);return [Math.cos(ang/2),ax[0]*s,ax[1]*s,ax[2]*s]}
+function rotv(q,v){const R=new Float64Array(9);quatMat(q,0,R);return [R[0]*v[0]+R[1]*v[1]+R[2]*v[2],R[3]*v[0]+R[4]*v[1]+R[5]*v[2],R[6]*v[0]+R[7]*v[1]+R[8]*v[2]]}
+const norm=v=>{const n=Math.hypot(v[0],v[1],v[2])||1;return [v[0]/n,v[1]/n,v[2]/n]};
+
+function createSim(m,N,mode,phi,eps,mols){
+  mols=(mols||[]).filter(t=>t.count>0&&t.d>0);
+  const nh=m.nh,nt=m.nt,nb=nh+nt,Mp=N*nb,Nm=mols.reduce((a,t)=>a+t.count,0),M=Mp+Nm;
+  const S={m,N,nh,nt,nb,M,Mp,Nm,mols,mode,EPS:eps,steps:0,mtype:new Int32Array(Nm),molOf:new Int32Array(Nm).fill(-1),molCore:new Uint8Array(Nm),gC:{},molIdx:new Int32Array(Nm).map((_,i)=>Mp+i),
+    P:new Float64Array(M*3),F:new Float64Array(M*3),pos:new Float64Array(N*3),q:new Float64Array(N*4),Rm:new Float64Array(N*9),
+    copyOf:new Int32Array(M),kind:new Uint8Array(M),tix:new Int32Array(M),sh:new Float64Array(M),parent:new Int32Array(N),
+    rad:new Float64Array(M),Rbox:0,clusters:[],clusterOf:new Int32Array(N).fill(-1),gA:{},gB:{},allIdx:new Int32Array(Mp).map((_,i)=>i),tailIdx:new Int32Array(N*nt)};
+  for(let c=0,t=0;c<N;c++)for(let k=0;k<nt;k++)S.tailIdx[t++]=c*nb+nh+k;
+  for(let c=0;c<N;c++)for(let i=0;i<nb;i++){const b=c*nb+i;S.copyOf[b]=c;if(i<nh){S.kind[b]=0;S.tix[b]=-1;S.rad[b]=m.hr[i]}else{S.kind[b]=1;S.tix[b]=i-nh;S.sh[b]=Math.sqrt(m.h[i-nh]);S.rad[b]=RT}}
+  let maxHR=0;for(let i=0;i<nh;i++)maxHR=Math.max(maxHR,m.hr[i]);S.cellA=Math.max(2*maxHR,maxHR+RT,STT);S.maxHR=maxHR;
+  S.maxMR=0;{let b=Mp;mols.forEach((t,ti)=>{const r=t.d*5;S.maxMR=Math.max(S.maxMR,r);for(let k=0;k<t.count;k++,b++){S.kind[b]=2;S.copyOf[b]=N+(b-Mp);S.tix[b]=-1;S.rad[b]=r;S.sh[b]=Math.sqrt(Math.max(0,t.h!=null?t.h:(t.hydro?1:0)));S.mtype[b-Mp]=ti}})}
+  const MUH=MU*Math.min(1,4/Math.cbrt(m.nhRes));S.MUH=MUH;S.MUR=MUH*0.75/Math.max(25,m.rg*m.rg);
+  const al=m.anchorLocal,ad=Math.hypot(...al),u=norm(al);
+  const setBody=(c,p,q)=>{S.pos[c*3]=p[0];S.pos[c*3+1]=p[1];S.pos[c*3+2]=p[2];for(let k=0;k<4;k++)S.q[c*4+k]=q[k]};
+  if(mode==='build'){
+    const vBead=Math.PI/6*STT**3;
+    const Rc=Math.cbrt(3*N*nt*vBead/0.55/(4*Math.PI));
+    const rEff=Math.max(m.rb*0.85,8);
+    const cosA=Math.max(-0.99,1-1.8138/N),sinA=Math.sqrt(1-cosA*cosA);
+    const RsMin=N<=2?rEff:rEff/Math.max(0.05,sinA);
+    const Rcen=Math.max(RsMin,Rc+ad+3);
+    const ga=Math.PI*(3-Math.sqrt(5));
+    for(let c=0;c<N;c++){
+      const y=N===1?0:1-2*(c+0.5)/N,rr=Math.sqrt(1-y*y),th=ga*c,dir=[Math.cos(th)*rr,y,Math.sin(th)*rr];
+      let q=qFromTo(u,[-dir[0],-dir[1],-dir[2]]);q=qnorm(qmul(qAxis(dir,Math.random()*2*Math.PI),q));
+      setBody(c,[dir[0]*Rcen,dir[1]*Rcen,dir[2]*Rcen],q);
+      const A=rotv(q,al),Aw=[A[0]+dir[0]*Rcen,A[1]+dir[1]*Rcen,A[2]+dir[2]*Rcen];
+      const Ar=Math.hypot(...Aw);
+      for(let k=0;k<nt;k++){
+        const f=(k+1)/(nt+1)*0.92,b=(c*nb+nh+k)*3;
+        S.P[b]=Aw[0]*(1-f)+gauss()*1.5;S.P[b+1]=Aw[1]*(1-f)+gauss()*1.5;S.P[b+2]=Aw[2]*(1-f)+gauss()*1.5;
+        if(Ar*(1-f)<2){S.P[b]+=gauss()*3;S.P[b+1]+=gauss()*3;S.P[b+2]+=gauss()*3}
+      }
+    }
+  }else{
+    const vCopy=m.vHead+m.vTail,vMol=mols.reduce((a,t)=>a+t.count*(4/3)*Math.PI*(t.d*5)**3,0);
+    S.Rbox=Math.cbrt(3*(N*vCopy+vMol)/(4*Math.PI*phi));
+    const minD=2*m.rb,cen=[];
+    for(let c=0;c<N;c++){
+      let p;
+      for(let t=0;t<300;t++){
+        const rr=(S.Rbox-m.rb*0.6)*Math.cbrt(Math.random()),d=norm([gauss(),gauss(),gauss()]);p=[d[0]*rr,d[1]*rr,d[2]*rr];
+        if(cen.every(o=>d3(o,p)>minD))break;
+      }
+      cen.push(p);const q=randQuat();setBody(c,p,q);
+      const A=rotv(q,al);let prev=[p[0]+A[0],p[1]+A[1],p[2]+A[2]];let dir=norm(A);
+      for(let k=0;k<nt;k++){
+        dir=norm([dir[0]+gauss()*0.45,dir[1]+gauss()*0.45,dir[2]+gauss()*0.45]);
+        let nx=[prev[0]+dir[0]*B0,prev[1]+dir[1]*B0,prev[2]+dir[2]*B0];
+        const rn=Math.hypot(...nx);if(rn>S.Rbox){dir=norm([dir[0]-nx[0]/rn,dir[1]-nx[1]/rn,dir[2]-nx[2]/rn]);nx=[prev[0]+dir[0]*B0,prev[1]+dir[1]*B0,prev[2]+dir[2]*B0]}
+        const b=(c*nb+nh+k)*3;S.P[b]=nx[0];S.P[b+1]=nx[1];S.P[b+2]=nx[2];prev=nx;
+      }
+    }
+  }
+  // molecules: hydrophobic ones start in the core when a micelle is built; others start around it (or anywhere in the box)
+  if(Nm){
+    let rIn=0,rOut;
+    if(mode==='build'){let rc=0,ro=0;for(let c=0;c<N;c++){ro=Math.max(ro,Math.hypot(S.pos[c*3],S.pos[c*3+1],S.pos[c*3+2]))}rc=Math.max(5,ro-m.rb*1.2);S._rc=rc;S._ro=ro+m.rb;S.molBox=S._ro+Math.max(40,6*S.maxMR)}
+    for(let b=Mp;b<M;b++){
+      const r=S.rad[b],d=norm([gauss(),gauss(),gauss()]);let rr;
+      if(S.Rbox>0)rr=(S.Rbox-r)*Math.cbrt(Math.random());
+      else if(S.sh[b]>=0.7)rr=S._rc*Math.cbrt(Math.random());
+      else rr=Math.min(S.molBox-r,S._ro+r+Math.random()*Math.max(30,4*r));
+      S.P[b*3]=d[0]*rr;S.P[b*3+1]=d[1]*rr;S.P[b*3+2]=d[2]*rr;
+    }
+  }
+  headsToWorld(S);
+  return S;
+}
+function nearProtein(S,b,range,cb){
+  const G=S.gA;if(!G.beg)return;
+  const P=S.P,cs=G.cs,mn=G.mn,nx=G.nx,ny=G.ny,nz=G.nz,beg=G.beg,cnt=G.cnt,order=G.order;
+  const R=Math.ceil(range/cs),cx=Math.floor((P[b*3]-mn[0])/cs),cy=Math.floor((P[b*3+1]-mn[1])/cs),cz=Math.floor((P[b*3+2]-mn[2])/cs);
+  for(let ez=Math.max(0,cz-R);ez<=Math.min(nz-1,cz+R);ez++)for(let ey=Math.max(0,cy-R);ey<=Math.min(ny-1,cy+R);ey++)for(let ex=Math.max(0,cx-R);ex<=Math.min(nx-1,cx+R);ex++){
+    const c=ex+nx*(ey+ny*ez),n=cnt[c];if(!n)continue;for(let a=beg[c],e=a+n;a<e;a++)cb(order[a]);
+  }
+}
+function forcesMol(S){
+  const {Mp,M,P,F,kind,rad,sh}=S;if(M===Mp)return;
+  const FA=S.EPS*Math.PI/(2*WC),PIW=Math.PI/WC,reach=Math.max(S.maxHR,RT);
+  for(let b=Mp;b<M;b++){
+    const rb=rad[b],hb=sh[b],b3=b*3;
+    nearProtein(S,b,rb+reach+(hb>0?WC:0),j=>{
+      const kj=kind[j],sig=rb+rad[j],j3=j*3,dx=P[j3]-P[b3],dy=P[j3+1]-P[b3+1],dz=P[j3+2]-P[b3+2],r2=dx*dx+dy*dy+dz*dz;
+      const att=hb>0&&kj===1,lim=att?sig+WC:sig;if(r2>=lim*lim)return;
+      const r=Math.sqrt(r2)||1e-6;let f=r<sig?KREP*(sig-r):-FA*hb*sh[j]*Math.sin(PIW*(r-sig));
+      f/=r;F[b3]-=f*dx;F[b3+1]-=f*dy;F[b3+2]-=f*dz;F[j3]+=f*dx;F[j3+1]+=f*dy;F[j3+2]+=f*dz;
+    });
+  }
+  if(M-Mp>1){
+    buildGrid(S.gC,S.molIdx,2*S.maxMR+WC,P);
+    const G=S.gC,beg=G.beg,cnt=G.cnt,order=G.order,pr=G.pairs,np=G.np;
+    for(let p=0;p<np;p+=2){const c=pr[p],c2=pr[p+1],s0=beg[c],e0=s0+cnt[c],same=c===c2;
+      for(let a=s0;a<e0;a++){const i=order[a],i3=i*3;for(let bb=same?a+1:beg[c2],e1=beg[c2]+cnt[c2];bb<e1;bb++){const j=order[bb],j3=j*3;
+        const sig=rad[i]+rad[j],att=sh[i]>0&&sh[j]>0,lim=att?sig+WC:sig,dx=P[j3]-P[i3],dy=P[j3+1]-P[i3+1],dz=P[j3+2]-P[i3+2],r2=dx*dx+dy*dy+dz*dz;if(r2>=lim*lim)continue;
+        const r=Math.sqrt(r2)||1e-6;let f=r<sig?KREP*(sig-r):-FA*sh[i]*sh[j]*Math.sin(PIW*(r-sig));f/=r;
+        F[i3]-=f*dx;F[i3+1]-=f*dy;F[i3+2]-=f*dz;F[j3]+=f*dx;F[j3+1]+=f*dy;F[j3+2]+=f*dz}}}
+  }
+}
+function resolveMol(S){
+  const {Mp,M,P,kind,rad}=S;let worst=0;const reach=Math.max(S.maxHR,RT);
+  for(let b=Mp;b<M;b++){const rb=rad[b],b3=b*3;
+    nearProtein(S,b,rb+reach,j=>{const sig=rb+rad[j],j3=j*3,dx=P[j3]-P[b3],dy=P[j3+1]-P[b3+1],dz=P[j3+2]-P[b3+2],r2=dx*dx+dy*dy+dz*dz;if(r2>=sig*sig)return;
+      let r=Math.sqrt(r2),nx=1,ny=0,nz=0;if(r>1e-6){nx=dx/r;ny=dy/r;nz=dz/r}else r=1e-6;const dd=sig-r;if(dd>worst)worst=dd;const push=dd+0.02;
+      if(kind[j]===1){const h=push/2;P[b3]-=nx*h;P[b3+1]-=ny*h;P[b3+2]-=nz*h;P[j3]+=nx*h;P[j3+1]+=ny*h;P[j3+2]+=nz*h}
+      else{P[b3]-=nx*push;P[b3+1]-=ny*push;P[b3+2]-=nz*push}});
+  }
+  if(M-Mp>1){
+    buildGrid(S.gC,S.molIdx,2*S.maxMR,P);
+    const G=S.gC,beg=G.beg,cnt=G.cnt,order=G.order,pr=G.pairs,np=G.np;
+    for(let p=0;p<np;p+=2){const c=pr[p],c2=pr[p+1],s0=beg[c],e0=s0+cnt[c],same=c===c2;
+      for(let a=s0;a<e0;a++){const i=order[a],i3=i*3;for(let bb=same?a+1:beg[c2],e1=beg[c2]+cnt[c2];bb<e1;bb++){const j=order[bb],j3=j*3;
+        const sig=rad[i]+rad[j],dx=P[j3]-P[i3],dy=P[j3+1]-P[i3+1],dz=P[j3+2]-P[i3+2],r2=dx*dx+dy*dy+dz*dz;if(r2>=sig*sig)continue;
+        let r=Math.sqrt(r2),nx=1,ny=0,nz=0;if(r>1e-6){nx=dx/r;ny=dy/r;nz=dz/r}else r=1e-6;const dd=sig-r;if(dd>worst)worst=dd;const h=(dd+0.02)/2;
+        P[i3]-=nx*h;P[i3+1]-=ny*h;P[i3+2]-=nz*h;P[j3]+=nx*h;P[j3+1]+=ny*h;P[j3+2]+=nz*h}}}
+  }
+  return worst;
+}
+function headsToWorld(S){
+  const {N,nh,nb,m,P,pos,q,Rm}=S,hl=m.hl;
+  for(let c=0;c<N;c++){
+    quatMat(q,c*4,Rm.subarray(c*9,c*9+9));const R=Rm.subarray(c*9,c*9+9),px=pos[c*3],py=pos[c*3+1],pz=pos[c*3+2];
+    for(let i=0;i<nh;i++){const b=(c*nb+i)*3,x=hl[i*3],y=hl[i*3+1],z=hl[i*3+2];P[b]=px+R[0]*x+R[1]*y+R[2]*z;P[b+1]=py+R[3]*x+R[4]*y+R[5]*z;P[b+2]=pz+R[6]*x+R[7]*y+R[8]*z}
+  }
+}
+const OFF=[];for(let dz=-1;dz<=1;dz++)for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){if(dz>0||(dz===0&&dy>0)||(dz===0&&dy===0&&dx>0))OFF.push([dx,dy,dz])}
+function find(par,x){while(par[x]!==x){par[x]=par[par[x]];x=par[x]}return x}
+function buildGrid(G,idx,cs0,P,S){
+  const n=idx.length;
+  let mnx=1e9,mny=1e9,mnz=1e9,mxx=-1e9,mxy=-1e9,mxz=-1e9;
+  for(let a=0;a<n;a++){const b=idx[a]*3,x=P[b],y=P[b+1],z=P[b+2];if(x<mnx)mnx=x;if(x>mxx)mxx=x;if(y<mny)mny=y;if(y>mxy)mxy=y;if(z<mnz)mnz=z;if(z>mxz)mxz=z}
+  let cs=cs0,nx,ny,nz;
+  for(;;){nx=Math.floor((mxx-mnx)/cs)+1;ny=Math.floor((mxy-mny)/cs)+1;nz=Math.floor((mxz-mnz)/cs)+1;if(nx*ny*nz<=4e6)break;cs*=1.3}
+  const nc=nx*ny*nz;
+  if(!G.cellOf||G.cellOf.length<n){G.cellOf=new Int32Array(n);G.order=new Int32Array(n);G.occ=new Int32Array(n);G.nOcc=0}
+  if(!G.cnt||G.cnt.length<nc){G.cnt=new Int32Array(nc);G.beg=new Int32Array(nc);G.fill=new Int32Array(nc);G.own=new Int32Array(nc);G.nOcc=0}
+  const cellOf=G.cellOf,order=G.order,cnt=G.cnt,beg=G.beg,fill=G.fill,occ=G.occ;
+  for(let o=0;o<G.nOcc;o++)cnt[occ[o]]=0;
+  let nOcc=0;
+  for(let a=0;a<n;a++){const b=idx[a]*3,c=Math.floor((P[b]-mnx)/cs)+nx*(Math.floor((P[b+1]-mny)/cs)+ny*Math.floor((P[b+2]-mnz)/cs));cellOf[a]=c;if(cnt[c]++===0)occ[nOcc++]=c}
+  G.nOcc=nOcc;
+  let off=0;for(let o=0;o<nOcc;o++){const c=occ[o];beg[c]=off;fill[c]=off;off+=cnt[c]}
+  for(let a=0;a<n;a++)order[fill[cellOf[a]]++]=idx[a];
+  G.nx=nx;G.ny=ny;G.nz=nz;G.cs=cs;G.mn=[mnx,mny,mnz];
+  // cell owner: the copy id when every bead in the cell is a head bead of that one copy, else -1.
+  // Pairs of cells owned by the same copy are skipped (a rigid head never collides with itself).
+  const own=G.own;
+  if(S){const kind=S.kind,copyOf=S.copyOf;for(let o=0;o<nOcc;o++){const c=occ[o],s0=beg[c],e0=s0+cnt[c];let w=copyOf[order[s0]];for(let a=s0;a<e0;a++){const b=order[a];if(kind[b]!==0||copyOf[b]!==w){w=-1;break}}own[c]=w}}
+  if(!G.pairs||G.pairs.length<nOcc*28)G.pairs=new Int32Array(Math.max(nOcc*28,1024));
+  let m=0;const pr=G.pairs,nxy=nx*ny;
+  for(let o=0;o<nOcc;o++){
+    const c=occ[o],z=Math.floor(c/nxy),y=Math.floor((c-z*nxy)/nx),x=c-z*nxy-y*nx,oc=S?own[c]:-1;
+    if(oc<0){pr[m++]=c;pr[m++]=c}
+    for(let k=0;k<13;k++){const d=OFF[k],xx=x+d[0],yy=y+d[1],zz=z+d[2];if(xx<0||yy<0||zz<0||xx>=nx||yy>=ny||zz>=nz)continue;const c2=xx+nx*(yy+ny*zz);if(cnt[c2]===0)continue;if(oc>=0&&own[c2]===oc)continue;pr[m++]=c;pr[m++]=c2}
+  }
+  G.np=m;
+}
+function forcesA(S){
+  const G=S.gA,P=S.P,F=S.F,kind=S.kind,copyOf=S.copyOf,tix=S.tix,rad=S.rad,beg=G.beg,cnt=G.cnt,order=G.order,pr=G.pairs,np=G.np;
+  for(let p=0;p<np;p+=2){
+    const c=pr[p],c2=pr[p+1],s0=beg[c],e0=s0+cnt[c],same=c===c2;
+    for(let a=s0;a<e0;a++){
+      const i=order[a],ki=kind[i],ci=copyOf[i],i3=i*3,xi=P[i3],yi=P[i3+1],zi=P[i3+2];
+      for(let bb=same?a+1:beg[c2],e1=beg[c2]+cnt[c2];bb<e1;bb++){
+        const j=order[bb],kj=kind[j];
+        if(ki===1&&kj===1)continue;
+        const cj=copyOf[j];
+        if(ci===cj){if(ki===0&&kj===0)continue;const t=ki===1?tix[i]:tix[j];if(t<1)continue}
+        const sig=rad[i]+rad[j],s2=sig*sig;
+        const j3=j*3,dx=P[j3]-xi,dy=P[j3+1]-yi,dz=P[j3+2]-zi,r2=dx*dx+dy*dy+dz*dz;
+        if(r2>=s2)continue;
+        const r=Math.sqrt(r2)||1e-6,f=KREP*(sig-r)/r,fx=f*dx,fy=f*dy,fz=f*dz;
+        F[i3]-=fx;F[i3+1]-=fy;F[i3+2]-=fz;F[j3]+=fx;F[j3+1]+=fy;F[j3+2]+=fz;
+      }
+    }
+  }
+}
+function forcesB(S,doCluster){
+  const G=S.gB,P=S.P,F=S.F,copyOf=S.copyOf,tix=S.tix,sh=S.sh,parent=S.parent,beg=G.beg,cnt=G.cnt,order=G.order,pr=G.pairs,np=G.np;
+  const cl2=(STT+0.6*WC)**2,PIW=Math.PI/WC,FA=S.EPS*Math.PI/(2*WC),rcT2=(STT+WC)**2,st2=STT*STT;
+  for(let p=0;p<np;p+=2){
+    const c=pr[p],c2=pr[p+1],s0=beg[c],e0=s0+cnt[c],same=c===c2;
+    for(let a=s0;a<e0;a++){
+      const i=order[a],ci=copyOf[i],ti=tix[i],i3=i*3,xi=P[i3],yi=P[i3+1],zi=P[i3+2],shi=sh[i];
+      for(let bb=same?a+1:beg[c2],e1=beg[c2]+cnt[c2];bb<e1;bb++){
+        const j=order[bb],cj=copyOf[j];let attract=true;
+        if(ci===cj){const d=ti>tix[j]?ti-tix[j]:tix[j]-ti;if(d<=1)continue;attract=d>=3}
+        const j3=j*3,dx=P[j3]-xi,dy=P[j3+1]-yi,dz=P[j3+2]-zi,r2=dx*dx+dy*dy+dz*dz;
+        if(r2>=(attract?rcT2:st2))continue;
+        const r=Math.sqrt(r2)||1e-6;let f=0;
+        if(r<STT)f=KREP*(STT-r);
+        else{const e=shi*sh[j];if(e>0)f=-FA*e*Math.sin(PIW*(r-STT))}
+        if(doCluster&&ci!==cj&&r2<cl2){let x=ci;while(parent[x]!==x)x=parent[x];let y=cj;while(parent[y]!==y)y=parent[y];if(x!==y)parent[x]=y}
+        if(f===0)continue;
+        f/=r;const fx=f*dx,fy=f*dy,fz=f*dz;
+        F[i3]-=fx;F[i3+1]-=fy;F[i3+2]-=fz;F[j3]+=fx;F[j3+1]+=fy;F[j3+2]+=fz;
+      }
+    }
+  }
+}
+/* Long-range moves for self-assembly: whole assemblies (and lone copies) hop and turn, so they meet in
+   seconds instead of minutes. A hop is refused if any moved bead would clash with a head bead of another copy. */
+function hops(S){
+  const {N,nh,nt,nb,P,pos,q,m,copyOf,kind,gA:G}=S;
+  if(!G.beg)return;
+  const groups=S.clusters.length?S.clusters:[...Array(N).keys()].map(c=>({copies:[c],n:1}));
+  const mark=S.mark||(S.mark=new Uint8Array(N));
+  const rad=S.rad,{nx,ny,nz,beg,cnt,order,cs}=G,[mx,my,mz]=G.mn;
+  const R=new Float64Array(9),buf=S.hopBuf&&S.hopBuf.length>=N*nb*3?S.hopBuf:(S.hopBuf=new Float64Array(N*nb*3));
+  const order2=[...groups.keys()];for(let k=order2.length-1;k>0;k--){const j=Math.floor(Math.random()*(k+1));[order2[k],order2[j]]=[order2[j],order2[k]]}
+  for(const gi of order2){
+    const cp=groups[gi].copies,n=cp.length;
+    let gx=0,gy=0,gz=0;for(const c of cp){gx+=pos[c*3];gy+=pos[c*3+1];gz+=pos[c*3+2]}gx/=n;gy/=n;gz/=n;
+    const sig=5/Math.cbrt(n),dx=gauss()*sig,dy=gauss()*sig,dz=gauss()*sig;
+    if(Math.hypot(gx+dx,gy+dy,gz+dz)>S.Rbox-m.rb*0.5)continue;
+    const dq=qAxis(norm([gauss(),gauss(),gauss()]),gauss()*0.25/Math.cbrt(n));quatMat(dq,0,R);
+    for(const c of cp)mark[c]=1;
+    let ok=true,w=0;
+    outer:for(const c of cp)for(let i=0;i<nb;i++){
+      const b3=(c*nb+i)*3,x=P[b3]-gx,y=P[b3+1]-gy,z=P[b3+2]-gz;
+      const X=gx+dx+R[0]*x+R[1]*y+R[2]*z,Y=gy+dy+R[3]*x+R[4]*y+R[5]*z,Z=gz+dz+R[6]*x+R[7]*y+R[8]*z;
+      buf[w++]=X;buf[w++]=Y;buf[w++]=Z;
+      const ki=i<nh?0:1,ri=rad[c*nb+i],cx=Math.floor((X-mx)/cs),cy=Math.floor((Y-my)/cs),cz=Math.floor((Z-mz)/cs);
+      for(let ez=cz-1;ez<=cz+1;ez++){if(ez<0||ez>=nz)continue;for(let ey=cy-1;ey<=cy+1;ey++){if(ey<0||ey>=ny)continue;for(let ex=cx-1;ex<=cx+1;ex++){if(ex<0||ex>=nx)continue;
+        const cc=ex+nx*(ey+ny*ez);
+        if(cnt[cc]===0)continue;for(let a=beg[cc],e=a+cnt[cc];a<e;a++){const j=order[a];if(mark[copyOf[j]])continue;const kj=kind[j];if(ki===1&&kj===1)continue;
+          const j3=j*3,ddx=P[j3]-X,ddy=P[j3+1]-Y,ddz=P[j3+2]-Z,r2=ddx*ddx+ddy*ddy+ddz*ddz;
+          const sg=ri+rad[j];if(r2<sg*sg){ok=false;break outer}}
+      }}}
+    }
+    for(const c of cp)mark[c]=0;
+    if(!ok)continue;
+    w=0;
+    for(const c of cp){
+      for(let i=0;i<nb;i++){const b3=(c*nb+i)*3;P[b3]=buf[w++];P[b3+1]=buf[w++];P[b3+2]=buf[w++]}
+      const x=pos[c*3]-gx,y=pos[c*3+1]-gy,z=pos[c*3+2]-gz;
+      pos[c*3]=gx+dx+R[0]*x+R[1]*y+R[2]*z;pos[c*3+1]=gy+dy+R[3]*x+R[4]*y+R[5]*z;pos[c*3+2]=gz+dz+R[6]*x+R[7]*y+R[8]*z;
+      const o=c*4,nq=qnorm(qmul(dq,[q[o],q[o+1],q[o+2],q[o+3]]));q[o]=nq[0];q[o+1]=nq[1];q[o+2]=nq[2];q[o+3]=nq[3];
+    }
+    const gm=groups[gi].mols;if(gm)for(const b of gm){const b3=b*3,x=P[b3]-gx,y=P[b3+1]-gy,z=P[b3+2]-gz;P[b3]=gx+dx+R[0]*x+R[1]*y+R[2]*z;P[b3+1]=gy+dy+R[3]*x+R[4]*y+R[5]*z;P[b3+2]=gz+dz+R[6]*x+R[7]*y+R[8]*z}
+  }
+}
+/* Hard no-overlap rule. Soft forces drive the motion; this pass then pushes apart anything still overlapping:
+   tail beads move directly, heads move as rigid bodies. Repeats until the deepest overlap is below tol (Å). */
+function resolveOverlaps(S,maxIter,tol){
+  const {N,nb,P,pos,kind,copyOf,tix,rad}=S;
+  const corr=S.corr||(S.corr=new Float64Array(N*3)),ccount=S.ccount||(S.ccount=new Int32Array(N));
+  let worst=0;
+  for(let it=0;it<maxIter;it++){
+    buildGrid(S.gA,S.allIdx,S.cellA,P,S);
+    const G=S.gA,beg=G.beg,cnt=G.cnt,order=G.order,pr=G.pairs,np=G.np;
+    corr.fill(0);ccount.fill(0);worst=0;
+    for(let p=0;p<np;p+=2){
+      const c=pr[p],c2=pr[p+1],s0=beg[c],e0=s0+cnt[c],same=c===c2;
+      for(let a=s0;a<e0;a++){
+        const i=order[a],ki=kind[i],ci=copyOf[i];
+        for(let bb=same?a+1:beg[c2],e1=beg[c2]+cnt[c2];bb<e1;bb++){
+          const j=order[bb],kj=kind[j],cj=copyOf[j];
+          if(ci===cj){if(ki===0&&kj===0)continue;if(ki===1&&kj===1){const d=tix[i]>tix[j]?tix[i]-tix[j]:tix[j]-tix[i];if(d<=1)continue}else{const t=ki===1?tix[i]:tix[j];if(t<1)continue}}
+          const sig=rad[i]+rad[j],i3=i*3,j3=j*3,dx=P[j3]-P[i3],dy=P[j3+1]-P[i3+1],dz=P[j3+2]-P[i3+2],r2=dx*dx+dy*dy+dz*dz;
+          if(r2>=sig*sig)continue;
+          let r=Math.sqrt(r2),nx,ny,nz;if(r<1e-6){r=1e-6;nx=1;ny=0;nz=0}else{nx=dx/r;ny=dy/r;nz=dz/r}
+          const dd=sig-r;if(dd>worst)worst=dd;const push=dd+0.02;
+          if(ki===1&&kj===1){const h=push/2;P[i3]-=nx*h;P[i3+1]-=ny*h;P[i3+2]-=nz*h;P[j3]+=nx*h;P[j3+1]+=ny*h;P[j3+2]+=nz*h}
+          else if(ki===1){P[i3]-=nx*push;P[i3+1]-=ny*push;P[i3+2]-=nz*push}
+          else if(kj===1){P[j3]+=nx*push;P[j3+1]+=ny*push;P[j3+2]+=nz*push}
+          else{const h=push/2;corr[ci*3]-=nx*h;corr[ci*3+1]-=ny*h;corr[ci*3+2]-=nz*h;ccount[ci]++;corr[cj*3]+=nx*h;corr[cj*3+1]+=ny*h;corr[cj*3+2]+=nz*h;ccount[cj]++}
+        }
+      }
+    }
+    if(S.M>S.Mp){const wm=resolveMol(S);if(wm>worst)worst=wm}
+    if(worst<tol)break;
+    let moved=false;
+    for(let c=0;c<N;c++){if(!ccount[c])continue;moved=true;
+      const k=1/Math.sqrt(ccount[c]),dx=corr[c*3]*k,dy=corr[c*3+1]*k,dz=corr[c*3+2]*k;
+      pos[c*3]+=dx;pos[c*3+1]+=dy;pos[c*3+2]+=dz;
+      for(let t=S.nh;t<nb;t++){const b3=(c*nb+t)*3;P[b3]+=dx;P[b3+1]+=dy;P[b3+2]+=dz}}
+    if(moved)headsToWorld(S);
+  }
+  S.maxOverlap=worst;
+  return worst;
+}
+function step(S,doCluster){
+  const {M,N,nh,nt,nb,P,F,copyOf,kind,tix,sh,pos,Rm,parent}=S;
+  if(S.mode==='self'&&S.steps%10===0)doCluster=true;
+  F.fill(0);
+  if(doCluster)for(let c=0;c<N;c++)parent[c]=c;
+  buildGrid(S.gA,S.allIdx,S.cellA,P,S);forcesA(S);
+  buildGrid(S.gB,S.tailIdx,STT+WC,P);forcesB(S,doCluster);
+  forcesMol(S);
+  // wall
+  if(S.Rbox>0||S.molBox>0){const R=S.Rbox>0?S.Rbox:S.molBox;for(let b=S.Rbox>0?0:S.Mp;b<M;b++){const b3=b*3,x=P[b3],y=P[b3+1],z=P[b3+2],r=Math.sqrt(x*x+y*y+z*z);if(r>R){const f=-KW*(r-R)/r;F[b3]+=f*x;F[b3+1]+=f*y;F[b3+2]+=f*z}}}
+  // bonds + bodies
+  const al=S.m.anchorLocal,MUH=S.MUH,MUR=S.MUR,sH=Math.sqrt(2*MUH),sR=Math.sqrt(2*MUR);
+  for(let c=0;c<N;c++){
+    const R=Rm.subarray(c*9,c*9+9),px=pos[c*3],py=pos[c*3+1],pz=pos[c*3+2];
+    const ax=R[0]*al[0]+R[1]*al[1]+R[2]*al[2],ay=R[3]*al[0]+R[4]*al[1]+R[5]*al[2],az=R[6]*al[0]+R[7]*al[1]+R[8]*al[2];
+    let Fx=0,Fy=0,Fz=0,Tx=0,Ty=0,Tz=0;
+    // bond chain
+    let qx=px+ax,qy=py+ay,qz=pz+az,prev=-1;
+    for(let k=0;k<nt;k++){
+      const b=c*nb+nh+k,b3=b*3,dx=P[b3]-qx,dy=P[b3+1]-qy,dz=P[b3+2]-qz,r=Math.sqrt(dx*dx+dy*dy+dz*dz)||1e-6,f=KB*(r-B0)/r;
+      F[b3]-=f*dx;F[b3+1]-=f*dy;F[b3+2]-=f*dz;
+      if(prev<0){const fx=f*dx,fy=f*dy,fz=f*dz;Fx+=fx;Fy+=fy;Fz+=fz;Tx+=ay*fz-az*fy;Ty+=az*fx-ax*fz;Tz+=ax*fy-ay*fx}
+      else{F[prev]+=f*dx;F[prev+1]+=f*dy;F[prev+2]+=f*dz}
+      prev=b3;qx=P[b3];qy=P[b3+1];qz=P[b3+2];
+    }
+    for(let i=0;i<nh;i++){const b3=(c*nb+i)*3,fx=F[b3],fy=F[b3+1],fz=F[b3+2],rx=P[b3]-px,ry=P[b3+1]-py,rz=P[b3+2]-pz;Fx+=fx;Fy+=fy;Fz+=fz;Tx+=ry*fz-rz*fy;Ty+=rz*fx-rx*fz;Tz+=rx*fy-ry*fx}
+    let dx=Fx*MUH+gauss()*sH,dy=Fy*MUH+gauss()*sH,dz=Fz*MUH+gauss()*sH;const dl=Math.sqrt(dx*dx+dy*dy+dz*dz);if(dl>1){dx/=dl;dy/=dl;dz/=dl}
+    pos[c*3]+=dx;pos[c*3+1]+=dy;pos[c*3+2]+=dz;
+    let wx=Tx*MUR+gauss()*sR,wy=Ty*MUR+gauss()*sR,wz=Tz*MUR+gauss()*sR;let ang=Math.sqrt(wx*wx+wy*wy+wz*wz);
+    if(ang>1e-9){if(ang>0.05){wx*=0.05/ang;wy*=0.05/ang;wz*=0.05/ang;ang=0.05}
+      const s=Math.sin(ang/2)/ang,dq=[Math.cos(ang/2),wx*s,wy*s,wz*s],o=c*4,qq=[S.q[o],S.q[o+1],S.q[o+2],S.q[o+3]];
+      const nq=qnorm(qmul(dq,qq));S.q[o]=nq[0];S.q[o+1]=nq[1];S.q[o+2]=nq[2];S.q[o+3]=nq[3]}
+  }
+  // tails
+  const sT=Math.sqrt(2*MU);
+  for(let c=0;c<N;c++)for(let k=0;k<nt;k++){
+    const b3=(c*nb+nh+k)*3;let dx=F[b3]*MU+gauss()*sT,dy=F[b3+1]*MU+gauss()*sT,dz=F[b3+2]*MU+gauss()*sT;
+    const dl=Math.sqrt(dx*dx+dy*dy+dz*dz);if(dl>1.2){dx*=1.2/dl;dy*=1.2/dl;dz*=1.2/dl}
+    P[b3]+=dx;P[b3+1]+=dy;P[b3+2]+=dz;
+  }
+  for(let b=S.Mp;b<M;b++){const mu=MU*Math.min(1,RT/S.rad[b]),sm=Math.sqrt(2*mu),b3=b*3;let dx=F[b3]*mu+gauss()*sm,dy=F[b3+1]*mu+gauss()*sm,dz=F[b3+2]*mu+gauss()*sm;
+    const dl=Math.sqrt(dx*dx+dy*dy+dz*dz);if(dl>1.2){dx*=1.2/dl;dy*=1.2/dl;dz*=1.2/dl}P[b3]+=dx;P[b3+1]+=dy;P[b3+2]+=dz}
+  // collective moves: an assembly also drifts as a whole, more slowly the bigger it is
+  const sC=Math.sqrt(2*MUH);
+  for(const g of S.clusters){
+    if(g.n<2)continue;
+    const k=sC/Math.cbrt(g.n),dx=gauss()*k,dy=gauss()*k,dz=gauss()*k;
+    for(const c of g.copies){pos[c*3]+=dx;pos[c*3+1]+=dy;pos[c*3+2]+=dz;for(let t=0;t<nt;t++){const b3=(c*nb+nh+t)*3;P[b3]+=dx;P[b3+1]+=dy;P[b3+2]+=dz}}
+    if(g.mols)for(const b of g.mols){P[b*3]+=dx;P[b*3+1]+=dy;P[b*3+2]+=dz}
+  }
+  if(S.mode==='self'&&S.steps%10===0)hops(S);
+  headsToWorld(S);
+  S.steps++;
+  if(doCluster){resolveOverlaps(S,80,0.02);analyze(S)}
+}
+function eig3(a){
+  const A=[[a[0],a[1],a[2]],[a[1],a[3],a[4]],[a[2],a[4],a[5]]];
+  for(let sw=0;sw<60;sw++){
+    if(A[0][1]**2+A[0][2]**2+A[1][2]**2<1e-14)break;
+    for(const [p,q] of [[0,1],[0,2],[1,2]]){
+      if(Math.abs(A[p][q])<1e-15)continue;
+      const th=(A[q][q]-A[p][p])/(2*A[p][q]),t=(th>=0?1:-1)/(Math.abs(th)+Math.sqrt(th*th+1)),c=1/Math.sqrt(t*t+1),s=t*c;
+      for(let k=0;k<3;k++){const kp=A[k][p],kq=A[k][q];A[k][p]=c*kp-s*kq;A[k][q]=s*kp+c*kq}
+      for(let k=0;k<3;k++){const pk=A[p][k],qk=A[q][k];A[p][k]=c*pk-s*qk;A[q][k]=s*pk+c*qk}
+    }
+  }
+  return [A[0][0],A[1][1],A[2][2]].map(x=>Math.max(0,x)).sort((x,y)=>y-x);
+}
+function classify(ax,n){
+  if(n<2)return 'Unassembled';
+  const [a,b,c]=ax;
+  if(a/c<1.25)return 'Sphere';
+  const A=a/b,B=b/c;
+  if(A>B*1.3)return a/b>2?'Rod':'Prolate ellipsoid';
+  if(B>A*1.3)return b/c>2?'Disc or bilayer patch':'Oblate ellipsoid';
+  return 'Irregular (triaxial)';
+}
+function analyze(S){
+  const {N,nh,nt,nb,P,parent}=S,groups=new Map();
+  for(let c=0;c<N;c++){const r=find(parent,c);if(!groups.has(r))groups.set(r,[]);groups.get(r).push(c)}
+  const out=[];
+  for(const copies of groups.values()){
+    let cx=0,cy=0,cz=0,n=0;
+    for(const c of copies)for(let i=0;i<nb;i++){const b=(c*nb+i)*3;cx+=P[b];cy+=P[b+1];cz+=P[b+2];n++}
+    cx/=n;cy/=n;cz/=n;
+    let xx=0,xy=0,xz=0,yy=0,yz=0,zz=0,rmax=0,tg=0,tc=[0,0,0];
+    for(const c of copies)for(let k=0;k<nt;k++){const b=(c*nb+nh+k)*3;tc[0]+=P[b];tc[1]+=P[b+1];tc[2]+=P[b+2]}
+    const ntt=copies.length*nt;tc=tc.map(v=>v/ntt);
+    for(const c of copies)for(let i=0;i<nb;i++){const b=(c*nb+i)*3,x=P[b]-cx,y=P[b+1]-cy,z=P[b+2]-cz;xx+=x*x;xy+=x*y;xz+=x*z;yy+=y*y;yz+=y*z;zz+=z*z;const r=x*x+y*y+z*z;if(r>rmax)rmax=r;
+      if(i>=nh){const tx=P[b]-tc[0],ty=P[b+1]-tc[1],tz=P[b+2]-tc[2];tg+=tx*tx+ty*ty+tz*tz}}
+    const L=eig3([xx/n,xy/n,xz/n,yy/n,yz/n,zz/n]),sum=L[0]+L[1]+L[2]||1;
+    const ax=L.map(l=>Math.sqrt(5*l));
+    const k2=1-3*(L[0]*L[1]+L[1]*L[2]+L[0]*L[2])/(sum*sum);
+    out.push({copies,n:copies.length,shape:classify(ax,copies.length),dims:ax.map(a=>2*a+6),diam:2*Math.sqrt(rmax)+6,core:Math.sqrt(5/3*tg/ntt)+2.5,k2,center:[cx,cy,cz]});
+  }
+  out.sort((a,b)=>b.n-a.n);
+  out.forEach((g,i)=>{for(const c of g.copies)S.clusterOf[c]=i;g.mols=[];g.molCore=0;g.molSurf=0});
+  S.clusters=out;
+  // molecules: an assembly counts a molecule when it touches (within 2 Å) one of its beads; "core" if it touches a tail
+  S.molFree=0;
+  if(S.M>S.Mp){const {Mp,M,rad,kind,copyOf}=S,reach=Math.max(S.maxHR,RT);
+    for(let b=Mp;b<M;b++){const rb=rad[b],b3=b*3;let bestD=1e9,bestC=-1,tail=false;
+      nearProtein(S,b,rb+reach+2,j=>{const d=Math.hypot(P[j*3]-P[b3],P[j*3+1]-P[b3+1],P[j*3+2]-P[b3+2])-rb-rad[j];if(d<2){if(kind[j]===1)tail=true;if(d<bestD){bestD=d;bestC=copyOf[j]}}});
+      const k=b-Mp,gi=bestC>=0?S.clusterOf[bestC]:-1,g=gi>=0?out[gi]:null;
+      if(g&&g.n>=2){S.molOf[k]=gi;S.molCore[k]=tail?1:0;g.mols.push(b);if(tail)g.molCore++;else g.molSurf++}else{S.molOf[k]=-1;S.molFree++}}}
+}
+
+</script>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+<script>setTimeout(function(){if(!window.__paReady){var e=document.getElementById('viewerEmpty');if(e)e.textContent='The 3D library could not be loaded. Check your internet connection and reload the page.'}},12000)</script>
+<script type="module">
+import * as THREE from 'three';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+import {edgeTable,triTable} from 'three/addons/objects/MarchingCubes.js';
+window.__paReady=true;
+const $=id=>document.getElementById(id);
+
+/* ---------- residue tables ---------- */
+const AA3={ALA:'A',ARG:'R',ASN:'N',ASP:'D',CYS:'C',GLN:'Q',GLU:'E',GLY:'G',HIS:'H',ILE:'I',LEU:'L',LYS:'K',MET:'M',PHE:'F',PRO:'P',SER:'S',THR:'T',TRP:'W',TYR:'Y',VAL:'V',MSE:'M',SEC:'C',HSD:'H',HSE:'H',HIE:'H',HID:'H',HIP:'H',CYX:'C'};
+const A1={A:'ALA',R:'ARG',N:'ASN',D:'ASP',C:'CYS',Q:'GLN',E:'GLU',G:'GLY',H:'HIS',I:'ILE',L:'LEU',K:'LYS',M:'MET',F:'PHE',P:'PRO',S:'SER',T:'THR',W:'TRP',Y:'TYR',V:'VAL'};
+const KD={A:1.8,R:-4.5,N:-3.5,D:-3.5,C:2.5,Q:-3.5,E:-3.5,G:-0.4,H:-3.2,I:4.5,L:3.8,K:-3.9,M:1.9,F:2.8,P:-1.6,S:-0.8,T:-0.7,W:-0.9,Y:-1.3,V:4.2};
+const VOL={A:88.6,R:173.4,N:114.1,D:111.1,C:108.5,Q:143.8,E:138.4,G:60.1,H:153.2,I:166.7,L:166.7,K:168.6,M:162.9,F:189.9,P:112.7,S:89.0,T:116.1,W:227.8,Y:193.6,V:140.0};
+const vol=c=>VOL[c]||135;
+const hyd=c=>Math.min(1,Math.max(0,((KD[c]??-1)+1)/5.5));
+
+/* ---------- parsing ---------- */
+function parsePdb(text){
+  const atoms=[];
+  for(const line of text.split(/\r?\n/)){
+    const rec=line.slice(0,6);
+    if(rec==='ENDMDL')break;
+    if(rec!=='ATOM  '&&rec!=='HETATM')continue;
+    const alt=line[16]||' ';if(alt!==' '&&alt!=='A'&&alt!=='1')continue;
+    const resn=line.slice(17,20).trim();
+    const x=parseFloat(line.slice(30,38)),y=parseFloat(line.slice(38,46)),z=parseFloat(line.slice(46,54));
+    if(!isFinite(x)||!isFinite(y)||!isFinite(z))continue;
+    let el=line.slice(76,78).trim();const name=line.slice(12,16).trim();if(!el)el=name.replace(/[^A-Za-z]/g,'')[0]||'C';
+    atoms.push({name,resn,chain:line[21]===' '?'A':line[21],num:parseInt(line.slice(22,26)),ins:(line[26]||' ').trim(),x,y,z,b:parseFloat(line.slice(60,66))||0,el});
+  }
+  return atoms;
+}
+function cifTokens(line){const out=[];let i=0;const n=line.length;while(i<n){const c=line[i];if(c===' '||c==='\t'){i++;continue}if(c==="'"||c==='"'){let j=i+1;while(j<n&&!(line[j]===c&&(j+1===n||line[j+1]===' '||line[j+1]==='\t')))j++;out.push(line.slice(i+1,j));i=j+1}else{let j=i;while(j<n&&line[j]!==' '&&line[j]!=='\t')j++;out.push(line.slice(i,j));i=j}}return out}
+function parseCif(text){
+  const lines=text.split(/\r?\n/),atoms=[];
+  for(let i=0;i<lines.length;i++){
+    if(lines[i].trim()!=='loop_'||!(lines[i+1]||'').trim().startsWith('_atom_site.'))continue;
+    const cols=[];let j=i+1;
+    while(j<lines.length&&lines[j].trim().startsWith('_atom_site.')){cols.push(lines[j].trim().split(/\s+/)[0].slice(11));j++}
+    const ix=k=>cols.indexOf(k);
+    const c={g:ix('group_PDB'),an:ix('auth_atom_id')>=0?ix('auth_atom_id'):ix('label_atom_id'),alt:ix('label_alt_id'),rn:ix('auth_comp_id')>=0?ix('auth_comp_id'):ix('label_comp_id'),ch:ix('auth_asym_id')>=0?ix('auth_asym_id'):ix('label_asym_id'),sq:ix('auth_seq_id')>=0?ix('auth_seq_id'):ix('label_seq_id'),ins:ix('pdbx_PDB_ins_code'),x:ix('Cartn_x'),y:ix('Cartn_y'),z:ix('Cartn_z'),b:ix('B_iso_or_equiv'),el:ix('type_symbol'),m:ix('pdbx_PDB_model_num')};
+    let model=null,buf=[];
+    for(;j<lines.length;j++){
+      const t=lines[j].trim();if(!t)continue;
+      if(t==='#'||t.startsWith('loop_')||t.startsWith('_'))break;
+      buf.push(...cifTokens(lines[j]));
+      while(buf.length>=cols.length){
+        const r=buf.splice(0,cols.length);
+        if(c.m>=0){if(model===null)model=r[c.m];else if(r[c.m]!==model)continue}
+        const alt=c.alt>=0?r[c.alt]:'.';if(alt!=='.'&&alt!=='?'&&alt!=='A'&&alt!=='1')continue;
+        const ins=c.ins>=0&&r[c.ins]!=='?'&&r[c.ins]!=='.'?r[c.ins]:'';
+        atoms.push({name:r[c.an].replace(/"/g,''),resn:r[c.rn],chain:r[c.ch],num:parseInt(r[c.sq]),ins,x:+r[c.x],y:+r[c.y],z:+r[c.z],b:c.b>=0?(+r[c.b]||0):0,el:c.el>=0?r[c.el]:'C'});
+      }
+    }
+    break;
+  }
+  return atoms;
+}
+function parseStructure(text,label,forcePlddt){
+  const isCif=/^_atom_site\./m.test(text);
+  const atoms=isCif?parseCif(text):parsePdb(text);
+  const chains=new Map();
+  for(const a of atoms){
+    if(!(a.resn in AA3)||!isFinite(a.num))continue;
+    if(!chains.has(a.chain))chains.set(a.chain,{id:a.chain,res:[],map:new Map()});
+    const ch=chains.get(a.chain),key=a.num+'|'+a.ins;
+    let r=ch.map.get(key);
+    if(!r){r={resn:a.resn,one:AA3[a.resn],num:a.num,ins:a.ins,atoms:[],ca:null,b:0};ch.map.set(key,r);ch.res.push(r)}
+    if(r.atoms.some(o=>o.name===a.name))continue;
+    r.atoms.push(a);if(a.name==='CA'){r.ca=[a.x,a.y,a.z];r.b=a.b}
+  }
+  const list=[...chains.values()].map(ch=>({id:ch.id,res:ch.res.filter(r=>r.ca)})).filter(ch=>ch.res.length>=5);
+  let title='';
+  const tl=text.match(/^TITLE\s+\d*\s*(.*)$/gm);if(tl)title=tl.map(s=>s.replace(/^TITLE\s+\d*\s*/,'').trim()).join(' ');
+  if(!title){const m=text.match(/_struct\.title\s+(?:'([^']*)'|"([^"]*)"|([^\n]+))/);if(m)title=(m[1]||m[2]||m[3]||'').trim()}
+  if(!title){const m=text.match(/_struct\.title\s*\n;([^\n]*)/);if(m)title=m[1].trim()}
+  const plddt=!!forcePlddt||/ALPHAFOLD|_ma_qa_metric/i.test(text);
+  return {chains:list,title,plddt,label};
+}
+
+/* ---------- app state ---------- */
+const st={prot:null,chain:null,tailStart:null,tailEnd:null,model:null};
+function setMsg(id,text,cls){const e=$(id);e.textContent=text||'';e.className='msg'+(cls?' '+cls:'')}
+function loadText(text,label,forcePlddt){
+  let p;
+  try{p=parseStructure(text,label,forcePlddt)}catch(e){setMsg('loadMsg','Could not read that file: '+e.message,'err');return false}
+  if(!p.chains.length){setMsg('loadMsg','No protein chain with Cα atoms was found in '+label+'.','err');return false}
+  st.prot=p;
+  const sel=$('chain');sel.innerHTML='';
+  for(const ch of p.chains){const o=document.createElement('option');o.value=ch.id;o.textContent=`${ch.id} (${ch.res.length} residues)`;sel.appendChild(o)}
+  $('chainWrap').hidden=p.chains.length<2;
+  setMsg('loadMsg','Loaded '+label+'.','ok');
+  $('plddtLegend').hidden=!p.plddt;
+  selectChain(p.chains[0].id,true);
+  return true;
+}
+function selectChain(id,auto){
+  st.chain=st.prot.chains.find(c=>c.id===id);
+  const r=st.chain.res;
+  $('protInfo').innerHTML='';
+  const info=document.createElement('div');
+  info.textContent=(st.prot.title?st.prot.title+' · ':'')+`Chain ${st.chain.id}: residues ${r[0].num}–${r[r.length-1].num} (${r.length} with Cα)`+(st.prot.plddt?' · AlphaFold model (pLDDT in B-factor column)':'');
+  $('protInfo').appendChild(info);
+  $('tailStart').min=$('tailEnd').min=r[0].num;$('tailStart').max=$('tailEnd').max=r[r.length-1].num;
+  if(auto&&modeIs('struct'))autoDetect(true);else update();
+}
+const modeIs=m=>document.querySelector('input[name=tailMode]:checked').value===m;
+function idxOfNum(n){const r=st.chain.res;let best=-1,bd=1e9;for(let i=0;i<r.length;i++){const d=Math.abs(r[i].num-n);if(d<bd){bd=d;best=i}}return best}
+function d3(a,b){const x=a[0]-b[0],y=a[1]-b[1],z=a[2]-b[2];return Math.sqrt(x*x+y*y+z*z)}
+
+function autoDetect(quiet){
+  if(!st.chain)return;
+  const r=st.chain.res,n=r.length;
+  const cnt=new Array(n).fill(0);
+  for(let i=0;i<n;i++)for(let j=i+9;j<n;j++){if(d3(r[i].ca,r[j].ca)<10){cnt[i]++;cnt[j]++}}
+  const low=r.map((x,i)=>{const s=(cnt[i]+(cnt[i-1]??cnt[i])+(cnt[i+1]??cnt[i]))/3;return s<=2.5||(st.prot.plddt&&x.b<50)});
+  let a=0;while(a<n&&low[a])a++;
+  let c=0;while(c<n&&low[n-1-c])c++;
+  let s,e;
+  if(Math.max(a,c)>=4&&Math.max(a,c)<n-5){if(c>=a){s=n-c;e=n-1}else{s=0;e=a-1}}
+  if(s===undefined){
+    if(!quiet)setMsg('tailMsg','No terminal stretch clearly sticks out from the head. Set the tail by hand, or type a tail sequence.','warn');
+    st.tailStart=null;st.tailEnd=null;$('tailStart').value='';$('tailEnd').value='';update(true);return;
+  }
+  st.tailStart=s;st.tailEnd=e;$('tailStart').value=r[s].num;$('tailEnd').value=r[e].num;
+  update();
+  setMsg('tailMsg',`Auto-detected a ${e-s+1}-residue ${s===0?'N':'C'}-terminal tail (residues ${r[s].num}–${r[e].num}). Adjust it if needed.`,'ok');
+}
+
+const surfCache=new Map();
+/* Build the coarse model from current choices. Returns {model} or {error}. */
+function buildModel(){
+  if(!st.chain)return {error:''};
+  const r=st.chain.res,n=r.length;
+  let headRes,tailOne,tailNums,tailResn,anchor,term;
+  if(modeIs('struct')){
+    if(st.tailStart==null||st.tailEnd==null)return {error:'Choose the tail residues, click a residue, or press Auto-detect.'};
+    let s=Math.min(st.tailStart,st.tailEnd),e=Math.max(st.tailStart,st.tailEnd);
+    if(s!==0&&e!==n-1)return {error:'The tail must run to one end of the chain. Set "from" to the first residue or "to" to the last residue.'};
+    if(s===0&&e===n-1)return {error:'The tail cannot be the whole chain; leave some residues for the head.'};
+    if(e-s+1<2)return {error:'The tail needs at least 2 residues.'};
+    if(n-(e-s+1)<5)return {error:'Leave at least 5 residues for the head.'};
+    if(s===0){term='N';headRes=r.slice(e+1);anchor=0;const t=r.slice(0,e+1).reverse();tailOne=t.map(x=>x.one);tailNums=t.map(x=>x.num);tailResn=t.map(x=>x.resn)}
+    else{term='C';headRes=r.slice(0,s);anchor=headRes.length-1;const t=r.slice(s);tailOne=t.map(x=>x.one);tailNums=t.map(x=>x.num);tailResn=t.map(x=>x.resn)}
+  }else{
+    const seq=$('tailSeq').value.toUpperCase().replace(/[^ACDEFGHIKLMNPQRSTVWY]/g,'');
+    if(seq.length<2)return {error:'Type a tail sequence of at least 2 residues (standard one-letter codes).'};
+    headRes=r.slice();term=$('attachAt').value;
+    if(term==='C'){anchor=headRes.length-1;tailOne=[...seq];const last=r[n-1].num;tailNums=tailOne.map((_,k)=>last+1+k)}
+    else{anchor=0;tailOne=[...seq].reverse();const first=r[0].num;tailNums=tailOne.map((_,k)=>first-1-k)}
+    tailResn=tailOne.map(c=>A1[c]);
+  }
+  if(tailOne.length>150)return {error:'Tails longer than 150 residues are not supported.'};
+  // head centroid
+  let cx=0,cy=0,cz=0;for(const x of headRes){cx+=x.ca[0];cy+=x.ca[1];cz+=x.ca[2]}
+  const nr=headRes.length;cx/=nr;cy/=nr;cz/=nr;
+  for(const x of headRes){const dx=x.ca[0]-cx,dy=x.ca[1]-cy,dz=x.ca[2]-cz;var rgs=(rgs||0)+dx*dx+dy*dy+dz*dz}
+  const rg=Math.sqrt(rgs/nr);
+  const an=headRes[anchor].ca,anchorLocal=[an[0]-cx,an[1]-cy,an[2]-cz];
+  const allAtoms=[];for(const x of headRes)for(const a of x.atoms)allAtoms.push({name:a.name,resn:x.resn,num:x.num,ins:x.ins,el:a.el,x:a.x-cx,y:a.y-cy,z:a.z-cz});
+  // collision beads: atoms grouped into small cubes; only cubes on the outside are kept. Each bead's radius covers
+  // its atoms (plus 1.7 Å van der Waals) and every point of the drawn surface nearest to it, so non-overlapping
+  // beads mean non-overlapping surfaces.
+  const ckey=[st.prot.label,st.chain.id,headRes[0].num,headRes[nr-1].num,allAtoms.length].join('|');
+  let geo=surfCache.get(ckey);if(!geo){geo=headSurface({allAtoms});surfCache.set(ckey,geo)}
+  const heavy=allAtoms.filter(a=>a.el.toUpperCase()!=='H'),vox=heavy.length>12000?5:heavy.length>5000?4:3;
+  const cells=new Map();
+  for(const a of heavy){const k=Math.floor(a.x/vox)+','+Math.floor(a.y/vox)+','+Math.floor(a.z/vox);let c=cells.get(k);if(!c){c=[];cells.set(k,c)}c.push(a)}
+  const bc=[],br=[];
+  for(const [k,list] of cells){
+    const [i,j,l]=k.split(',').map(Number);
+    if(cells.has((i+1)+','+j+','+l)&&cells.has((i-1)+','+j+','+l)&&cells.has(i+','+(j+1)+','+l)&&cells.has(i+','+(j-1)+','+l)&&cells.has(i+','+j+','+(l+1))&&cells.has(i+','+j+','+(l-1)))continue;
+    let x=0,y=0,z=0;for(const a of list){x+=a.x;y+=a.y;z+=a.z}x/=list.length;y/=list.length;z/=list.length;
+    let r=0;for(const a of list)r=Math.max(r,Math.hypot(a.x-x,a.y-y,a.z-z));
+    bc.push(x,y,z);br.push(r+1.7);
+  }
+  const nbd=br.length,hash=new Map(),hc=6,hk=(x,y,z)=>Math.floor(x/hc)+','+Math.floor(y/hc)+','+Math.floor(z/hc);
+  for(let b=0;b<nbd;b++){const k=hk(bc[b*3],bc[b*3+1],bc[b*3+2]);if(!hash.has(k))hash.set(k,[]);hash.get(k).push(b)}
+  const vp=geo.attributes.position.array;
+  for(let v=0;v<vp.length;v+=3){
+    const x=vp[v],y=vp[v+1],z=vp[v+2],gx=Math.floor(x/hc),gy=Math.floor(y/hc),gz=Math.floor(z/hc);let best=-1,bd=1e18;
+    for(let ring=1;ring<=4&&best<0;ring++)for(let ix=gx-ring;ix<=gx+ring;ix++)for(let iy=gy-ring;iy<=gy+ring;iy++)for(let iz=gz-ring;iz<=gz+ring;iz++){const L=hash.get(ix+','+iy+','+iz);if(!L)continue;for(const b of L){const d=(bc[b*3]-x)**2+(bc[b*3+1]-y)**2+(bc[b*3+2]-z)**2;if(d<bd){bd=d;best=b}}}
+    if(best<0)for(let b=0;b<nbd;b++){const d=(bc[b*3]-x)**2+(bc[b*3+1]-y)**2+(bc[b*3+2]-z)**2;if(d<bd){bd=d;best=b}}
+    const d=Math.sqrt(bd);if(d>br[best])br[best]=d;
+  }
+  const hl=new Float64Array(bc),hr=new Float64Array(br);
+  let rb=0;for(let b=0;b<nbd;b++)rb=Math.max(rb,Math.hypot(bc[b*3],bc[b*3+1],bc[b*3+2])+br[b]);
+  const stride=1;
+  const kd=$('hydroMode').value==='kd';
+  const h=tailOne.map(c=>kd?hyd(c):1);
+  const vHead=headRes.reduce((s,x)=>s+vol(x.one),0),vTail=tailOne.reduce((s,c)=>s+vol(c),0);
+  return {model:{_surf:geo,hr,vox,headRes,tailOne,tailNums,tailResn,term,anchor,anchorLocal,hl,nh:nbd,nhRes:nr,stride,nt:tailOne.length,rg,rb,allAtoms,h,vHead,vTail,kd,headStart:headRes[0].num,headEnd:headRes[nr-1].num}};
+}
+
+/* ---------- sequence strip ---------- */
+function drawStrip(){
+  const box=$('seqStrip');box.innerHTML='';
+  if(!st.chain)return;
+  const r=st.chain.res,m=st.model,frag=document.createDocumentFragment();
+  let tailSet=new Set(),anchorNum=null;
+  if(m&&modeIs('struct')){const s=Math.min(st.tailStart,st.tailEnd),e=Math.max(st.tailStart,st.tailEnd);for(let i=s;i<=e;i++)tailSet.add(i)}
+  if(m)anchorNum=m.headRes[m.anchor].num;
+  for(let g=0;g<r.length;g+=10){
+    const grp=document.createElement('span');grp.className='grp';
+    const num=document.createElement('span');num.className='num';num.textContent=r[g].num;grp.appendChild(num);
+    const row=document.createElement('span');row.className='res';
+    for(let i=g;i<Math.min(g+10,r.length);i++){
+      const s=document.createElement('span');s.textContent=r[i].one;s.dataset.i=i;
+      s.title=`${r[i].resn} ${r[i].num}${r[i].ins}`+(st.prot.plddt?` · pLDDT ${r[i].b.toFixed(0)}`:'');
+      if(st.prot.plddt){const b=r[i].b;s.style.borderBottomColor=b>90?'#0053d6':b>70?'#65cbf3':b>50?'#ffdb13':'#ff7d45'}
+      if(tailSet.has(i))s.className='tail';else if(r[i].num===anchorNum&&m)s.className='anchor';
+      row.appendChild(s);
+    }
+    grp.appendChild(row);frag.appendChild(grp);
+  }
+  if(m&&modeIs('seq')){
+    const grp=document.createElement('span');grp.className='grp';const num=document.createElement('span');num.className='num';num.textContent=m.term==='C'?'added tail':'added tail (N)';grp.appendChild(num);
+    const row=document.createElement('span');row.className='res';
+    const seq=m.term==='C'?m.tailOne:[...m.tailOne].reverse();
+    for(const c of seq){const s=document.createElement('span');s.textContent=c;s.className='tail';row.appendChild(s)}
+    grp.appendChild(row);
+    if(m.term==='C')frag.appendChild(grp);else frag.insertBefore(grp,frag.firstChild);
+  }
+  box.appendChild(frag);
+}
+$('seqStrip').addEventListener('click',e=>{
+  const i=e.target.dataset&&e.target.dataset.i;if(i===undefined||!st.chain)return;
+  if(!modeIs('struct')){document.querySelector('input[name=tailMode][value=struct]').checked=true;syncMode()}
+  const k=+i,n=st.chain.res.length;
+  if(k>=n/2){st.tailStart=k;st.tailEnd=n-1}else{st.tailStart=0;st.tailEnd=k}
+  $('tailStart').value=st.chain.res[st.tailStart].num;$('tailEnd').value=st.chain.res[st.tailEnd].num;
+  setMsg('tailMsg','');update();
+});
+
+/* ---------- prediction ---------- */
+function predict(m){
+  const nt=m.nt,v=m.vTail;
+  const helix=$('conf').value==='helix';
+  const l=helix?1.5*nt:0.8*3.5*nt;
+  const rh=Math.cbrt(3*m.vHead/(4*Math.PI)),a0=Math.PI*rh*rh;
+  const p=v/(a0*l);
+  const nCore=Math.max(1,Math.floor((4/3)*Math.PI*l**3/v));
+  const Rs=l+rh,sa=Math.min(1,rh/Rs),cosA=Math.sqrt(1-sa*sa);
+  const nShell=Math.max(1,Math.floor(0.9069*2/(1-cosA)));
+  const nMax=Math.min(nCore,nShell);
+  return {v,l,rh,a0,p,nCore,nShell,nMax,limit:nCore<nShell?'core':'shell'};
+}
+function shapeFromP(p){
+  if(p<1/3)return ['Spherical micelles','Tails are small relative to the heads, so a curved surface with heads spread around a small core works best.'];
+  if(p<0.5)return ['Rod-like (cylindrical) micelles','The tails take up enough room that a sphere cannot hold them all; a cylinder lowers the curvature.'];
+  if(p<1)return ['Bilayers or vesicles','Head and tail cross-sections are similar, so flat or gently curved layers fit best.'];
+  return ['Flat bilayers or inverted structures','The tails are bulkier than the heads.'];
+}
+function drawPred(){
+  const box=$('pred'),m=st.model;
+  if(!m){box.innerHTML='<p class="note">Load a protein and choose a tail to see the prediction.</p>';return}
+  const P=predict(m),N=+$('copies').value;
+  const [shape,why]=shapeFromP(P.p);
+  const nMic=Math.ceil(N/P.nMax);
+  const pos=Math.min(100,P.p/1*100);
+  box.innerHTML=`<div class="pred-grid">
+<div><b>${m.nt}</b>tail residues</div><div><b>${m.nhRes}</b>head residues</div>
+<div><b>${(P.v/1000).toFixed(2)} nm³</b>tail volume <i>v</i></div><div><b>${(P.l/10).toFixed(2)} nm</b>tail length <i>l</i></div>
+<div><b>${(P.rh/10).toFixed(2)} nm</b>head radius</div><div><b>${(P.a0/100).toFixed(1)} nm²</b>head area <i>a</i>₀</div>
+<div><b>${P.p<0.01?P.p.toExponential(1):P.p.toFixed(3)}</b>packing parameter <i>p</i></div><div><b>${P.nMax}</b>max copies per micelle</div></div>
+<div class="pscale" aria-hidden="true"><span style="left:16%">sphere</span><span style="left:41.6%">rod</span><span style="left:75%">bilayer</span><i class="tick" style="left:0">0</i><i class="tick" style="left:33.3%">⅓</i><i class="tick" style="left:50%">½</i><i class="tick" style="left:100%">1</i><i class="marker" style="left:${pos}%"></i></div>
+<div class="verdict"><b>Expected: ${shape}.</b> ${why} About ${P.nMax} copies fit in one spherical micelle (core limit ${P.nCore}, shell limit ${P.nShell}; the ${P.limit} is the bottleneck). ${N>P.nMax?`With ${N} copies, expect about ${nMic} micelles, or elongated ones.`:`${N} copies should fit in one micelle.`}</div>`;
+}
+
+/* ---------- update cycle ---------- */
+function update(keepMsg){
+  const res=buildModel();
+  st.model=res.model||null;
+  if(!keepMsg)setMsg('tailMsg',res.error||'',res.error?'err':'');
+  else if(res.error&&!$('tailMsg').textContent)setMsg('tailMsg',res.error,'err');
+  drawStrip();drawPred();
+  $('runBtn').disabled=!st.model;$('calcBtn').disabled=!st.model;
+}
+function syncMode(){$('tailStructBox').hidden=!modeIs('struct');$('tailSeqBox').hidden=modeIs('struct')}
+document.querySelectorAll('input[name=tailMode]').forEach(r=>r.addEventListener('change',()=>{syncMode();update()}));
+for(const id of ['tailStart','tailEnd'])$(id).addEventListener('change',()=>{
+  if(!st.chain)return;
+  const a=$('tailStart').value,b=$('tailEnd').value;
+  st.tailStart=a===''?null:idxOfNum(+a);st.tailEnd=b===''?null:idxOfNum(+b);update();
+});
+$('tailSeq').addEventListener('input',()=>update());$('attachAt').addEventListener('change',()=>update());
+$('hydroMode').addEventListener('change',()=>{update();if(sim)applyColors()});
+$('conf').addEventListener('change',drawPred);
+$('autoTail').onclick=()=>autoDetect(false);
+$('chain').onchange=()=>selectChain($('chain').value,true);
+$('copies').addEventListener('input',()=>{$('copiesRange').value=$('copies').value;drawPred()});
+$('copiesRange').addEventListener('input',()=>{$('copies').value=$('copiesRange').value;drawPred()});
+$('mode').onchange=()=>{$('phiWrap').hidden=$('mode').value!=='self'};
+$('eps').addEventListener('input',()=>{$('epsOut').textContent=(+$('eps').value).toFixed(1)+' kT';if(sim)sim.EPS=+$('eps').value});
+
+$('file').onchange=async e=>{const f=e.target.files[0];if(!f)return;const t=await f.text();if(loadText(t,f.name)){}e.target.value=''};
+let saved=null;
+function setSaved(text,name){saved={text,name};$('saveModel').hidden=false;$('saveModel').textContent='Download '+name}
+$('saveModel').onclick=()=>{if(saved)download(new Blob([saved.text],{type:'chemical/x-pdb'}),saved.name)};
+async function fetchId(raw){
+  const id=raw.replace(/\s+/g,'').toUpperCase();if(!id)return;
+  setMsg('loadMsg','Fetching '+id+'…');
+  try{
+    let text,label;
+    if(/^[0-9][A-Z0-9]{3}$/.test(id)){
+      const r=await fetch(`https://files.rcsb.org/download/${id}.cif`);
+      if(r.status===404)throw Object.assign(Error(`No entry named ${id} was found in the PDB.`),{known:true});
+      if(!r.ok)throw Object.assign(Error(`The PDB did not return ${id} (error ${r.status}). Try again in a moment.`),{known:true});
+      text=await r.text();label='PDB '+id;setSaved(text,id+'.cif');
+    }else if(/^AF-[A-Z0-9]{6,10}-F\d+/.test(id)||/^[A-Z0-9]{6,10}$/.test(id)){
+      const af=id.match(/^AF-([A-Z0-9]{6,10})-F(\d+)/),acc=af?af[1]:id,entry=`AF-${acc}-F${af?af[2]:1}`;
+      let url=null;
+      try{const r=await fetch(`https://alphafold.ebi.ac.uk/api/prediction/${acc}`);
+        if(r.ok){const j=await r.json();const list=Array.isArray(j)?j:[j];const e0=list.find(e=>(e.entryId||'').toUpperCase()===entry)||(af&&af[2]!=='1'?null:list[0]);if(e0)url=e0.pdbUrl||e0.cifUrl}}catch(e){}
+      let text2=null;
+      if(url){const r2=await fetch(url);if(r2.ok)text2=await r2.text()}
+      if(!text2)for(const v of [6,5,4,3]){try{const r3=await fetch(`https://alphafold.ebi.ac.uk/files/${entry}-model_v${v}.pdb`);if(r3.ok){text2=await r3.text();break}}catch(e){}}
+      if(!text2)throw Object.assign(Error(`No AlphaFold model named ${entry} was found. Check the code (for example AF-P28635-F1).`),{known:true});
+      label=`AlphaFold model ${entry}`;$('afPickWrap').hidden=true;
+      setSaved(text2,`${entry}.${/^data_|_atom_site\./m.test(text2)?'cif':'pdb'}`);
+      if(loadText(text2,label,true)){afLoaded(label);return true}return false;
+    }else throw Object.assign(Error('Enter a 4-character PDB ID (e.g. 1AKI), an AlphaFold code (e.g. AF-P28635-F1) or a UniProt accession (e.g. P28635).'),{known:true});
+    return loadText(text,label);
+  }catch(e){setMsg('loadMsg',e.known?e.message:'Could not reach the server. Check your internet connection, or download the file and use Open structure.','err');return false}
+}
+$('fetchBtn').onclick=()=>fetchId($('fetchId').value);
+$('fetchId').addEventListener('keydown',e=>{if(e.key==='Enter')fetchId($('fetchId').value)});
+function loadScript(src){return new Promise((ok,bad)=>{const s=document.createElement('script');s.src=src;s.onload=ok;s.onerror=bad;document.head.appendChild(s)})}
+$('exLys').onclick=async()=>{
+  try{if(!window.SHARAF_EXAMPLE_1AKI)await loadScript('examples/lysozyme-1aki.js')}catch(e){setMsg('loadMsg','The example file could not be loaded.','err');return}
+  if(!loadText(window.SHARAF_EXAMPLE_1AKI,'lysozyme (PDB 1AKI)'))return;
+  document.querySelector('input[name=tailMode][value=seq]').checked=true;syncMode();
+  $('tailSeq').value='GSGSLLLLVVAALLVVALLA';$('attachAt').value='C';update();
+  setMsg('tailMsg','Example: a made-up 20-residue tail (a short GS linker, then a leucine/valine/alanine stretch) added after the C-terminus of lysozyme.','ok');
+};
+$('exB5').onclick=async()=>{
+  document.querySelector('input[name=tailMode][value=struct]').checked=true;syncMode();
+  $('fetchId').value='P00167';
+  if(await fetchId('P00167'))setMsg('loadMsg','Loaded the AlphaFold model of human cytochrome b5 (UniProt P00167): a heme-binding head and a C-terminal membrane anchor.','ok');
+};
+
+/* ---------- extra molecules ---------- */
+const MOLCOL=['#c84083','#ffd60a','#4cc9f0','#80ed99','#f9844a','#3a86ff'];
+let molSeq=0;
+function addMolRow(def){
+  const i=molSeq++,row=document.createElement('div');row.className='mol-row';
+  row.innerHTML=`<label>CAS number <input type="text" class="mCas" placeholder="e.g. 85721-33-1" size="13" spellcheck="false"></label><button class="mini mLook">Look up</button>
+<div class="mInfo"></div>
+<label>Name <input type="text" class="mName" maxlength="30" value="${def&&def.name||'Molecule '+(i+1)}"></label>
+<label>Diameter <input type="number" class="mD" min="0.2" max="30" step="0.1" value="${def&&def.d||1}"> nm</label>
+<label>How many <input type="number" class="mN" min="0" max="2000" step="1" value="${def&&def.count!=null?def.count:20}"></label>
+<label>Hydrophobicity <input type="range" class="mH" min="0" max="2" step="0.05" value="${def&&def.h!=null?def.h:1.45}"><output class="mHo"></output></label>
+<label>Color <input type="color" class="mC" value="${def&&def.color||MOLCOL[i%MOLCOL.length]}"></label>
+<button class="mini mDel" aria-label="Remove this molecule">Remove</button>`;
+  const hOut=()=>{const v=+row.querySelector('.mH').value;row.querySelector('.mHo').textContent=v.toFixed(2)+(v===0?' (inert)':v<0.5?' (slightly sticky)':v<1.2?' (like a tail residue)':' (stickier than a tail)')};
+  row.querySelector('.mH').addEventListener('input',hOut);hOut();row._hOut=hOut;
+  row.querySelector('.mDel').onclick=()=>row.remove();
+  row.querySelector('.mLook').onclick=()=>lookupChem(row);
+  row.querySelector('.mCas').addEventListener('keydown',e=>{if(e.key==='Enter')lookupChem(row)});
+  row.querySelector('.mC').addEventListener('input',()=>{if(sim&&meshes)applyColors()});
+  $('molList').appendChild(row);
+}
+$('addMol').onclick=()=>addMolRow();
+function casValid(c){const m=c.match(/^(\d{2,7})-(\d{2})-(\d)$/);if(!m)return null;const d=(m[1]+m[2]).split('').reverse();let sum=0;d.forEach((x,i)=>sum+=(+x)*(i+1));return sum%10===+m[3]}
+async function lookupChem(row){
+  const q=row.querySelector('.mCas').value.trim(),info=row.querySelector('.mInfo');if(!q)return;
+  const ok=casValid(q);
+  if(ok===false){info.innerHTML='<span class="msg err">That CAS number fails its check digit. Check for a typo.</span>';return}
+  info.innerHTML='<span class="note">Looking up '+q.replace(/</g,'&lt;')+' in PubChem…</span>';
+  try{
+    const r=await fetch('https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/'+encodeURIComponent(q)+'/property/Title,MolecularFormula,MolecularWeight,XLogP,Volume3D,IUPACName/JSON');
+    if(r.status===404){info.innerHTML='<span class="msg err">PubChem has no compound with that CAS number or name.</span>';return}
+    if(!r.ok)throw Error('PubChem error '+r.status);
+    const j=await r.json(),c=j.PropertyTable.Properties[0],mw=+c.MolecularWeight;
+    const v3=c.Volume3D!=null?+c.Volume3D:null,V=v3||mw*1.25,d=2*Math.cbrt(3*V/(4*Math.PI))/10,dR=Math.round(d*100)/100;
+    const name=(c.Title||q).slice(0,30);
+    row.querySelector('.mName').value=name;row.querySelector('.mD').value=dR;
+    let beh='';
+    if(c.XLogP!=null){const hv=Math.round(Math.min(2,Math.max(0,+c.XLogP/4))*20)/20;row.querySelector('.mH').value=hv;row._hOut();beh=` Hydrophobicity set to <b>${hv.toFixed(2)}</b> from XLogP ${(+c.XLogP).toFixed(1)} (XLogP ÷ 4, so XLogP 4 matches a tail residue; 0 or below is inert). Adjust the slider if you like.`}
+    else{row.querySelector('.mH').value=1.45;row._hOut();beh=' PubChem gives no XLogP, so hydrophobicity is set to the default <b>1.45</b> (stickier than a tail residue). Adjust the slider if you like.'}
+    Object.assign(row.dataset,{cas:q,cid:c.CID,mw:mw,formula:c.MolecularFormula||'',xlogp:c.XLogP!=null?c.XLogP:''});
+    const esc=t=>String(t).replace(/[<>&"]/g,ch=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[ch]));
+    info.innerHTML=`<img alt="2D structure of ${esc(name)}" src="https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/${c.CID}/PNG?image_size=small" width="100" height="100"><div><b>${esc(name)}</b> · ${esc(c.MolecularFormula||'')} · ${mw.toFixed(1)} g/mol<br>Volume ${V.toFixed(0)} Å³ (${v3?'from the PubChem 3D conformer':'estimated from mass, no 3D conformer'}) → sphere diameter <b>${dR} nm</b>.${beh}<br><a href="https://pubchem.ncbi.nlm.nih.gov/compound/${c.CID}" target="_blank" rel="noopener">PubChem CID ${c.CID}</a></div>`;
+  }catch(e){info.innerHTML='<span class="msg err">Could not reach PubChem. Check your internet connection, or enter the diameter by hand.</span>'}
+}
+function getMols(){
+  let total=0;
+  return [...document.querySelectorAll('#molList .mol-row')].map(r=>{
+    const d=Math.min(30,Math.max(0.2,+r.querySelector('.mD').value||1));let count=Math.max(0,Math.min(2000,Math.round(+r.querySelector('.mN').value||0)));
+    if(total+count>3000)count=Math.max(0,3000-total);total+=count;
+    return {name:r.querySelector('.mName').value.trim()||'Molecule',d,count,h:+r.querySelector('.mH').value,hydro:+r.querySelector('.mH').value>0,color:r.querySelector('.mC').value,cas:r.dataset.cas||'',mw:r.dataset.mw||''};
+  }).filter(t=>t.count>0);
+}
+
+/* ---------- AlphaFold import ---------- */
+let afZip=null;
+function rankName(n){const l=n.toLowerCase();let s=0;if(/model_0\b|model_0\./.test(l))s+=10;if(/rank_0*1[_.]/.test(l))s+=10;if(/relaxed/.test(l)&&!/unrelaxed/.test(l))s+=2;if(/\.cif$/.test(l))s+=1;return s}
+function afLoaded(label){
+  document.querySelector('input[name=tailMode][value=struct]').checked=true;syncMode();
+  if(st.chain)selectChain(st.chain.id,true);
+  setMsg('loadMsg','Loaded '+label+'. pLDDT is shown as a colored line under each residue; low-confidence termini are good tail candidates.','ok');
+}
+$('afFile').onchange=async e=>{
+  const f=e.target.files[0];e.target.value='';if(!f)return;
+  $('afPickWrap').hidden=true;afZip=null;
+  if(/\.zip$/i.test(f.name)){
+    setMsg('loadMsg','Opening '+f.name+'…');
+    try{if(!window.JSZip)await loadScript('https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js')}catch(err){setMsg('loadMsg','Could not load the unzip library. Check your internet connection, or unzip the file and import the .cif or .pdb inside.','err');return}
+    let zip;try{zip=await JSZip.loadAsync(f)}catch(err){setMsg('loadMsg','That .zip file could not be read.','err');return}
+    const names=Object.keys(zip.files).filter(n=>!zip.files[n].dir&&!/__MACOSX|\/\._/.test(n)&&/\.(cif|mmcif|pdb)$/i.test(n)&&!/template/i.test(n));
+    if(!names.length){setMsg('loadMsg','No .cif or .pdb model was found inside '+f.name+'.','err');return}
+    names.sort((a,b)=>rankName(b)-rankName(a)||a.localeCompare(b));
+    afZip=zip;const sel=$('afPick');sel.innerHTML='';
+    for(const n of names){const o=document.createElement('option');o.value=n;o.textContent=n.split('/').pop();sel.appendChild(o)}
+    $('afPickWrap').hidden=names.length<2;
+    const t=await zip.files[names[0]].async('string');
+    if(loadText(t,names[0].split('/').pop(),true))afLoaded(names[0].split('/').pop()+(names.length>1?` (best of ${names.length} models in the archive)`:''));
+  }else{
+    const t=await f.text();
+    if(loadText(t,f.name,true))afLoaded(f.name);
+  }
+};
+$('afPick').onchange=async()=>{if(!afZip)return;const n=$('afPick').value;const t=await afZip.files[n].async('string');if(loadText(t,n.split('/').pop(),true))afLoaded(n.split('/').pop())};
+
+/* ---------- simulation (core text is shared with the background calculators) ---------- */
+const CORE_SRC=document.getElementById('simcore').textContent;
+const {createSim,step,analyze,headsToWorld,eig3,resolveOverlaps,qmul,qnorm,qAxis,quatMat}=new Function(CORE_SRC+'\nreturn {createSim,step,analyze,headsToWorld,eig3,resolveOverlaps,qmul,qnorm,qAxis,quatMat};')();
+let sim=null;
+/* ---------- rendering ---------- */
+const PAL=['#2a9d8f','#4361ee','#7b2cbf','#52b788','#0096c7','#9d4edd','#2d6a4f','#5e60ce','#48cae4','#6a4c93','#74c69d','#3a0ca3','#c77dff','#40916c','#4895ef','#1b998b'];
+const TAIL_POLAR=new THREE.Color('#ffe066'),TAIL_HYD=new THREE.Color('#f77f00'),GRAY=new THREE.Color('#b8c4d6');
+const view=$('viewer');
+const renderer=new THREE.WebGLRenderer({antialias:true,preserveDrawingBuffer:true,alpha:true});
+renderer.setPixelRatio(Math.min(2,window.devicePixelRatio||1));renderer.setClearColor(0xffffff,1);renderer.localClippingEnabled=true;
+view.appendChild(renderer.domElement);
+const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(35,1,1,50000);camera.position.set(0,0,300);
+scene.add(new THREE.HemisphereLight(0xffffff,0xb8c4d6,0.75));const dl=new THREE.DirectionalLight(0xffffff,1.1);dl.position.set(0.5,0.8,1);camera.add(dl);scene.add(camera);
+const controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;
+const clipPlane=new THREE.Plane(new THREE.Vector3(0,0,-1),0);
+const mkMat=()=>new THREE.MeshPhongMaterial({shininess:30,specular:0x1c1c1c,side:THREE.DoubleSide});
+const mats={head:mkMat(),tail:mkMat(),bond:mkMat(),mol:mkMat()};
+let meshes=null;
+function resize(){const w=view.clientWidth,h=view.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix()}
+new ResizeObserver(resize).observe(view);resize();
+
+/* Smooth molecular surface of the head: a blobby (Gaussian) density from every head atom, contoured with
+   marching cubes once, then drawn for every copy as an instance. */
+const CUBE=[[0,0,0],[1,0,0],[1,1,0],[0,1,0],[0,0,1],[1,0,1],[1,1,1],[0,1,1]];
+const EDGES=[[0,1],[1,2],[2,3],[3,0],[4,5],[5,6],[6,7],[7,4],[0,4],[1,5],[2,6],[3,7]];
+function headSurface(m){
+  if(m._surf)return m._surf;
+  const atoms=m.allAtoms.filter(a=>a.el.toUpperCase()!=='H');
+  const R=1.8,B=-1.5,ISO=1,h=atoms.length>8000?1.6:atoms.length>3000?1.3:1.0,pad=5;
+  let mn=[1e9,1e9,1e9],mx=[-1e9,-1e9,-1e9];
+  for(const a of atoms){mn=[Math.min(mn[0],a.x),Math.min(mn[1],a.y),Math.min(mn[2],a.z)];mx=[Math.max(mx[0],a.x),Math.max(mx[1],a.y),Math.max(mx[2],a.z)]}
+  mn=mn.map(v=>v-pad);const nx=Math.ceil((mx[0]+pad-mn[0])/h)+1,ny=Math.ceil((mx[1]+pad-mn[1])/h)+1,nz=Math.ceil((mx[2]+pad-mn[2])/h)+1;
+  const F=new Float32Array(nx*ny*nz),id=(i,j,k)=>i+nx*(j+ny*k),cut=R*2.05,cut2=cut*cut,iR2=1/(R*R);
+  for(const a of atoms){
+    const gx=(a.x-mn[0])/h,gy=(a.y-mn[1])/h,gz=(a.z-mn[2])/h,c=Math.ceil(cut/h);
+    for(let k=Math.max(0,Math.floor(gz-c));k<=Math.min(nz-1,Math.ceil(gz+c));k++){const dz=(k-gz)*h;
+      for(let j=Math.max(0,Math.floor(gy-c));j<=Math.min(ny-1,Math.ceil(gy+c));j++){const dy=(j-gy)*h,dyz=dy*dy+dz*dz;if(dyz>cut2)continue;
+        for(let i=Math.max(0,Math.floor(gx-c));i<=Math.min(nx-1,Math.ceil(gx+c));i++){const dx=(i-gx)*h,d2=dx*dx+dyz;if(d2<cut2)F[id(i,j,k)]+=Math.exp(B*(d2*iR2-1))}}}
+  }
+  const val=(i,j,k)=>F[id(Math.min(nx-1,Math.max(0,i)),Math.min(ny-1,Math.max(0,j)),Math.min(nz-1,Math.max(0,k)))];
+  const grad=(i,j,k)=>[val(i+1,j,k)-val(i-1,j,k),val(i,j+1,k)-val(i,j-1,k),val(i,j,k+1)-val(i,j,k-1)];
+  const pos=[],nor=[],idx=[],map=new Map(),ev=new Int32Array(12),vals=new Float64Array(8);
+  function vert(i,j,k,e){
+    const [ca,cb]=EDGES[e],A=CUBE[ca],Bc=CUBE[cb];
+    const ai=i+A[0],aj=j+A[1],ak=k+A[2],bi=i+Bc[0],bj=j+Bc[1],bk=k+Bc[2];
+    const axis=A[0]!==Bc[0]?0:A[1]!==Bc[1]?1:2,lo=(ai+aj+ak<=bi+bj+bk)?id(ai,aj,ak):id(bi,bj,bk),key=lo*3+axis;
+    let v=map.get(key);if(v!==undefined)return v;
+    const va=vals[ca],vb=vals[cb],t=Math.abs(vb-va)<1e-9?0.5:(ISO-va)/(vb-va);
+    pos.push(mn[0]+(ai+t*(bi-ai))*h,mn[1]+(aj+t*(bj-aj))*h,mn[2]+(ak+t*(bk-ak))*h);
+    const ga=grad(ai,aj,ak),gb=grad(bi,bj,bk);let n=[-(ga[0]+t*(gb[0]-ga[0])),-(ga[1]+t*(gb[1]-ga[1])),-(ga[2]+t*(gb[2]-ga[2]))];const l=Math.hypot(...n)||1;
+    nor.push(n[0]/l,n[1]/l,n[2]/l);
+    v=pos.length/3-1;map.set(key,v);return v;
+  }
+  for(let k=0;k<nz-1;k++)for(let j=0;j<ny-1;j++)for(let i=0;i<nx-1;i++){
+    let ci=0;for(let c=0;c<8;c++){const v=F[id(i+CUBE[c][0],j+CUBE[c][1],k+CUBE[c][2])];vals[c]=v;if(v<ISO)ci|=1<<c}
+    const et=edgeTable[ci];if(!et)continue;
+    for(let e=0;e<12;e++)if(et&(1<<e))ev[e]=vert(i,j,k,e);
+    for(let t=ci*16;triTable[t]!==-1;t+=3){
+      let a=ev[triTable[t]],b=ev[triTable[t+1]],c=ev[triTable[t+2]];
+      const ux=pos[b*3]-pos[a*3],uy=pos[b*3+1]-pos[a*3+1],uz=pos[b*3+2]-pos[a*3+2],wx=pos[c*3]-pos[a*3],wy=pos[c*3+1]-pos[a*3+1],wz=pos[c*3+2]-pos[a*3+2];
+      const nx_=uy*wz-uz*wy,ny_=uz*wx-ux*wz,nz_=ux*wy-uy*wx;
+      if(nx_*(nor[a*3]+nor[b*3]+nor[c*3])+ny_*(nor[a*3+1]+nor[b*3+1]+nor[c*3+1])+nz_*(nor[a*3+2]+nor[b*3+2]+nor[c*3+2])<0){const tmp=b;b=c;c=tmp}
+      idx.push(a,b,c);
+    }
+  }
+  const g=new THREE.BufferGeometry();
+  g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));g.setAttribute('normal',new THREE.Float32BufferAttribute(nor,3));
+  g.setIndex(pos.length/3>65535?new THREE.Uint32BufferAttribute(idx,1):new THREE.Uint16BufferAttribute(idx,1));
+  m._surf=g;return g;
+}
+const surfaceMode=()=>$('display').value==='surface';
+function buildMeshes(S){
+  if(meshes){for(const k of ['head','tail','bond','mol']){if(!meshes[k])continue;scene.remove(meshes[k]);if(meshes[k].geometry!==S.m._surf)meshes[k].geometry.dispose()}}
+  let head;
+  if(surfaceMode())head=new THREE.InstancedMesh(headSurface(S.m),mats.head,S.N);
+  else{const big=S.N*S.nh>20000;head=new THREE.InstancedMesh(new THREE.SphereGeometry(1,big?10:14,big?7:10),mats.head,S.N*S.nh)}
+  const tail=new THREE.InstancedMesh(new THREE.SphereGeometry(1,12,8),mats.tail,S.N*S.nt),bond=new THREE.InstancedMesh(new THREE.CylinderGeometry(1,1,1,10,1,true),mats.bond,S.N*S.nt);
+  for(const m of [head,tail,bond]){m.instanceMatrix.setUsage(THREE.DynamicDrawUsage);m.frustumCulled=false;scene.add(m)}
+  let mol=null;if(S.Nm){mol=new THREE.InstancedMesh(new THREE.SphereGeometry(1,28,18),mats.mol,S.Nm);mol.instanceMatrix.setUsage(THREE.DynamicDrawUsage);mol.frustumCulled=false;scene.add(mol)}
+  meshes={head,tail,bond,mol,surface:surfaceMode()};
+  applyColors();updateMeshes();
+}
+function applyColors(){
+  if(!sim||!meshes)return;
+  const S=sim,by=$('colorBy').value,tc=$('tailColor').value,col=new THREE.Color();
+  const hcol=c=>{if(by==='cluster'){const k=S.clusterOf[c];const g=S.clusters[k];if(!g||g.n<2)return GRAY;return col.set(PAL[k%PAL.length])}return col.set(PAL[c%PAL.length])};
+  for(let c=0;c<S.N;c++){
+    const hc=hcol(c).clone();
+    if(meshes.surface)meshes.head.setColorAt(c,hc);else for(let i=0;i<S.nh;i++)meshes.head.setColorAt(c*S.nh+i,hc);
+    for(let k=0;k<S.nt;k++){
+      const t=tc==='head'?hc:TAIL_POLAR.clone().lerp(TAIL_HYD,S.m.h[k]);
+      meshes.tail.setColorAt(c*S.nt+k,t);meshes.bond.setColorAt(c*S.nt+k,t);
+    }
+  }
+  if(meshes.mol){const rows=[...document.querySelectorAll('#molList .mol-row')];for(let k=0;k<S.Nm;k++){const t=S.mols[S.mtype[k]];col.set(t.color);meshes.mol.setColorAt(k,col)}}
+  for(const k of ['head','tail','bond','mol'])if(meshes[k]&&meshes[k].instanceColor)meshes[k].instanceColor.needsUpdate=true;
+  meshes.tail.visible=meshes.bond.visible=tc!=='hide';
+}
+const _m=new THREE.Matrix4(),_q=new THREE.Quaternion(),_v=new THREE.Vector3(),_s=new THREE.Vector3(),_up=new THREE.Vector3(0,1,0),_d=new THREE.Vector3();
+function updateMeshes(){
+  const S=sim,P=S.P,surf=meshes.surface,tr=2.8,br=surf?2.8:1.2;
+  let hi=0,ti=0;
+  for(let c=0;c<S.N;c++){
+    const R=S.Rm.subarray(c*9,c*9+9),al=S.m.anchorLocal;
+    if(surf){_m.set(R[0],R[1],R[2],S.pos[c*3],R[3],R[4],R[5],S.pos[c*3+1],R[6],R[7],R[8],S.pos[c*3+2],0,0,0,1);meshes.head.setMatrixAt(c,_m)}
+    else for(let i=0;i<S.nh;i++){const b=(c*S.nb+i)*3,rh=S.m.hr[i];_m.makeScale(rh,rh,rh);_m.setPosition(P[b],P[b+1],P[b+2]);meshes.head.setMatrixAt(hi++,_m)}
+    let px=S.pos[c*3]+R[0]*al[0]+R[1]*al[1]+R[2]*al[2],py=S.pos[c*3+1]+R[3]*al[0]+R[4]*al[1]+R[5]*al[2],pz=S.pos[c*3+2]+R[6]*al[0]+R[7]*al[1]+R[8]*al[2];
+    for(let k=0;k<S.nt;k++){
+      const b=(c*S.nb+S.nh+k)*3,x=P[b],y=P[b+1],z=P[b+2];
+      _m.makeScale(tr,tr,tr);_m.setPosition(x,y,z);meshes.tail.setMatrixAt(ti,_m);
+      _d.set(x-px,y-py,z-pz);const L=_d.length()||1e-3;_d.divideScalar(L);_q.setFromUnitVectors(_up,_d);
+      _v.set((x+px)/2,(y+py)/2,(z+pz)/2);_s.set(br,L,br);_m.compose(_v,_q,_s);meshes.bond.setMatrixAt(ti,_m);
+      ti++;px=x;py=y;pz=z;
+    }
+  }
+  if(meshes.mol){for(let k=0;k<S.Nm;k++){const b=S.Mp+k,r=S.rad[b];_m.makeScale(r,r,r);_m.setPosition(P[b*3],P[b*3+1],P[b*3+2]);meshes.mol.setMatrixAt(k,_m)}meshes.mol.instanceMatrix.needsUpdate=true}
+  for(const k of ['head','tail','bond'])meshes[k].instanceMatrix.needsUpdate=true;
+}
+function fitView(){
+  if(!sim)return;
+  const P=sim.P;let cx=0,cy=0,cz=0;const M=sim.M;
+  for(let b=0;b<M;b++){cx+=P[b*3];cy+=P[b*3+1];cz+=P[b*3+2]}cx/=M;cy/=M;cz/=M;
+  let r=0;for(let b=0;b<M;b++){r=Math.max(r,Math.hypot(P[b*3]-cx,P[b*3+1]-cy,P[b*3+2]-cz))}
+  r+=8;const dist=r/Math.sin(THREE.MathUtils.degToRad(camera.fov/2))*1.05;
+  const dir=camera.position.clone().sub(controls.target).normalize();if(!isFinite(dir.x)||dir.lengthSq()<0.5)dir.set(0,0,1);
+  controls.target.set(cx,cy,cz);camera.position.set(cx+dir.x*dist,cy+dir.y*dist,cz+dir.z*dist);camera.near=Math.max(0.5,dist/200);camera.far=dist*20;camera.updateProjectionMatrix();controls.update();
+}
+function fitViewSoft(){
+  const P=sim.P,M=sim.M;let cx=0,cy=0,cz=0;for(let b=0;b<M;b++){cx+=P[b*3];cy+=P[b*3+1];cz+=P[b*3+2]}cx/=M;cy/=M;cz/=M;
+  let r=0;for(let b=0;b<M;b++)r=Math.max(r,Math.hypot(P[b*3]-cx,P[b*3+1]-cy,P[b*3+2]-cz));r+=8;
+  const dist=r/Math.sin(THREE.MathUtils.degToRad(camera.fov/2))*1.05,cur=camera.position.distanceTo(controls.target);
+  if(dist>cur){const dir=camera.position.clone().sub(controls.target).normalize();camera.position.copy(controls.target).addScaledVector(dir,dist);camera.far=Math.max(camera.far,dist*20);camera.updateProjectionMatrix()}
+}
+function setClip(){const on=$('cut').checked;for(const k in mats){mats[k].clippingPlanes=on?[clipPlane]:[];mats[k].needsUpdate=true}}
+$('cut').onchange=setClip;
+$('colorBy').onchange=()=>{applyColors();drawResults()};$('tailColor').onchange=applyColors;
+$('display').onchange=()=>{if(sim){buildMeshes(sim)}};
+
+/* ---------- results ---------- */
+function drawResults(){
+  const S=sim,body=$('results');body.innerHTML='';
+  if(!S||!S.clusters.length){body.innerHTML='<tr><td colspan="8" class="note">No assembly yet.</td></tr>';return}
+  const real=S.clusters.filter(g=>g.n>=2),free=S.clusters.filter(g=>g.n<2).length;
+  $('stClusters').textContent=real.length;$('stLargest').textContent=real.length?real[0].n:0;$('stFree').textContent=free;
+  const f=x=>(x/10).toFixed(1);
+  real.slice(0,15).forEach((g,i)=>{
+    const tr=document.createElement('tr');
+    const color=$('colorBy').value==='cluster'?`<span class="cdot" style="background:${PAL[i%PAL.length]}"></span>`:'';
+    tr.innerHTML=`<td>${color}${i+1}</td><td>${g.n}</td><td>${g.shape}</td><td>${g.dims.map(f).join(' × ')}</td><td>${f(g.diam)}</td><td>${f(g.core)}</td><td>${g.k2.toFixed(2)}</td><td>${S.Nm?`${g.molCore||0} / ${g.molSurf||0}`:'–'}</td>`;
+    body.appendChild(tr);
+  });
+  if(!real.length)body.innerHTML='<tr><td colspan="8" class="note">No tails are touching yet.</td></tr>';
+  const sizes=real.map(g=>g.n);
+  $('resSummary').textContent=(real.length?`${real.length} assembl${real.length===1?'y':'ies'} (${sizes.slice(0,12).join(', ')}${sizes.length>12?', …':''} copies)`:'No assemblies')+(free?`; ${free} unassembled cop${free===1?'y':'ies'}.`:'.')+(real.length>15?' The table shows the 15 largest.':'')+(S.Nm?` ${S.molFree||0} of ${S.Nm} molecules are free (not touching an assembly).`:'')+' κ² is 0 for a perfect sphere and 1 for a straight line.';
+}
+
+/* ---------- run loop ---------- */
+let running=false,lastUI=0,lastColorSig='';
+const stepLimit=()=>Math.max(100,Math.round(+$('stepLimit').value||5000));
+function syncMore(){$('moreBtn').textContent=`Keep going (+${stepLimit().toLocaleString()} steps)`}
+$('stepLimit').addEventListener('input',syncMore);syncMore();
+function enableViewButtons(){$('svgBtn').disabled=false;$('blowBtn').disabled=false;$('pauseBtn').disabled=false;$('fitBtn').disabled=false;$('pngBtn').disabled=false;$('pdbBtn').disabled=false;$('viewerEmpty').textContent=''}
+$('runBtn').onclick=()=>{
+  if(!st.model)return;
+  const N=Math.max(2,Math.min(200,Math.round(+$('copies').value||2)));$('copies').value=N;
+  const mode=$('mode').value;
+  blow=null;
+  sim=createSim(st.model,N,mode,+$('phi').value,+$('eps').value,getMols());sim.limit=stepLimit();resolveOverlaps(sim,200,0.02);
+  for(let c=0;c<N;c++)sim.parent[c]=c;
+  analyze(sim);
+  buildMeshes(sim);fitView();enableViewButtons();
+  running=true;$('pauseBtn').textContent='Pause';$('moreBtn').hidden=true;$('restartBtn').hidden=true;
+  $('runBtn').textContent='Restart';
+  const P=predict(st.model);
+  let msg=mode==='build'?`Built ${N} copies around one core and relaxing.`:`Scattered ${N} copies in a sphere ${(sim.Rbox/5).toFixed(0)} nm across; waiting for tails to find each other.`;
+  if(sim.Nm)msg+=` Added ${sim.Nm} molecule${sim.Nm>1?'s':''} (${sim.mols.map(t=>`${t.count} × ${t.name}, ${t.d} nm`).join('; ')}).`;
+  msg+=` It stops automatically after ${sim.limit.toLocaleString()} steps.`;
+  if(mode==='build'&&N>P.nMax)msg+=` That is more than the ~${P.nMax} copies predicted to fit in one spherical micelle, so expect it to deform or crowd.`;
+  if(sim.M>40000)msg+=' This is a large system, so it will run slowly.';
+  setMsg('simMsg',msg);
+};
+function keepGoing(){if(!sim||blow)return;$('restartBtn').hidden=true;if(sim.steps>=sim.limit)sim.limit=sim.steps+stepLimit();running=true;$('moreBtn').hidden=true;$('pauseBtn').textContent='Pause';setMsg('simMsg',`Continuing to ${sim.limit.toLocaleString()} steps.`)}
+$('moreBtn').onclick=keepGoing;
+$('pauseBtn').onclick=()=>{if(!sim)return;if(running){running=false;$('pauseBtn').textContent='Resume'}else keepGoing()};
+$('fitBtn').onclick=fitView;
+function refreshUI(){$('stSteps').textContent=sim.steps.toLocaleString();$('stOverlap').textContent=sim.maxOverlap==null?'–':sim.maxOverlap<0.02?'0.00':sim.maxOverlap.toFixed(2);drawResults();
+  if($('colorBy').value==='cluster'){const sig=Array.from(sim.clusterOf).join(',');if(sig!==lastColorSig){lastColorSig=sig;applyColors()}}}
+function animate(t){
+  requestAnimationFrame(animate);
+  if(sim&&blow){blowFrame();updateMeshes();if(blow&&blow.frame%5===0)fitViewSoft()}
+  if(sim&&running){
+    const t0=performance.now();let n=0;
+    while(sim.steps<sim.limit&&performance.now()-t0<14&&n<400){const dc=(sim.steps+1)%100===0||sim.steps+1===sim.limit;step(sim,dc);n++}
+    resolveOverlaps(sim,40,0.02);
+    updateMeshes();
+    if(sim.steps>=sim.limit){running=false;$('pauseBtn').textContent='Resume';$('moreBtn').hidden=false;refreshUI();
+      setMsg('simMsg',`Stopped at ${sim.steps.toLocaleString()} steps. Press "Keep going" to run ${stepLimit().toLocaleString()} more.`,'ok')}
+    else if(t-lastUI>400){lastUI=t;refreshUI()}
+  }
+  if($('cut').checked){const d=new THREE.Vector3();camera.getWorldDirection(d);clipPlane.setFromNormalAndCoplanarPoint(d,controls.target)}
+  controls.update();renderer.render(scene,camera);
+}
+requestAnimationFrame(animate);
+
+/* ---------- blow up ---------- */
+let blow=null;
+function blowUp(){
+  if(!sim||blow)return;
+  const S=sim,{N,nh,nt,nb,Mp,M,P,pos}=S;
+  let cx=0,cy=0,cz=0;for(let c=0;c<N;c++){cx+=pos[c*3];cy+=pos[c*3+1];cz+=pos[c*3+2]}cx/=N;cy/=N;cz/=N;
+  // final spread: everything ends up filling about 5% of a sphere
+  const vMol=S.mols.reduce((a,t)=>a+t.count*(4/3)*Math.PI*(t.d*5)**3,0),V=N*(S.m.vHead+S.m.vTail)+vMol,Rnew=Math.cbrt(3*V/(4*Math.PI*0.05))+S.m.rb;
+  const rnd=()=>{let x,y,z,l;do{x=Math.random()*2-1;y=Math.random()*2-1;z=Math.random()*2-1;l=x*x+y*y+z*z}while(l>1||l<1e-4);return [x,y,z]};
+  const target=new Float64Array(N*3),mt=new Float64Array(Math.max(1,M-Mp)*3),spin=[];
+  for(let c=0;c<N;c++){let d=[pos[c*3]-cx,pos[c*3+1]-cy,pos[c*3+2]-cz];const l=Math.hypot(...d);const j=rnd();
+    d=l>1?[d[0]/l+0.6*j[0],d[1]/l+0.6*j[1],d[2]/l+0.6*j[2]]:j;const dl=Math.hypot(...d)||1,R=(Rnew-S.m.rb)*(0.55+0.45*Math.random());
+    target[c*3]=cx+d[0]/dl*R;target[c*3+1]=cy+d[1]/dl*R;target[c*3+2]=cz+d[2]/dl*R;
+    const ax=rnd(),al=Math.hypot(...ax);spin.push([ax[0]/al,ax[1]/al,ax[2]/al,(Math.random()*2-1)*0.08])}
+  for(let b=Mp;b<M;b++){const k=b-Mp;let d=[P[b*3]-cx,P[b*3+1]-cy,P[b*3+2]-cz];const l=Math.hypot(...d),j=rnd();d=l>1?[d[0]/l+0.6*j[0],d[1]/l+0.6*j[1],d[2]/l+0.6*j[2]]:j;const dl=Math.hypot(...d)||1,R=(Rnew-S.rad[b])*(0.4+0.6*Math.random());
+    mt[k*3]=cx+d[0]/dl*R;mt[k*3+1]=cy+d[1]/dl*R;mt[k*3+2]=cz+d[2]/dl*R}
+  blow={frame:0,frames:45,target,mt,spin,center:[cx,cy,cz],Rnew,wasRunning:running};
+  running=false;$('blowBtn').disabled=true;$('moreBtn').hidden=true;
+  setMsg('simMsg','Blowing up…');
+}
+function blowFrame(){
+  const S=sim,B=blow,{N,nh,nt,nb,Mp,M,P,pos,q}=S,f=1/(B.frames-B.frame);// move 1/(frames left) of the remaining way: fast start, smooth stop
+  const R=new Float64Array(9);
+  for(let c=0;c<N;c++){
+    const k=Math.min(1,f*1.8),dx=(B.target[c*3]-pos[c*3])*k,dy=(B.target[c*3+1]-pos[c*3+1])*k,dz=(B.target[c*3+2]-pos[c*3+2])*k;
+    const sp=B.spin[c],dq=qAxis([sp[0],sp[1],sp[2]],sp[3]);quatMat(dq,0,R);
+    const px=pos[c*3],py=pos[c*3+1],pz=pos[c*3+2];
+    for(let t=0;t<nt;t++){const b3=(c*nb+nh+t)*3,x=P[b3]-px,y=P[b3+1]-py,z=P[b3+2]-pz;P[b3]=px+dx+R[0]*x+R[1]*y+R[2]*z;P[b3+1]=py+dy+R[3]*x+R[4]*y+R[5]*z;P[b3+2]=pz+dz+R[6]*x+R[7]*y+R[8]*z}
+    pos[c*3]+=dx;pos[c*3+1]+=dy;pos[c*3+2]+=dz;
+    const o=c*4,nq=qnorm(qmul(dq,[q[o],q[o+1],q[o+2],q[o+3]]));q[o]=nq[0];q[o+1]=nq[1];q[o+2]=nq[2];q[o+3]=nq[3];
+  }
+  for(let b=Mp;b<M;b++){const k=b-Mp;for(let a=0;a<3;a++)P[b*3+a]+=(B.mt[k*3+a]-P[b*3+a])*Math.min(1,f*1.8)}
+  headsToWorld(S);resolveOverlaps(S,20,0.02);
+  B.frame++;
+  if(B.frame>=B.frames){
+    // re-center so the self-assembly box is centered on the origin, then continue as self-assembly
+    const [cx,cy,cz]=B.center;for(let c=0;c<N;c++){pos[c*3]-=cx;pos[c*3+1]-=cy;pos[c*3+2]-=cz}for(let b=0;b<M;b++){P[b*3]-=cx;P[b*3+1]-=cy;P[b*3+2]-=cz}
+    headsToWorld(S);
+    S.mode='self';S.Rbox=B.Rnew;S.molBox=0;
+    for(let c=0;c<N;c++)S.parent[c]=c;analyze(S);
+    S.limit=S.steps+stepLimit();blow=null;running=false;
+    $('blowBtn').disabled=false;$('pauseBtn').textContent='Resume';$('restartBtn').hidden=false;
+    fitView();refreshUI();applyColors();
+    setMsg('simMsg',`Blew up ${N} copies${S.Nm?` and ${S.Nm} molecules`:''} into a sphere ${(2*B.Rnew/10).toFixed(0)} nm across. Paused. Press Resume to let them reassemble (self-assembly, ${stepLimit().toLocaleString()} steps), or Restart from the beginning to rebuild with the current settings.`,'ok');
+  }
+}
+$('blowBtn').onclick=blowUp;
+$('restartBtn').onclick=()=>{$('restartBtn').hidden=true;$('runBtn').click()};
+
+/* ---------- calculate without 3D (background workers) ---------- */
+const WORKER_SRC=`
+self.onmessage=function(e){var d=e.data;var S=createSim(d.model,d.N,d.mode,d.phi,d.eps,d.mols);for(var c=0;c<d.N;c++)S.parent[c]=c;analyze(S);
+  function loop(){var t0=performance.now();while(S.steps<d.limit&&performance.now()-t0<150){step(S,(S.steps+1)%100===0||S.steps+1===d.limit)}
+    if(S.steps<d.limit){self.postMessage({type:'progress',steps:S.steps});setTimeout(loop,0)}
+    else self.postMessage({type:'done',steps:S.steps,molFree:S.molFree,clusters:S.clusters,state:{P:S.P,pos:S.pos,q:S.q,clusterOf:S.clusterOf}},[S.P.buffer,S.pos.buffer,S.q.buffer,S.clusterOf.buffer])}
+  loop()};`;
+let workerURL=null,workerOK=true;
+function makeWorker(){
+  if(!workerOK)return null;
+  try{if(!workerURL)workerURL=URL.createObjectURL(new Blob([CORE_SRC+'\n'+WORKER_SRC],{type:'text/javascript'}));return new Worker(workerURL)}catch(e){workerOK=false;return null}
+}
+const slim=m=>({hr:m.hr,hl:m.hl,nh:m.nh,nt:m.nt,nhRes:m.nhRes,stride:m.stride,rg:m.rg,rb:m.rb,anchorLocal:m.anchorLocal,h:m.h,vHead:m.vHead,vTail:m.vTail});
+let jobs=[],active=[],jobSeq=0;
+function runLocal(job,onProgress,onDone){
+  const S=createSim(job.model,job.N,job.mode,job.phi,job.eps,job.mols);for(let c=0;c<job.N;c++)S.parent[c]=c;analyze(S);
+  const h={stop:false};
+  (function loop(){if(h.stop)return;const t0=performance.now();while(S.steps<job.limit&&performance.now()-t0<30)step(S,(S.steps+1)%100===0||S.steps+1===job.limit);
+    if(S.steps<job.limit){onProgress(S.steps);setTimeout(loop,0)}else onDone({steps:S.steps,molFree:S.molFree,clusters:S.clusters,state:{P:S.P,pos:S.pos,q:S.q,clusterOf:S.clusterOf}})})();
+  return {terminate(){h.stop=true}};
+}
+function startJob(job){
+  job.status='running';drawCalcRow(job);
+  const done=r=>{job.status='done';job.result=r;active=active.filter(x=>x!==job);if(job.handle&&job.handle.terminate&&job.worker)job.handle.terminate();drawCalcRow(job);pump();finishCheck()};
+  const prog=steps=>{job.steps=steps;drawCalcRow(job)};
+  const w=makeWorker();
+  if(w){
+    job.worker=true;job.handle=w;
+    w.onmessage=e=>{if(e.data.type==='progress')prog(e.data.steps);else done(e.data)};
+    w.onerror=()=>{w.terminate();job.worker=false;job.handle=runLocal(job,prog,done)};
+    w.postMessage({model:slim(job.model),N:job.N,mode:job.mode,phi:job.phi,eps:job.eps,limit:job.limit,mols:job.mols});
+  }else job.handle=runLocal(job,prog,done);
+  active.push(job);
+}
+function pump(){const conc=Math.max(1,Math.min(4,(navigator.hardwareConcurrency||2)-1));while(active.length<conc){const j=jobs.find(x=>x.status==='queued');if(!j)break;startJob(j)}}
+function finishCheck(){if(!jobs.some(j=>j.status==='queued'||j.status==='running')){$('calcStop').disabled=true;$('calcMsg').textContent='Done.';$('calcMsg').className='msg ok'}}
+const nm=x=>(x/10).toFixed(1);
+function summary(r){
+  const real=r.clusters.filter(g=>g.n>=2),free=r.clusters.filter(g=>g.n<2).length,big=real[0]||null;
+  const meanD=real.length?real.reduce((s,g)=>s+g.diam,0)/real.length:0;
+  const mc=real.reduce((s,g)=>s+(g.molCore||0),0),ms=real.reduce((s,g)=>s+(g.molSurf||0),0);
+  return {real,free,big,meanD,mc,ms,mf:r.molFree||0,meanN:real.length?real.reduce((s,g)=>s+g.n,0)/real.length:0};
+}
+function drawCalcRow(job){
+  const body=$('calcRows');
+  if(!job.row){if(body.querySelector('td.note'))body.innerHTML='';job.row=document.createElement('tr');body.appendChild(job.row)}
+  const tr=job.row,start=job.mode==='build'?'Built':'Self-assembly';
+  if(job.status!=='done'){
+    const label=job.status==='queued'?'Waiting':job.status==='stopped'?'Stopped':`${(job.steps||0).toLocaleString()} / ${job.limit.toLocaleString()}`;
+    tr.innerHTML=`<td>${job.N}</td><td>${start}</td><td class="prog">${label}</td><td colspan="10" class="prog">${job.status==='running'?'Calculating…':''}</td>`;return;
+  }
+  const S=summary(job.result),b=S.big;
+  const sizes=S.real.map(g=>g.n),list=(sizes.length?sizes.slice(0,10).join(', ')+(sizes.length>10?', …':''):'none')+(S.free?` · ${S.free} single`:'');
+  tr.innerHTML=`<td>${job.N}</td><td>${start}</td><td>${job.result.steps.toLocaleString()}</td><td>${S.real.length}</td><td>${list}</td><td>${b?b.shape:'–'}</td><td>${b?b.dims.map(nm).join(' × '):'–'}</td><td>${b?nm(b.diam):'–'}</td><td>${b?nm(b.core):'–'}</td><td>${S.real.length?nm(S.meanD):'–'}</td><td>${b?b.k2.toFixed(2):'–'}</td><td>${job.mols&&job.mols.length?`${S.mc} / ${S.ms} / ${S.mf}`:'–'}</td><td><button class="mini">View in 3D</button></td>`;
+  tr.querySelector('button').onclick=()=>viewJob(job);
+}
+function viewJob(job){
+  const r=job.result,S=createSim(job.model,job.N,job.mode,job.phi,job.eps,job.mols);
+  S.P.set(r.state.P);S.pos.set(r.state.pos);S.q.set(r.state.q);S.clusterOf.set(r.state.clusterOf);S.clusters=r.clusters;S.molFree=r.molFree;S.steps=r.steps;S.limit=r.steps;
+  for(let c=0;c<S.N;c++)S.parent[c]=c;
+  headsToWorld(S);resolveOverlaps(S,100,0.02);blow=null;sim=S;running=false;
+  buildMeshes(sim);fitView();enableViewButtons();refreshUI();
+  $('pauseBtn').textContent='Resume';$('moreBtn').hidden=false;$('runBtn').textContent='Restart';
+  setMsg('simMsg',`Showing the calculated run with ${job.N} copies at ${r.steps.toLocaleString()} steps. Press "Keep going" to continue it here.`,'ok');
+  $('viewer').scrollIntoView({behavior:'smooth',block:'center'});
+}
+$('calcBtn').onclick=()=>{
+  if(!st.model)return;
+  const nums=[...new Set($('calcCopies').value.split(/[,;\s]+/).map(x=>Math.round(+x)).filter(x=>x>=2&&x<=200))].slice(0,12);
+  if(!nums.length){$('calcMsg').textContent='Enter copy numbers between 2 and 200, separated by commas.';$('calcMsg').className='msg err';return}
+  const base={model:st.model,mols:getMols(),mode:$('mode').value,phi:+$('phi').value,eps:+$('eps').value,limit:stepLimit(),label:st.prot.label,tail:st.model.tailOne.join('')};
+  for(const N of nums){const j={...base,id:++jobSeq,N,status:'queued',steps:0};jobs.push(j);drawCalcRow(j)}
+  $('calcStop').disabled=false;$('calcCsv').disabled=false;$('calcClear').disabled=false;
+  $('calcMsg').textContent=`Calculating ${nums.length} run${nums.length>1?'s':''} of ${base.limit.toLocaleString()} steps${workerOK?' in the background':''}…`;$('calcMsg').className='msg';
+  pump();
+};
+$('calcStop').onclick=()=>{
+  for(const j of jobs)if(j.status==='queued'||j.status==='running'){if(j.handle)j.handle.terminate();j.status='stopped';drawCalcRow(j)}
+  active=[];$('calcStop').disabled=true;$('calcMsg').textContent='Stopped. Finished runs are kept.';$('calcMsg').className='msg warn';
+};
+$('calcClear').onclick=()=>{$('calcStop').onclick();jobs=[];$('calcRows').innerHTML='<tr><td colspan="13" class="note">No calculations yet.</td></tr>';$('calcCsv').disabled=true;$('calcClear').disabled=true;$('calcMsg').textContent=''};
+$('calcCsv').onclick=()=>{
+  const q=v=>/[",\n]/.test(String(v))?'"'+String(v).replace(/"/g,'""')+'"':v;
+  const rows=[['protein','tail_sequence','copies','start','crowding','hydrophobic_strength_kT','steps','assemblies','unassembled_copies','copies_per_assembly','mean_copies_per_assembly','largest_shape','largest_axes_nm','largest_diameter_nm','largest_core_radius_nm','largest_kappa2','mean_diameter_nm','molecules','molecules_in_core','molecules_on_surface','molecules_free']];
+  for(const j of jobs){if(j.status!=='done')continue;const S=summary(j.result),b=S.big;
+    rows.push([j.label,j.tail,j.N,j.mode==='build'?'built':'self-assembly',j.mode==='self'?j.phi:'',j.eps,j.result.steps,S.real.length,S.free,S.real.map(g=>g.n).join(';'),S.meanN.toFixed(1),b?b.shape:'',b?b.dims.map(nm).join(' x '):'',b?nm(b.diam):'',b?nm(b.core):'',b?b.k2.toFixed(3):'',S.real.length?nm(S.meanD):'',(j.mols||[]).map(t=>`${t.count}x ${t.name}${t.cas?' CAS '+t.cas:''} (${t.d} nm, hydrophobicity ${(t.h||0).toFixed(2)})`).join('; '),j.mols&&j.mols.length?S.mc:'',j.mols&&j.mols.length?S.ms:'',j.mols&&j.mols.length?S.mf:''])}
+  download(new Blob([rows.map(r=>r.map(q).join(',')).join('\n')+'\n'],{type:'text/csv'}),'protein-assembly-runs.csv');
+};
+
+/* ---------- export ---------- */
+function download(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
+$('pngBtn').onclick=()=>{renderer.render(scene,camera);renderer.domElement.toBlob(b=>download(b,'protein-assembly.png'),'image/png')};
+/* SVG export: the current view rendered at high resolution on a transparent background, trimmed to the
+   molecules plus a small margin, and placed in an SVG exactly 1 inch wide. */
+$('svgBtn').onclick=()=>{
+  if(!sim)return;
+  const dpi=+$('svgDpi').value,view=renderer.domElement,vw=view.clientWidth||view.width,vh=view.clientHeight||view.height;
+  // render larger than needed, then trim to the content so the content itself is 1 inch wide
+  let W=Math.round(dpi*1.6),H=Math.round(W*vh/vw);
+  const maxT=renderer.capabilities.maxTextureSize||4096;if(W>maxT){H=Math.round(H*maxT/W);W=maxT}if(H>maxT){W=Math.round(W*maxT/H);H=maxT}
+  const pr=renderer.getPixelRatio(),old=new THREE.Vector2();renderer.getSize(old);const oc=new THREE.Color();renderer.getClearColor(oc);const oa=renderer.getClearAlpha();
+  renderer.setPixelRatio(1);renderer.setSize(W,H,false);renderer.setClearColor(0xffffff,0);camera.aspect=W/H;camera.updateProjectionMatrix();
+  renderer.render(scene,camera);
+  const src=document.createElement('canvas');src.width=W;src.height=H;const sctx=src.getContext('2d');sctx.drawImage(renderer.domElement,0,0);
+  renderer.setPixelRatio(pr);renderer.setSize(old.x,old.y,false);renderer.setClearColor(oc,oa);camera.aspect=old.x/old.y;camera.updateProjectionMatrix();renderer.render(scene,camera);
+  const data=sctx.getImageData(0,0,W,H).data;let x0=W,y0=H,x1=-1,y1=-1;
+  for(let y=0;y<H;y++)for(let x=0;x<W;x++)if(data[(y*W+x)*4+3]>8){if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y}
+  if(x1<0){setMsg('simMsg','Nothing to export in the current view.','err');return}
+  const pad=Math.round((x1-x0)*0.02);x0=Math.max(0,x0-pad);y0=Math.max(0,y0-pad);x1=Math.min(W-1,x1+pad);y1=Math.min(H-1,y1+pad);
+  const cw=x1-x0+1,ch=y1-y0+1,outW=dpi,outH=Math.round(dpi*ch/cw);
+  const out=document.createElement('canvas');out.width=outW;out.height=outH;const octx=out.getContext('2d');octx.imageSmoothingQuality='high';octx.drawImage(src,x0,y0,cw,ch,0,0,outW,outH);
+  const png=out.toDataURL('image/png'),hIn=(outH/dpi).toFixed(4);
+  const svg=`<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1in" height="${hIn}in" viewBox="0 0 ${outW} ${outH}">\n<title>Protein assembly: ${sim.N} copies${sim.Nm?`, ${sim.Nm} molecules`:''}</title>\n<image width="${outW}" height="${outH}" xlink:href="${png}" href="${png}"/>\n</svg>\n`;
+  download(new Blob([svg],{type:'image/svg+xml'}),'protein-assembly.svg');
+  setMsg('simMsg',`Saved protein-assembly.svg: 1 × ${hIn} inches at ${dpi} dpi (${outW} × ${outH} pixels), transparent background.`,'ok');
+};
+const CH='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+function atomLine(serial,name,resn,chain,num,ins,x,y,z,el,seg){
+  const nm=name.length>=4?name.slice(0,4):(el.length===1?' '+name.padEnd(3):name.padEnd(4));
+  const f=v=>v.toFixed(3).padStart(8);
+  return 'ATOM  '+String(serial%100000).padStart(5)+' '+nm+' '+resn.padStart(3)+' '+chain+String(num).padStart(4)+(ins||' ')+'   '+f(x)+f(y)+f(z)+'  1.00  0.00      '+seg.padEnd(4)+el.toUpperCase().padStart(2);
+}
+$('pdbBtn').onclick=()=>{
+  if(!sim)return;
+  const S=sim,m=S.m,L=[];
+  L.push('REMARK   1 SHARAF LAB PROTEIN ASSEMBLY TOOL: '+S.N+' COPIES, '+S.steps+' STEPS');
+  L.push('REMARK   1 COARSE MODEL. HEADS ARE RIGID COPIES OF THE INPUT ATOMS; TAILS ARE CA-ONLY BEADS.');
+  if(S.N>CH.length)L.push('REMARK   1 MORE THAN 62 COPIES: CHAIN IDS REPEAT, USE THE SEGMENT ID (COLS 73-76).');
+  let serial=1;
+  for(let c=0;c<S.N;c++){
+    const ch=CH[c%CH.length],seg=('C'+(c+1)).slice(0,4),R=S.Rm.subarray(c*9,c*9+9),px=S.pos[c*3],py=S.pos[c*3+1],pz=S.pos[c*3+2];
+    const tailLines=[];
+    for(let k=0;k<S.nt;k++){const b=(c*S.nb+S.nh+k)*3;tailLines.push({k,line:()=>atomLine(serial++,'CA',m.tailResn[k],ch,m.tailNums[k],'',S.P[b],S.P[b+1],S.P[b+2],'C',seg)})}
+    const order=m.term==='N'?[...tailLines].reverse():tailLines;
+    if(m.term==='N')for(const t of order)L.push(t.line());
+    for(const a of m.allAtoms){const x=px+R[0]*a.x+R[1]*a.y+R[2]*a.z,y=py+R[3]*a.x+R[4]*a.y+R[5]*a.z,z=pz+R[6]*a.x+R[7]*a.y+R[8]*a.z;L.push(atomLine(serial++,a.name,a.resn,ch,a.num,a.ins,x,y,z,a.el||'C',seg))}
+    if(m.term==='C')for(const t of order)L.push(t.line());
+    L.push('TER');
+  }
+  if(S.Nm){
+    S.mols.forEach((t,i)=>L.push(`REMARK   2 MOLECULE TYPE ${i+1}: ${t.name.toUpperCase()} DIAMETER ${t.d} NM HYDROPHOBICITY ${(t.h||0).toFixed(2)}; RADIUS (A) IN B-FACTOR COLUMN`));
+    for(let k=0;k<S.Nm;k++){const b=S.Mp+k,t=S.mols[S.mtype[k]],rn=(t.name.toUpperCase().replace(/[^A-Z0-9]/g,'')+'MOL').slice(0,3),f=v=>v.toFixed(3).padStart(8);
+      L.push('HETATM'+String(serial++%100000).padStart(5)+'  X   '+rn.padStart(3)+' '+'Z'+String((k+1)%10000).padStart(4)+'    '+f(S.P[b*3])+f(S.P[b*3+1])+f(S.P[b*3+2])+'  1.00'+S.rad[b].toFixed(2).padStart(6)+'      MOL   X')}
+    L.push('TER');
+  }
+  L.push('END');
+  download(new Blob([L.join('\n')+'\n'],{type:'chemical/x-pdb'}),'protein-assembly.pdb');
+};
+/* ---------- default example, loaded with its button ---------- */
+async function loadDefaultExample(){
+  document.querySelector('input[name=tailMode][value=struct]').checked=true;syncMode();
+  $('fetchId').value='AF-P28635-F1';
+  const ok=await fetchId('AF-P28635-F1');
+  let row=[...document.querySelectorAll('#molList .mol-row')].find(r=>r.querySelector('.mCas').value.trim()==='632-69-9');
+  if(!row){addMolRow();row=document.querySelector('#molList .mol-row:last-child');row.querySelector('.mCas').value='632-69-9'}
+  await lookupChem(row);
+  if(!ok)setMsg('loadMsg','The example model AF-P28635-F1 could not be fetched from the AlphaFold Database. Check your internet connection, or use the lysozyme example, which works offline.','err');
+}
+$('exDefault').onclick=loadDefaultExample;
+window.__pa={st,get sim(){return sim},step,analyze,eig3,parseStructure,predict,createSim,get jobs(){return jobs},headSurface};
+</script>
+</body></html>
