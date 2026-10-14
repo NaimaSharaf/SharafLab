@@ -59,7 +59,20 @@
 #lnp-single-stage svg{max-width:170px}
 #lnp-pl-stage svg{max-width:120px}
 .lnp-singles{display:grid;gap:20px;align-content:start}
+.lnp-undo{display:inline-flex;gap:6px;margin-left:10px}
+.lnp .lnp-undo button:disabled{opacity:.4;cursor:default}
+.lnp-mode{display:inline-flex;border:1px solid #b8c8d5;border-radius:7px;overflow:hidden}
+.lnp .lnp-mode button{border:0;border-radius:0;padding:6px 12px;font:600 13px "Montserrat",Arial,sans-serif;background:#fff;color:#173650}
+.lnp .lnp-mode button[aria-pressed=true]{background:#0b6870;color:#fff}
 #lnp-np-stage{touch-action:none}
+.lnp-view{position:relative}
+.lnp-ctx{position:absolute;z-index:20;min-width:210px;background:#fff;border:1px solid #c9d6dc;border-radius:8px;box-shadow:0 8px 24px rgba(16,42,51,.16);padding:6px;display:flex;flex-direction:column}
+.lnp-ctx .ctx-title{font:700 11px "Montserrat",Arial,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#0b6870;padding:6px 10px 4px}
+.lnp .lnp-ctx button{border:0;border-radius:5px;background:none;text-align:left;padding:8px 10px;font-size:13px;display:flex;gap:8px;align-items:center}
+.lnp .lnp-ctx button:hover,.lnp .lnp-ctx button:focus-visible{background:#e7f7f5}
+.lnp-ctx .sw{width:14px;height:14px;border-radius:3px;border:1px solid rgba(0,0,0,.25);flex:none}
+.lnp-ctx hr{border:0;border-top:1px solid #e4ebeb;margin:4px 0}
+.lnp-ctx-color{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;left:0;top:0}
 #lnp-np-stage [data-mol]{cursor:grab}
 .lnp-selbar{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;padding:10px 18px;border-top:1px solid #e4ebeb;font-size:13px;color:#586e73;min-height:24px}
 .lnp-selbar #selTools{display:inline-flex;flex-wrap:wrap;gap:10px;align-items:center}
@@ -212,6 +225,14 @@
               <label for="headSize">Head size</label>
               <span class="val"><input id="headSize" type="range" min="10" max="50" value="22" /><output id="headSizeOut">22</output></span>
             </div>
+            <div class="lnp-row" id="headMixRow">
+              <label for="headMix">Different shape for each lipoprotein</label>
+              <span class="val"><input id="headMix" type="checkbox" /><button id="shapeShuffle" class="mini" type="button" title="Pick new random shapes">↻ Randomize</button></span>
+            </div>
+            <div class="lnp-row" id="colorMixRow">
+              <label for="colorMix">Different color for each lipoprotein</label>
+              <span class="val"><input id="colorMix" type="checkbox" /><button id="colorShuffle" class="mini" type="button" title="Pick new random colors">↻ Randomize</button></span>
+            </div>
             <div class="lnp-row" id="headStretchRow">
               <label for="headStretch">Shape stretch</label>
               <span class="val"><input id="headStretch" type="range" min="0.5" max="2" step="0.05" value="1" /><output id="headStretchOut">1</output></span>
@@ -297,6 +318,42 @@
             </div>
             <p class="lnp-note">Phospholipids sit between the lipoproteins with their tails pointing into the core. Turn them with <em>Rotate phospholipids</em> above the figure; at 0° they sit halfway between neighbouring lipoproteins.</p>
             </div>
+            <h3>Small molecules</h3>
+            <div class="lnp-row">
+              <label for="smOn">Add small molecules</label>
+              <span class="val"><input id="smOn" type="checkbox" /></span>
+            </div>
+            <div id="smRows">
+            <div class="lnp-row">
+              <label for="smN">Number</label>
+              <span class="val"><input id="smN" type="range" min="1" max="200" step="1" value="24" /><output id="smNOut">24</output></span>
+            </div>
+            <div class="lnp-row">
+              <label for="smColor">Color</label>
+              <span class="val"><input id="smColor" type="color" value="#f2a93b" /><input id="smOutline" type="color" value="#231f20" aria-label="Small molecule outline color" /></span>
+            </div>
+            <div class="lnp-row">
+              <label for="smStroke">Outline width (pt)</label>
+              <span class="val"><input id="smStroke" type="range" min="0" max="3" step="0.05" value="0" /><output id="smStrokeOut">0</output></span>
+            </div>
+            <div class="lnp-row">
+              <label for="smSize">Size</label>
+              <span class="val"><input id="smSize" type="range" min="0.5" max="15" step="0.25" value="5" /><output id="smSizeOut">5</output></span>
+            </div>
+            <div class="lnp-row">
+              <label for="smVary">Size variation (%)</label>
+              <span class="val"><input id="smVary" type="range" min="0" max="80" step="5" value="20" /><output id="smVaryOut">20</output></span>
+            </div>
+            <div class="lnp-row">
+              <label for="smArea">Spread across core (%)</label>
+              <span class="val"><input id="smArea" type="range" min="10" max="150" step="5" value="85" /><output id="smAreaOut">85</output></span>
+            </div>
+            <div class="lnp-row">
+              <label for="smTop">Draw on top</label>
+              <span class="val"><input id="smTop" type="checkbox" checked /><button id="smShuffle" class="mini" type="button" title="Scatter them again">↻ Rescatter</button></span>
+            </div>
+            <p class="lnp-note">Small molecules are drawn as spheres scattered through the core without overlapping each other. Click one in the figure to move or remove it.</p>
+            </div>
             <p class="lnp-note"><button id="resetBtn" type="button">Reset to defaults</button></p>
           </div>
 
@@ -312,8 +369,47 @@
             </div>
             </div>
             <div class="lnp-view">
-              <header>Nanoparticle <small id="lnp-count"></small></header>
-              <div class="lnp-np-controls">
+              <header><span class="lnp-mode" role="group" aria-label="Figure type"><button type="button" id="modeParticle" aria-pressed="true">Nanoparticle</button><button type="button" id="modeMembrane" aria-pressed="false">Membrane</button></span><span class="lnp-undo"><button type="button" class="mini" id="undoBtn" title="Undo (Ctrl/⌘ Z)" disabled>↶ Undo</button><button type="button" class="mini" id="redoBtn" title="Redo (Ctrl/⌘ Shift Z)" disabled>↷ Redo</button><button type="button" class="mini" id="jiggleBtn" title="Swing each linker so the protein heads overlap as little as possible">Jiggle</button></span> <small id="lnp-count"></small></header>
+              <div class="lnp-np-controls hidden" id="memControls">
+                <div class="lnp-row">
+                  <label for="memLpN">Lipoproteins in membrane</label>
+                  <span class="val"><input id="memLpN" type="range" min="0" max="40" step="1" value="4" /><output id="memLpNOut">4</output></span>
+                </div>
+                <div class="lnp-row">
+                  <label for="memLpLift" title="Raises the lipoproteins out of the membrane (or sinks them in); the bilayer stays put">Lipoprotein height</label>
+                  <span class="val"><input id="memLpLift" type="range" min="-60" max="150" step="1" value="0" /><output id="memLpLiftOut">0</output></span>
+                </div>
+                <div class="lnp-row">
+                  <label for="memLpSide">Lipoproteins in</label>
+                  <span class="val"><select id="memLpSide"><option value="top" selected>Top leaflet</option><option value="bottom">Bottom leaflet</option><option value="both">Both, at random</option></select><button id="memShuffle" class="mini" type="button" title="New positions">↻</button></span>
+                </div>
+                <div class="lnp-row">
+                  <label for="memShape">Membrane shape</label>
+                  <span class="val"><select id="memShape"><option value="flat" selected>Flat</option><option value="curved">Curved</option><option value="wavy">Wavy</option><option value="vesicle">Vesicle</option></select></span>
+                </div>
+                <div class="lnp-row" id="memCurveRow">
+                  <label for="memCurve">Curvature</label>
+                  <span class="val"><input id="memCurve" type="range" min="0" max="100" step="1" value="40" /><output id="memCurveOut">40</output></span>
+                </div>
+                <div class="lnp-row" id="memWavesRow">
+                  <label for="memWaves">Waves</label>
+                  <span class="val"><input id="memWaves" type="range" min="0.5" max="6" step="0.5" value="2" /><output id="memWavesOut">2</output></span>
+                </div>
+                <div class="lnp-row">
+                  <label for="memLen">Membrane length</label>
+                  <span class="val"><input id="memLen" type="range" min="60" max="1400" step="10" value="320" /><output id="memLenOut">320</output></span>
+                </div>
+                <div class="lnp-row">
+                  <label for="memSpacing">Lipid spacing</label>
+                  <span class="val"><input id="memSpacing" type="range" min="6" max="60" step="0.5" value="25" /><output id="memSpacingOut">25</output></span>
+                </div>
+                <div class="lnp-row">
+                  <label for="memGap">Leaflet gap</label>
+                  <span class="val"><input id="memGap" type="range" min="-30" max="30" step="0.5" value="1" /><output id="memGapOut">1</output></span>
+                </div>
+                <p class="lnp-note">Uses the lipoprotein and phospholipid settings on the left. Lipoproteins push aside the phospholipids where they sit. Click any molecule to move or rotate it.</p>
+              </div>
+              <div class="lnp-np-controls" id="npControls">
             <div class="lnp-row">
               <label for="n">Lipoproteins</label>
               <span class="val"><input id="n" type="range" min="2" max="30" value="8" /><input id="nNum" type="number" min="2" max="30" value="8" aria-label="Lipoproteins (number)" /></span>
@@ -322,6 +418,10 @@
               <label for="spacing" title="Drag below 0 to let the tails overlap in the core">Core spacing</label>
               <span class="val"><input id="spacing" type="range" min="-100" max="80" value="6" /><output for="spacing" id="spacingOut">6</output></span>
             </div>
+                <div class="lnp-row">
+                  <label for="lpRadial" title="Moves only the lipoproteins in or out; phospholipids and small molecules stay put">Lipoprotein distance from center</label>
+                  <span class="val"><input id="lpRadial" type="range" min="-80" max="150" step="1" value="0" /><output id="lpRadialOut">0</output></span>
+                </div>
             <div class="lnp-row">
               <label for="rotation">Rotate lipoproteins</label>
               <span class="val"><input id="rotation" type="range" min="0" max="360" value="0" /><output id="rotationOut">0°</output></span>
@@ -342,11 +442,13 @@
                 <p class="lnp-note">Drag <em>Core spacing</em> below 0 to let the tails overlap in the core. Lower <em>Phospholipid core packing</em> pushes the phospholipids deeper into the core.</p>
               </div>
               <div class="lnp-stage" id="lnp-np-stage"></div>
+              <div class="lnp-ctx hidden" id="ctxMenu" role="menu"></div>
+              <input type="color" id="ctxColor" class="lnp-ctx-color" aria-label="Pick a color" tabindex="-1" />
               <div class="lnp-selbar" id="selBar">
-                <span id="selHint">Click a lipoprotein or phospholipid to select it. Drag it to move it, or drag its round handle to rotate it (hold Shift to snap to 15°).</span>
+                <span id="selHint">Click a molecule to select it. Drag it to move it, drag the round handle to rotate it, drag the green diamond to swing the linker, or drag the orange square to turn just the protein domain (hold Shift on a handle to snap to 15°). Shift-drag a molecule to drag out a copy. Right-click to change colors.</span>
                 <span id="selTools" class="hidden">
                   <strong id="selName"></strong>
-                  <label for="selRot">Rotate <input id="selRot" type="range" min="-180" max="180" step="1" value="0" /><output id="selRotOut">0°</output></label>
+                  <label for="selRot" id="selRotLabel">Rotate <input id="selRot" type="range" min="-180" max="180" step="1" value="0" /><output id="selRotOut">0°</output></label>
                   <button class="mini" id="selReset" type="button">Reset position</button>
                   <button class="mini" id="selRemove" type="button">Remove</button>
                   <button class="mini" id="selDone" type="button">Done</button>
@@ -360,7 +462,7 @@
                 <label for="exportIn">Size <input id="exportIn" type="number" min="0.2" max="20" step="0.05" value="0.8" style="width:70px" /> in</label>
                 <label for="dpi">Document DPI <input id="dpi" type="number" min="1" max="2400" step="1" value="360" style="width:76px" /></label>
                 <label><input id="pngWhite" type="checkbox" /> White PNG background</label>
-                <p class="lnp-note" style="flex-basis:100%;margin:0">The SVG is exported at this size, with line widths in points (pt). Set <em>Document DPI</em> to your Affinity document's DPI (File &rsaquo; Document Setup) so pastes land at the right size; use 72 for Illustrator.</p>
+                <p class="lnp-note" style="flex-basis:100%;margin:0">The SVG canvas is this size. Molecule sizes and line widths (in pt) stay fixed when you change the canvas or add molecules, so things may overlap or run past the edge. Set <em>Document DPI</em> to your Affinity document's DPI (File &rsaquo; Document Setup) so pastes land at the right size; use 72 for Illustrator.</p>
                 <span id="lnp-status" role="status"></span>
               </div>
             </div>
@@ -380,19 +482,22 @@
     n: 8, spacing: 6, rotation: 0, jitter: 0,
     tailColor: "#b3b3b3", outlineAuto: true, tailOutline: "#7a7a7a",
     tails: 3, tailLen: 38, tailStyle: "wavy", tailTurn: 0, tailRecolor: true, headRecolor: false, headOutlineOn: true, tailOutlineOn: true,
-    tailW: 1.3, tailGap: 10.5, waves: 2.5, waveAmp: 2.2, tailStroke: 1.3,
-    headShape: "circle", headColor: "#452a75", headOutline: "#231f20", headStroke: 1.3,
+    tailW: 1, tailGap: 10.5, waves: 2.5, waveAmp: 2.2, tailStroke: 1.3,
+    headShape: "circle", headColor: "#452a75", headOutline: "#231f20", headStroke: 0.75,
     headSize: 22, headStretch: 1, headTurn: 0, linkerOn: true, linkerColor: "#a7a9ac", linkerW: 1.3, linkerLen: 12,
     linkerAngle: 60, headAngle: 0,
     plOn: true, plN: 8, plHeadColor: "#452a75", plHeadOutline: "#231f20", plHeadStroke: 0, plHeadSize: 12,
-    plTailColor: "#452a75", plTails: 2, plTailW: 1.3, plTailLen: 34, plTailGap: 5, plWaves: 3.5, plWaveAmp: 1.5,
-    plRadial: 0, plAngle: 0, plTop: true
+    plTailColor: "#452a75", plTails: 2, plTailW: 1, plTailLen: 34, plTailGap: 5, plWaves: 3.5, plWaveAmp: 1.5,
+    plRadial: 0, plAngle: 0, plTop: true,
+    smOn: false, smN: 24, smColor: "#f2a93b", smOutline: "#231f20", smStroke: 0, smSize: 5, smVary: 20, smArea: 85, smTop: true,
+    headMix: false, colorMix: false,
+    memLpN: 4, lpRadial: 0, memLpLift: 0, memLpSide: "top", memLen: 320, memSpacing: 25, memGap: 1, memShape: "flat", memCurve: 40, memWaves: 2
   };
   const SWATCHES = ["#b3b3b3", "#e0569a", "#d94040", "#f08c2e", "#e8c32a", "#4caf6a", "#2a9d8f", "#3a7bd5", "#7b4fc9", "#555555"];
   let headImg = null; // {href, w, h, svg?}
   let tailImg = null;
   let edits = {};       // "lp:3" / "pl:5" -> { dx, dy, rot, hidden }
-  let sel = null, dragK = null, drag = null, lastK = 0.2, pivots = {};
+  let sel = null, dragK = null, drag = null, lastK = 0.2, pivots = {}, smSeed = 11, memSeed = 5, shapeSeed = 3, colorSeed = 9, mode = "particle";
   let seed = 7;
 
   // ---------- helpers ----------
@@ -481,7 +586,12 @@
       plOn: $("plOn").checked, plN: +$("plN").value, plHeadColor: $("plHeadColor").value, plHeadOutline: $("plHeadOutline").value,
       plHeadStroke: +$("plHeadStroke").value, plHeadSize: +$("plHeadSize").value, plTailColor: $("plTailColor").value, plTails: +$("plTails").value,
       plTailW: +$("plTailW").value, plTailLen: +$("plTailLen").value, plTailGap: +$("plTailGap").value, plWaves: +$("plWaves").value,
-      plWaveAmp: +$("plWaveAmp").value, plRadial: +$("plRadial").value, plAngle: +$("plAngle").value, plTop: $("plTop").checked, dpi: +$("dpi").value || 72,
+      plWaveAmp: +$("plWaveAmp").value, plRadial: +$("plRadial").value, plAngle: +$("plAngle").value, plTop: $("plTop").checked,
+      smOn: $("smOn").checked, smN: +$("smN").value, smColor: $("smColor").value, smOutline: $("smOutline").value, smStroke: +$("smStroke").value,
+      smSize: +$("smSize").value, smVary: +$("smVary").value, smArea: +$("smArea").value, smTop: $("smTop").checked,
+      mode, headMix: $("headMix").checked, colorMix: $("colorMix").checked,
+      memLpN: +$("memLpN").value, lpRadial: +$("lpRadial").value, memLpLift: +$("memLpLift").value, memLpSide: $("memLpSide").value, memLen: +$("memLen").value, memSpacing: +$("memSpacing").value,
+      memGap: +$("memGap").value, memShape: $("memShape").value, memCurve: +$("memCurve").value, memWaves: +$("memWaves").value, dpi: +$("dpi").value || 72,
       tailColor: $("tailColor").value, outlineAuto: $("outlineAuto").checked, tailOutline: $("tailOutline").value,
       tails: +$("tails").value, tailLen: +$("tailLen").value, tailStyle: $("tailStyle").value, tailTurn: +$("tailTurn").value, tailRecolor: $("tailRecolor").checked, headRecolor: $("headRecolor").checked, headOutlineOn: $("headOutlineOn").checked, tailOutlineOn: $("tailOutlineOn").checked,
       headShape: $("headShape").value, headColor: $("headColor").value, headOutline: $("headOutline").value,
@@ -728,6 +838,94 @@
     return `<svg xmlns="${NS}" viewBox="${f(x0 - pad)} ${f(y0 - pad)} ${f(w)} ${f(h)}"${wh} role="img" aria-label="One lipoprotein">${defsMarkup(p)}<g transform="rotate(-90)">${unitMarkup(p, d, r)}</g></svg>`;
   }
 
+  // One molecule: anchored at (ax0, ay0) facing angle ang, then moved by (dx, dy) and
+  // turned by rot around its own centre (pv, in the molecule's frame).
+  function placeXY(ctx, key, ang, ax0, ay0, pv, reach, tipX, inner, head) {
+    const { p, preview, sel, hs } = ctx;
+    const e = edits[key] || {};
+    if (e.hidden) return "";
+    const ax = ax0 + (e.dx || 0) * p.u, ay = ay0 + (e.dy || 0) * p.u;
+    const c = Math.cos(rad(ang)), s = Math.sin(rad(ang));
+    const px = ax + pv[0] * c - pv[1] * s, py = ay + pv[0] * s + pv[1] * c;
+    pivots[key] = { x: px, y: py, ang, ax: ax0, ay: ay0 };
+    if (head) {
+      // where the protein domain ends up, so its own handle can turn it
+      const rot = rad(e.rot || 0), cr = Math.cos(rot), sr = Math.sin(rot);
+      const lx = pv[0] + (head.C[0] - pv[0]) * cr - (head.C[1] - pv[1]) * sr, ly = pv[1] + (head.C[0] - pv[0]) * sr + (head.C[1] - pv[1]) * cr;
+      pivots[key].head = { x: ax + lx * c - ly * s, y: ay + lx * s + ly * c, base: ang + (e.rot || 0) + head.base };
+      const bx = pv[0] + (head.B[0] - pv[0]) * cr - (head.B[1] - pv[1]) * sr, by = pv[1] + (head.B[0] - pv[0]) * sr + (head.B[1] - pv[1]) * cr;
+      pivots[key].branch = { x: ax + bx * c - by * s, y: ay + bx * s + by * c, base: ang + (e.rot || 0) };
+    }
+    if (e.dx || e.dy || e.rot) ctx.ext = Math.max(ctx.ext, Math.hypot(px, py) + reach);
+    let extra = "";
+    if (preview && key === sel) {
+      const lw = hs * 0.28, hx = tipX + hs * 3;
+      let top = "";
+      if (head && head.linker) { // green diamond on the linker: swings the linker (and protein) around the tails
+        const mx = (head.B[0] + head.E[0]) / 2, my = (head.B[1] + head.E[1]) / 2, k = hs * 1.05;
+        top += `<path data-linkhandle="1" d="M${f(mx)},${f(my - k)}L${f(mx + k)},${f(my)}L${f(mx)},${f(my + k)}L${f(mx - k)},${f(my)}Z" fill="#ffffff" stroke="#2a9d8f" stroke-width="${f(lw * 1.6)}" style="cursor:grab"/>`;
+      }
+      if (head) { // orange square handle: turns only the protein domain
+        const ha = rad(head.base + (e.headRot || 0)), hd = head.r + hs * 2.6;
+        const qx = head.C[0] + hd * Math.cos(ha), qy = head.C[1] + hd * Math.sin(ha);
+        top += `<line x1="${f(head.C[0])}" y1="${f(head.C[1])}" x2="${f(qx)}" y2="${f(qy)}" stroke="#d9822b" stroke-width="${f(lw)}"/>` +
+          `<rect data-headhandle="1" x="${f(qx - hs * 0.85)}" y="${f(qy - hs * 0.85)}" width="${f(hs * 1.7)}" height="${f(hs * 1.7)}" fill="#ffffff" stroke="#d9822b" stroke-width="${f(lw * 1.6)}" style="cursor:grab"/>`;
+      }
+      extra += `<circle cx="${f(pv[0])}" cy="${f(pv[1])}" r="${f(reach)}" fill="none" stroke="#0b6870" stroke-width="${f(lw)}" stroke-dasharray="${f(hs)} ${f(hs * 0.7)}"/>` +
+        (key.startsWith("sm:") ? "" : `<line x1="${f(pv[0])}" y1="${f(pv[1])}" x2="${f(hx)}" y2="${f(pv[1])}" stroke="#0b6870" stroke-width="${f(lw)}"/>` +
+        `<circle data-handle="1" cx="${f(hx)}" cy="${f(pv[1])}" r="${f(hs)}" fill="#ffffff" stroke="#0b6870" stroke-width="${f(lw * 1.6)}" style="cursor:grab"/>`) + top + `<desc data-end="1"></desc>`;
+    }
+    const spin = e.rot ? ` translate(${f(pv[0])},${f(pv[1])}) rotate(${f(e.rot)}) translate(${f(-pv[0])},${f(-pv[1])})` : "";
+    const hit = preview ? `<circle cx="${f(pv[0])}" cy="${f(pv[1])}" r="${f(reach * 0.7)}" fill="transparent"/>` : "";
+    return `<g${preview ? ` data-mol="${key}"` : ""} transform="translate(${f(ax)},${f(ay)}) rotate(${f(ang)})${spin}">${hit}${inner}${extra}</g>`;
+  }
+  // keep the selected molecule on top in the preview so its handle can be grabbed
+  function liftSelected(body, preview, sel) {
+    if (!preview || !sel) return body;
+    const m = body.match(new RegExp(`<g data-mol="${sel}"[\\s\\S]*?<desc data-end="1"></desc></g>`));
+    return m ? body.replace(m[0], "") + m[0] : body;
+  }
+  // a different protein shape for each lipoprotein, when "mix shapes" is on
+  const MIX_SHAPES = () => SHAPE_GROUPS.flatMap((g) => g[1].map((x) => x[0]));
+  const MIX_COLORS = ["#452a75", "#7b4fc9", "#3a7bd5", "#2a9d8f", "#4caf6a", "#e8c32a", "#f08c2e", "#d94040", "#e0569a", "#8c6d5a", "#5f7a8a", "#a6a6a6"];
+  function lpVariant(p, i, key) {
+    const o = {}, e = (key && edits[key]) || {};
+    if (p.headMix && p.headShape !== "image") { const list = MIX_SHAPES(), r = rng(shapeSeed + i * 7919); r(); o.headShape = list[Math.floor(r() * list.length)]; }
+    if (p.colorMix) { const r = rng(colorSeed + i * 104729); r(); o.headColor = MIX_COLORS[Math.floor(r() * MIX_COLORS.length)]; }
+    if (e.color) o.headColor = e.color;
+    if (e.headRot) o.headTurn = p.headTurn + e.headRot;
+    if (e.linkerRot) o.linkerAngle = p.linkerAngle + e.linkerRot;
+    return Object.keys(o).length ? Object.assign({}, p, o) : p;
+  }
+  function plVariant(p, key) { const e = edits[key]; return e && e.color ? Object.assign({}, p, { plHeadColor: e.color }) : p; }
+  const lpHead = (p, d) => ({ C: d.C, base: p.headTurn + (d.dir * 180) / Math.PI, r: d.big, B: [d.L, 0], E: d.E, linker: p.linkerOn });
+  // one lipoprotein drawn with its own settings (shape, color, domain and linker turns)
+  function lpDraw(p, d, i, key, r) { const v = lpVariant(p, i, key), dv = v === p ? d : dims(v); return { markup: unitMarkup(v, dv, r), head: lpHead(p, dv) }; }
+
+  // ---------- copies made with Shift-drag ----------
+  // Each copy remembers its kind, the source index (for mixed shapes/colors) and where it was made,
+  // in unscaled units; its own moves, turns and colors live in edits["cp:<id>"].
+  let copies = [], copyId = 0, lastQ = null;
+  function molInfo(key) {
+    const [t, i] = key.split(":");
+    if (t === "cp") { const c = copies.find((x) => x.id === +i); return c ? { kind: c.kind, idx: c.idx } : { kind: "pl", idx: 0 }; }
+    return { kind: t === "lp" || t === "mlp" ? "lp" : t === "sm" ? "sm" : "pl", idx: +i };
+  }
+  function renderCopies(p, ctx, layout) {
+    const list = copies.filter((c) => c.mode === layout);
+    if (!list.length) return "";
+    const d = dims(p), pd = plDims(p);
+    const lpPv = [d.C[0] / 2, d.C[1] / 2], lpReach = Math.hypot(d.C[0], d.C[1]) / 2 + d.big + p.headStroke;
+    const tail = pd.L + pd.hr * 0.6, plPv = [(pd.hr - tail) / 2, 0], plReach = (tail + pd.hr) / 2 + pd.bundle / 2 + pd.amp + p.plTailW;
+    return list.map((c) => {
+      const key = "cp:" + c.id, x = c.x * p.u, y = c.y * p.u;
+      if (c.kind === "lp") { const lw = lpDraw(p, d, c.idx, key, rng(seed + c.idx)); return placeXY(ctx, key, c.ang, x, y, lpPv, lpReach, Math.max(d.C[0] + d.big, d.L), lw.markup, lw.head); }
+      if (c.kind === "pl") return placeXY(ctx, key, c.ang, x, y, plPv, plReach, pd.hr, plMarkup(plVariant(p, key), pd));
+      const r0 = c.r * p.u, sw = p.smStroke;
+      return placeXY(ctx, key, c.ang, x, y, [0, 0], r0 * 1.4 + sw, r0, `<circle r="${f(r0)}" fill="${(edits[key] || {}).color || p.smColor}" stroke="${sw > 0 ? p.smOutline : "none"}" stroke-width="${f(sw)}"/>`);
+    }).join("");
+  }
+
   function particle(p, opts) {
     const d = dims(p);
     const n = p.n;
@@ -746,37 +944,19 @@
     const hs = p.sizePt ? p.sizePt * 0.014 : 2 * p.u; // size of the on-screen handle
     pivots = {};
 
-    // One molecule: anchored at distance rr along angle ang, then moved by (dx, dy) and
-    // turned by rot around its own centre (pv, in the molecule's frame).
-    function place(key, ang, rr, pv, reach, tipX, inner) {
-      const e = edits[key] || {};
-      if (e.hidden) return "";
-      const ax = rr * Math.cos(rad(ang)) + (e.dx || 0) * p.u, ay = rr * Math.sin(rad(ang)) + (e.dy || 0) * p.u;
-      const c = Math.cos(rad(ang)), s = Math.sin(rad(ang));
-      const px = ax + pv[0] * c - pv[1] * s, py = ay + pv[0] * s + pv[1] * c;
-      pivots[key] = { x: px, y: py, ang };
-      if (e.dx || e.dy || e.rot) ext = Math.max(ext, Math.hypot(px, py) + reach);
-      let extra = "";
-      if (preview && key === sel) {
-        const lw = hs * 0.28, hx = tipX + hs * 3;
-        extra = `<circle cx="${f(pv[0])}" cy="${f(pv[1])}" r="${f(reach)}" fill="none" stroke="#0b6870" stroke-width="${f(lw)}" stroke-dasharray="${f(hs)} ${f(hs * 0.7)}"/>` +
-          `<line x1="${f(pv[0])}" y1="${f(pv[1])}" x2="${f(hx)}" y2="${f(pv[1])}" stroke="#0b6870" stroke-width="${f(lw)}"/>` +
-          `<circle data-handle="1" cx="${f(hx)}" cy="${f(pv[1])}" r="${f(hs)}" fill="#ffffff" stroke="#0b6870" stroke-width="${f(lw * 1.6)}" style="cursor:grab"/>`;
-      }
-      const spin = e.rot ? ` translate(${f(pv[0])},${f(pv[1])}) rotate(${f(e.rot)}) translate(${f(-pv[0])},${f(-pv[1])})` : "";
-      const hit = preview ? `<circle cx="${f(pv[0])}" cy="${f(pv[1])}" r="${f(reach * 0.7)}" fill="transparent"/>` : "";
-      return `<g${preview ? ` data-mol="${key}"` : ""} transform="translate(${f(ax)},${f(ay)}) rotate(${f(ang)})${spin}">${hit}${inner}${extra}</g>`;
-    }
+    const ctx = { p, preview, sel, hs, ext: 0 };
+    const place = (key, ang, rr, pv, reach, tipX, inner, head) => placeXY(ctx, key, ang, rr * Math.cos(rad(ang)), rr * Math.sin(rad(ang)), pv, reach, tipX, inner, head);
 
     const groups = [];
     const lpPv = [d.C[0] / 2, d.C[1] / 2];
     const lpReach = Math.hypot(d.C[0], d.C[1]) / 2 + d.big + p.headStroke;
     for (let i = 0; i < n; i++) {
       const ang = p.rotation + (360 * i) / n + (r() - 0.5) * p.jitter * (180 / n) * 0.18;
-      const rr = rIn + (r() - 0.5) * p.jitterLen * 1.2;
-      groups.push(place("lp:" + i, ang, rr, lpPv, lpReach, Math.max(d.C[0] + d.big, d.L), unitMarkup(p, d, r)));
+      const rr = Math.max(0, rIn + p.lpRadial) + (r() - 0.5) * p.jitterLen * 1.2;
+      const lw = lpDraw(p, d, i, "lp:" + i, r);
+      groups.push(place("lp:" + i, ang, rr, lpPv, lpReach, Math.max(d.C[0] + d.big, d.L), lw.markup, lw.head));
     }
-    unitBounds(p, d).forEach(([x, y, k]) => (ext = Math.max(ext, Math.hypot(rIn + x, y) + k)));
+    unitBounds(p, d).forEach(([x, y, k]) => (ext = Math.max(ext, Math.hypot(Math.max(0, rIn + p.lpRadial) + x, y) + k)));
     const pls = [];
     if (p.plOn && p.plN > 0) {
       const pd = plDims(p);
@@ -787,19 +967,141 @@
       for (let i = 0; i < p.plN; i++) {
         const ang = 180 / n + (360 * i) / p.plN + p.plAngle + (r() - 0.5) * p.jitter * (180 / p.plN) * 0.18;
         const rr = rp + (r() - 0.5) * p.jitterLen * 1.2;
-        pls.push(place("pl:" + i, ang, rr, plPv, plReach, pd.hr, plMarkup(p, pd)));
+        pls.push(place("pl:" + i, ang, rr, plPv, plReach, pd.hr, plMarkup(plVariant(p, "pl:" + i), pd)));
       }
       plBounds(p, pd).forEach(([x, y, k]) => (ext = Math.max(ext, Math.hypot(rp + x, y) + k)));
     }
+    // small molecules: spheres scattered through the core without overlapping each other
+    const sms = [];
+    if (p.smOn && p.smN > 0) {
+      const R = Math.max(p.smSize, (rIn + d.L * 0.8) * (p.smArea / 100));
+      const rs = rng(smSeed), placed = [];
+      for (let i = 0; i < p.smN; i++) {
+        const rad0 = p.smSize * (1 + ((rs() * 2 - 1) * p.smVary) / 100);
+        let best = null;
+        for (let t = 0; t < 60; t++) { // try spots until one is free; otherwise keep the least crowded
+          const rr = Math.max(0, R - rad0) * Math.sqrt(rs()), a = 360 * rs();
+          const x = rr * Math.cos(rad(a)), y = rr * Math.sin(rad(a));
+          let gapMin = Infinity;
+          placed.forEach((q) => (gapMin = Math.min(gapMin, Math.hypot(q.x - x, q.y - y) - q.r - rad0)));
+          if (!best || gapMin > best.g) best = { x, y, rr, a, g: gapMin };
+          if (gapMin > p.smSize * 0.25) break;
+        }
+        placed.push({ x: best.x, y: best.y, r: rad0 });
+        const sw = p.smStroke;
+        sms.push(place("sm:" + i, best.a, best.rr, [0, 0], rad0 * 1.4 + sw, rad0, `<circle r="${f(rad0)}" fill="${(edits["sm:" + i] || {}).color || p.smColor}" stroke="${sw > 0 ? p.smOutline : "none"}" stroke-width="${f(sw)}"/>`));
+        if (pivots["sm:" + i]) pivots["sm:" + i].r = rad0;
+      }
+      ext = Math.max(ext, R + p.smStroke);
+    }
+    ext = Math.max(ext, ctx.ext);
     ext += p.jitterLen * 1.2 + 8 * p.u;
-    const lp = groups.join(""), pl = pls.join("");
+    const lp = groups.join(""), pl = pls.join(""), sm = sms.join("");
     // keep the selected molecule on top in the preview so its handle can be grabbed
     let body = p.plTop ? lp + pl : pl + lp;
-    if (preview && sel) {
-      const m = body.match(new RegExp(`<g data-mol="${sel}"[\\s\\S]*?data-handle="1"[^>]*/></g>`));
-      if (m) body = body.replace(m[0], "") + m[0];
+    body = p.smTop ? body + sm : sm + body;
+    body += renderCopies(p, ctx, "particle");
+    return { ext, body: liftSelected(body, preview, sel) };
+  }
+
+  const PT_PER_UNIT = 0.18;
+  // ---------- membrane: phospholipid bilayer with lipoproteins in it ----------
+  // The midplane is a curve; each leaflet's phospholipids sit along it with heads facing out.
+  function membraneCurve(p) {
+    const Lm = p.memLen, N = 600, pts = [];
+    const amt = p.memCurve / 100;
+    for (let i = 0; i <= N; i++) {
+      const t = i / N;
+      let x, y;
+      if (p.memShape === "vesicle") {
+        const R = Lm / (2 * Math.PI), a = 2 * Math.PI * t - Math.PI / 2;
+        x = R * Math.cos(a); y = R * Math.sin(a);
+      } else if (p.memShape === "curved" && amt > 0.001) {
+        const beta = amt * Math.PI, R = Lm / beta, th = (t - 0.5) * beta;
+        x = R * Math.sin(th); y = R * (1 - Math.cos(th));
+      } else if (p.memShape === "wavy") {
+        x = (t - 0.5) * Lm; y = amt * Lm * 0.05 * Math.sin(2 * Math.PI * p.memWaves * t);
+      } else { x = (t - 0.5) * Lm; y = 0; }
+      pts.push([x, y]);
     }
-    return { ext, body };
+    // centre the shape and build an arc-length table
+    let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+    pts.forEach(([x, y]) => { x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y); });
+    const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
+    pts.forEach((q) => { q[0] -= cx; q[1] -= cy; });
+    const cum = [0];
+    for (let i = 1; i < pts.length; i++) cum.push(cum[i - 1] + Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]));
+    const total = cum[cum.length - 1], closed = p.memShape === "vesicle";
+    function at(sArc) {
+      if (closed) sArc = ((sArc % total) + total) % total;
+      sArc = Math.max(0, Math.min(total, sArc));
+      let lo = 0, hi = cum.length - 1;
+      while (hi - lo > 1) { const mid = (lo + hi) >> 1; if (cum[mid] < sArc) lo = mid; else hi = mid; }
+      const seg = cum[hi] - cum[lo] || 1, u = (sArc - cum[lo]) / seg;
+      const a = pts[lo], b = pts[hi];
+      const tx = b[0] - a[0], ty = b[1] - a[1], tl = Math.hypot(tx, ty) || 1;
+      return { x: a[0] + (b[0] - a[0]) * u, y: a[1] + (b[1] - a[1]) * u, nx: ty / tl, ny: -tx / tl };
+    }
+    return { at, total, closed };
+  }
+
+  function membrane(p, opts) {
+    const d = dims(p), pd = plDims(p);
+    const preview = !!(opts && opts.preview), sel = opts && opts.sel;
+    const hs = p.sizePt ? p.sizePt * 0.014 : 2 * p.u;
+    pivots = {};
+    const ctx = { p, preview, sel, hs, ext: 0 };
+    const cv = membraneCurve(p);
+    const tail = pd.L + pd.hr * 0.6;            // head centre to tail tip
+    const h = p.memGap / 2 + tail;               // head centre distance from the midplane
+    const tailPart = (tail + pd.hr) / 2 + pd.bundle / 2 + pd.amp + p.plTailW;
+    const plPv = [(pd.hr - tail) / 2, 0];
+    const r = rng(memSeed);
+
+    // lipoprotein positions along the membrane
+    const lps = [], nLp = p.memLpN;
+    for (let i = 0; i < nLp; i++) {
+      const step = cv.total / Math.max(1, nLp);
+      let sArc = cv.closed ? step * i : step * (i + 0.5);
+      sArc += (r() - 0.5) * step * 0.6;
+      const side = p.memLpSide === "both" ? (r() < 0.5 ? 1 : -1) : p.memLpSide === "bottom" ? -1 : 1;
+      lps.push({ s: sArc, side });
+    }
+    const clearance = d.bundle / 2 + p.memSpacing * 0.5;
+    const near = (sArc, side) => lps.some((l) => l.side === side && (() => {
+      let dd = Math.abs(l.s - sArc);
+      if (cv.closed) dd = Math.min(dd, cv.total - dd);
+      return dd < clearance;
+    })());
+
+    // phospholipids in both leaflets
+    const pls = [];
+    [1, -1].forEach((side) => {
+      // the inner leaflet of a vesicle is shorter
+      const len = cv.closed ? Math.max(p.memSpacing, cv.total + side * 2 * Math.PI * h) : cv.total;
+      const count = Math.max(1, Math.floor(len / p.memSpacing));
+      for (let i = 0; i < count; i++) {
+        const sArc = cv.closed ? (cv.total * i) / count : (cv.total * (i + 0.5)) / count;
+        if (near(sArc, side)) continue;
+        const q = cv.at(sArc), nx = q.nx * side, ny = q.ny * side;
+        const ang = (Math.atan2(ny, nx) * 180) / Math.PI;
+        const pk = (side > 0 ? "mpt:" : "mpb:") + i;
+        pls.push(placeXY(ctx, pk, ang, q.x + nx * h, q.y + ny * h, plPv, tailPart, pd.hr, plMarkup(plVariant(p, pk), pd)));
+      }
+    });
+
+    // lipoproteins: tails in the leaflet, protein outside the membrane
+    const lpPv = [d.C[0] / 2, d.C[1] / 2];
+    const lpReach = Math.hypot(d.C[0], d.C[1]) / 2 + d.big + p.headStroke;
+    const lpg = lps.map((l, i) => {
+      const q = cv.at(l.s), nx = q.nx * l.side, ny = q.ny * l.side;
+      const ang = (Math.atan2(ny, nx) * 180) / Math.PI;
+      const base = p.memGap / 2 + p.memLpLift;
+      const lw = lpDraw(p, d, i, "mlp:" + i, rng(seed + i));
+      return placeXY(ctx, "mlp:" + i, ang, q.x + nx * base, q.y + ny * base, lpPv, lpReach, Math.max(d.C[0] + d.big, d.L), lw.markup, lw.head);
+    });
+    const body = pls.join("") + lpg.join("") + renderCopies(p, ctx, "membrane");
+    return { ext: 0, body: liftSelected(body, preview, sel) };
   }
 
   // Line widths are in points at the export size. Lengths are scaled so the whole
@@ -807,7 +1109,8 @@
   function scaled(p, k, m) {
     return Object.assign({}, p, {
       tailW: p.tailW * m, tailStroke: p.tailStroke * m, headStroke: p.headStroke * m, linkerW: p.linkerW * m,
-      plTailW: p.plTailW * m, plHeadStroke: p.plHeadStroke * m,
+      plTailW: p.plTailW * m, plHeadStroke: p.plHeadStroke * m, smStroke: p.smStroke * m, smSize: p.smSize * k,
+      memLen: p.memLen * k, memSpacing: p.memSpacing * k, memGap: p.memGap * k, lpRadial: p.lpRadial * k, memLpLift: p.memLpLift * k,
       plHeadSize: p.plHeadSize * k, plTailLen: p.plTailLen * k, plTailGap: p.plTailGap * k, plWaveAmp: p.plWaveAmp * k, plRadial: p.plRadial * k,
       u: k, headSize: p.headSize * k, tailLen: p.tailLen * k, tailGap: p.tailGap * k, waveAmp: p.waveAmp * k,
       linkerLen: p.linkerLen * k, spacing: p.spacing * k, jitterLen: p.jitter * k
@@ -818,25 +1121,68 @@
     // so a figure N inches wide is N x DPI units, and a w pt line is w x DPI / 72 units.
     const dpi = Math.max(1, p.dpi || 72), m = dpi / 72;
     const sizePt = Math.max(0.1, p.exportIn || 0.8) * dpi;
-    let k = 0.2;
-    if (dragK) k = dragK; // keep the scale steady while a phospholipid is being dragged
-    else for (let i = 0; i < 6; i++) k *= sizePt / 2 / particle(scaled(p, k, m)).ext;
+    // Fixed scale: 1 size unit = PT_PER_UNIT points, whatever else changes. Molecules keep their size and
+    // line widths when you add molecules, change spacing or the export size; things may overlap or run past the edge.
+    const k = PT_PER_UNIT * m;
     const q = scaled(p, k, m);
     q.sizePt = sizePt; q.dpi = dpi;
     return q;
   }
 
   function npSVG(p, opts) {
-    const { body } = particle(p, opts);
+    const { body } = p.mode === "membrane" ? membrane(p, opts) : particle(p, opts);
     const ext = p.sizePt / 2; // viewBox in pixels at the chosen DPI
     const size = 2 * ext;
     const wh = opts && opts.px ? ` width="${opts.px}" height="${opts.px}"` : opts && opts.inch ? ` width="${f(opts.inch * p.dpi)}" height="${f(opts.inch * p.dpi)}"` : "";
     const bg = opts && opts.bg ? `<rect x="${f(-ext)}" y="${f(-ext)}" width="${f(size)}" height="${f(size)}" fill="${opts.bg}"/>` : "";
+    if (opts && opts.preview) {
+      // preview: show a margin around the canvas and mark the export area with a dashed square
+      const v = ext * 1.3, lw = size * 0.003;
+      const frame = `<rect x="${f(-ext)}" y="${f(-ext)}" width="${f(size)}" height="${f(size)}" fill="none" stroke="#8aa0a6" stroke-width="${f(lw)}" stroke-dasharray="${f(lw * 4)} ${f(lw * 3)}"/>`;
+      return `<svg xmlns="${NS}" viewBox="${f(-v)} ${f(-v)} ${f(2 * v)} ${f(2 * v)}" role="img" aria-label="Lipoprotein nanoparticle with ${p.n} lipoproteins">${defsMarkup(p)}${body}${frame}</svg>`;
+    }
     return `<svg xmlns="${NS}" viewBox="${f(-ext)} ${f(-ext)} ${f(size)} ${f(size)}"${wh} role="img" aria-label="Lipoprotein nanoparticle with ${p.n} lipoproteins">${defsMarkup(p)}${bg}${body}</svg>`;
   }
 
   // ---------- UI ----------
+  // ---------- undo / redo ----------
+  // A snapshot is every setting plus moved molecules, colors and random seeds.
+  const past = [], future = [];
+  let restoring = false, commitTimer = null;
+  function snapshot() {
+    const inputs = {};
+    document.querySelectorAll(".lnp-panel input, .lnp-panel select, .lnp-np-controls input, .lnp-np-controls select, #exportIn, #dpi").forEach((el) => {
+      if (!el.id || el.type === "file") return;
+      inputs[el.id] = el.type === "checkbox" ? el.checked : el.value;
+    });
+    return JSON.stringify({ inputs, edits, copies, copyId, seed, smSeed, memSeed, shapeSeed, colorSeed, mode });
+  }
+  function commit() {
+    clearTimeout(commitTimer);
+    if (restoring || drag) return;
+    const snap = snapshot();
+    if (past[past.length - 1] === snap) return;
+    past.push(snap);
+    if (past.length > 200) past.shift();
+    future.length = 0;
+    updateUndoButtons();
+  }
+  function scheduleCommit() { clearTimeout(commitTimer); commitTimer = setTimeout(commit, 350); }
+  function restore(snap) {
+    const o = JSON.parse(snap);
+    restoring = true;
+    Object.entries(o.inputs).forEach(([id, v]) => { const el = $(id); if (!el) return; if (el.type === "checkbox") el.checked = v; else el.value = v; });
+    edits = o.edits; copies = o.copies || []; copyId = Math.max(copyId, o.copyId || 0); seed = o.seed; smSeed = o.smSeed; memSeed = o.memSeed; shapeSeed = o.shapeSeed; colorSeed = o.colorSeed; mode = o.mode;
+    render();
+    restoring = false;
+    updateUndoButtons();
+  }
+  function undo() { commit(); if (past.length < 2) return; future.push(past.pop()); restore(past[past.length - 1]); }
+  function redo() { if (!future.length) return; const s1 = future.pop(); past.push(s1); restore(s1); }
+  function updateUndoButtons() { $("undoBtn").disabled = past.length < 2; $("redoBtn").disabled = !future.length; }
+
   function render() {
+    if (!restoring) scheduleCommit();
     const p = read();
     $("nNum").value = p.n;
     $("spacingOut").textContent = p.spacing;
@@ -878,15 +1224,26 @@
     $("plRadialRow").classList.toggle("hidden", !p.plOn);
     ["plN", "plHeadStroke", "plHeadSize", "plTailW", "plTailLen", "plTailGap", "plWaves", "plWaveAmp", "plRadial"].forEach((id) => ($(id + "Out").textContent = p[id]));
     $("plAngleOut").textContent = p.plAngle + "°";
-    lastK = q.u;
-    if (sel != null) { const [t, i] = sel.split(":"); if ((t === "pl" && (+i >= p.plN || !p.plOn)) || (t === "lp" && +i >= p.n)) sel = null; }
+    $("smRows").classList.toggle("hidden", !p.smOn);
+    $("npControls").classList.toggle("hidden", mode !== "particle");
+    $("memControls").classList.toggle("hidden", mode !== "membrane");
+    $("modeParticle").setAttribute("aria-pressed", String(mode === "particle"));
+    $("modeMembrane").setAttribute("aria-pressed", String(mode === "membrane"));
+    $("memCurveRow").classList.toggle("hidden", !(p.memShape === "curved" || p.memShape === "wavy"));
+    $("memWavesRow").classList.toggle("hidden", p.memShape !== "wavy");
+    ["lpRadial", "memLpLift", "memLpN", "memCurve", "memWaves", "memLen", "memSpacing", "memGap"].forEach((id) => ($(id + "Out").textContent = p[id]));
+    ["smN", "smStroke", "smSize", "smVary", "smArea"].forEach((id) => ($(id + "Out").textContent = p[id]));
+    lastK = q.u; lastQ = q;
+    if (sel != null) { const [t, i] = sel.split(":"); if ((t === "pl" && (+i >= p.plN || !p.plOn)) || (t === "lp" && +i >= p.n) || (t === "sm" && (+i >= p.smN || !p.smOn))) sel = null; }
     $("lnp-np-stage").innerHTML = npSVG(q, { preview: true, sel });
     const e = sel != null ? edits[sel] || {} : {};
     $("selHint").classList.toggle("hidden", sel != null);
     $("selTools").classList.toggle("hidden", sel == null);
-    if (sel != null) { const [t, i] = sel.split(":"); $("selName").textContent = `${t === "lp" ? "Lipoprotein" : "Phospholipid"} ${+i + 1}`; $("selRot").value = e.rot || 0; $("selRotOut").textContent = (e.rot || 0) + "°"; }
-    $("selResetAll").classList.toggle("hidden", !Object.keys(edits).length);
-    $("lnp-count").textContent = `${p.n} lipoproteins` + (p.plOn && p.plN ? ` · ${p.plN} phospholipids` : "");
+    if (sel != null) { const mi = molInfo(sel), isCopy = sel.startsWith("cp:"); $("selRotLabel").classList.toggle("hidden", mi.kind === "sm"); $("selName").textContent = (isCopy ? "Copy of " : "") + `${mi.kind === "lp" ? "lipoprotein" : mi.kind === "sm" ? "small molecule" : "phospholipid"} ${mi.idx + 1}`.replace(/^./, (ch) => (isCopy ? ch : ch.toUpperCase())); $("selRot").value = e.rot || 0; $("selRotOut").textContent = (e.rot || 0) + "°"; }
+    $("selResetAll").classList.toggle("hidden", !Object.keys(edits).length && !copies.length);
+    if (sel != null && !pivots[sel]) { sel = null; $("selTools").classList.add("hidden"); $("selHint").classList.remove("hidden"); }
+    $("lnp-count").textContent = `${p.n} lipoproteins` + (p.plOn && p.plN ? ` · ${p.plN} phospholipids` : "") + (p.smOn && p.smN ? ` · ${p.smN} small molecules` : "");
+    if (mode === "membrane") $("lnp-count").textContent = `${p.memLpN} lipoproteins · ${npStageCount("mpt:") + npStageCount("mpb:")} phospholipids`;
   }
 
   function setAll(v) {
@@ -915,7 +1272,7 @@
   });
 
   document.querySelectorAll(".lnp input, .lnp select").forEach((el) => {
-    if (el.id === "headFile" || el.id === "tailFile" || el.id === "pngWhite" || el.id === "selRot") return;
+    if (el.id === "headFile" || el.id === "tailFile" || el.id === "pngWhite" || el.id === "selRot" || el.id === "ctxColor") return;
     el.addEventListener("input", () => {
       if (el.id === "nNum") { const v = Math.max(2, Math.min(30, Math.round(+el.value || 2))); $("n").value = v; }
       render();
@@ -944,13 +1301,29 @@
   }
   const editOf = (key) => (edits[key] = edits[key] || {});
   npStage.addEventListener("pointerdown", (evt) => {
-    const handle = evt.target.closest("[data-handle]");
+    if (evt.button === 2) return; // right click opens the color menu
+    const handle = evt.target.closest("[data-handle]"), headHandle = evt.target.closest("[data-headhandle]"), linkHandle = evt.target.closest("[data-linkhandle]");
     const g = evt.target.closest("[data-mol]");
     if (!g) { if (sel != null) { sel = null; render(); } return; }
-    const key = g.dataset.mol, pt = svgPoint(evt), e = edits[key] || {};
+    let key = g.dataset.mol;
+    const pt = svgPoint(evt);
+    if (evt.shiftKey && !handle && !headHandle && !linkHandle && pivots[key]) {
+      // Shift-drag: leave the original and drag a copy of it
+      const src = pivots[key], info = molInfo(key), id = ++copyId;
+      copies.push({ id, mode, kind: info.kind, idx: info.idx, x: src.ax / lastK, y: src.ay / lastK, ang: src.ang, r: src.r ? src.r / lastK : 0 });
+      const se = JSON.parse(JSON.stringify(edits[key] || {}));
+      delete se.dx; delete se.dy; delete se.hidden; // the copy starts where its source is now (anchor + move)
+      const srcE = edits[key] || {};
+      copies[copies.length - 1].x += (srcE.dx || 0); copies[copies.length - 1].y += (srcE.dy || 0);
+      edits["cp:" + id] = se;
+      key = "cp:" + id;
+    }
+    const e = edits[key] || {};
     sel = key;
     dragK = lastK;
-    if (handle && pivots[key]) drag = { mode: "rotate", key };
+    if (linkHandle && pivots[key] && pivots[key].branch) drag = { mode: "linker", key, base: read().linkerAngle };
+    else if (headHandle && pivots[key] && pivots[key].head) drag = { mode: "head", key };
+    else if (handle && pivots[key]) drag = { mode: "rotate", key };
     else drag = { mode: "move", key, x: pt.x, y: pt.y, dx: e.dx || 0, dy: e.dy || 0 };
     npStage.setPointerCapture(evt.pointerId);
     evt.preventDefault();
@@ -962,6 +1335,18 @@
     if (drag.mode === "move") {
       e.dx = drag.dx + (pt.x - drag.x) / dragK;
       e.dy = drag.dy + (pt.y - drag.y) / dragK;
+    } else if (drag.mode === "linker") {
+      const br = pivots[drag.key] && pivots[drag.key].branch;
+      if (!br) return;
+      let a = (Math.atan2(pt.y - br.y, pt.x - br.x) * 180) / Math.PI - br.base - drag.base;
+      a = ((((a + 180) % 360) + 360) % 360) - 180;
+      e.linkerRot = Math.round(evt.shiftKey ? Math.round(a / 15) * 15 : a);
+    } else if (drag.mode === "head") {
+      const hd = pivots[drag.key] && pivots[drag.key].head;
+      if (!hd) return;
+      let a = (Math.atan2(pt.y - hd.y, pt.x - hd.x) * 180) / Math.PI - hd.base;
+      a = ((((a + 180) % 360) + 360) % 360) - 180;
+      e.headRot = Math.round(evt.shiftKey ? Math.round(a / 15) * 15 : a);
     } else {
       const pv = pivots[drag.key];
       if (!pv) return;
@@ -971,18 +1356,88 @@
     }
     render();
   });
-  const endDrag = () => { if (!drag) return; drag = null; dragK = null; render(); };
+  const endDrag = () => { if (!drag) return; drag = null; dragK = null; render(); commit(); };
   npStage.addEventListener("pointerup", endDrag);
   npStage.addEventListener("pointercancel", endDrag);
+  // right-click: change the color of one molecule or of all of that kind
+  const ctxMenu = $("ctxMenu"), ctxColor = $("ctxColor");
+  let ctxAction = null;
+  function kindOf(key) { return molInfo(key).kind; }
+  function closeCtx() { ctxMenu.classList.add("hidden"); }
+  function pickColor(current, apply) {
+    ctxAction = apply; ctxColor.value = /^#[0-9a-f]{6}$/i.test(current) ? current : "#888888";
+    closeCtx(); ctxColor.click();
+  }
+  ctxColor.addEventListener("input", () => { if (ctxAction) { ctxAction(ctxColor.value); render(); } });
+  ctxColor.addEventListener("change", () => { ctxAction = null; });
+  npStage.addEventListener("contextmenu", (evt) => {
+    evt.preventDefault();
+    const p = read(), g = evt.target.closest("[data-mol]"), key = g ? g.dataset.mol : null;
+    if (key) { sel = key; render(); }
+    const items = [];
+    const add = (label, color, fn) => items.push({ label, color, fn });
+    if (key) {
+      const kind = kindOf(key), e = edits[key] || {}, [t, i] = key.split(":");
+      if (kind === "lp") {
+        const v = lpVariant(p, molInfo(key).idx, key);
+        add("This protein", v.headColor, () => pickColor(v.headColor, (c) => (editOf(key).color = c)));
+        add("All proteins", p.headColor, () => pickColor(p.headColor, (c) => { $("headColor").value = c; $("colorMix").checked = false; Object.keys(edits).forEach((k) => kindOf(k) === "lp" && delete edits[k].color); }));
+        add("All lipoprotein tails", p.tailColor, () => pickColor(p.tailColor, (c) => ($("tailColor").value = c)));
+      } else if (kind === "pl") {
+        const c0 = e.color || p.plHeadColor;
+        add("This phospholipid head", c0, () => pickColor(c0, (c) => (editOf(key).color = c)));
+        add("All phospholipid heads", p.plHeadColor, () => pickColor(p.plHeadColor, (c) => { $("plHeadColor").value = c; Object.keys(edits).forEach((k) => kindOf(k) === "pl" && delete edits[k].color); }));
+        add("All phospholipid tails", p.plTailColor, () => pickColor(p.plTailColor, (c) => ($("plTailColor").value = c)));
+      } else {
+        const c0 = e.color || p.smColor;
+        add("This small molecule", c0, () => pickColor(c0, (c) => (editOf(key).color = c)));
+        add("All small molecules", p.smColor, () => pickColor(p.smColor, (c) => { $("smColor").value = c; Object.keys(edits).forEach((k) => kindOf(k) === "sm" && delete edits[k].color); }));
+      }
+      if (e.color) add("Reset this color", null, () => { delete edits[key].color; closeCtx(); render(); });
+    } else {
+      add("All proteins", p.headColor, () => pickColor(p.headColor, (c) => { $("headColor").value = c; $("colorMix").checked = false; Object.keys(edits).forEach((k) => kindOf(k) === "lp" && delete edits[k].color); }));
+      add("All lipoprotein tails", p.tailColor, () => pickColor(p.tailColor, (c) => ($("tailColor").value = c)));
+      if (p.plOn) add("All phospholipid heads", p.plHeadColor, () => pickColor(p.plHeadColor, (c) => ($("plHeadColor").value = c)));
+      if (p.plOn) add("All phospholipid tails", p.plTailColor, () => pickColor(p.plTailColor, (c) => ($("plTailColor").value = c)));
+      if (p.smOn) add("All small molecules", p.smColor, () => pickColor(p.smColor, (c) => ($("smColor").value = c)));
+    }
+    ctxMenu.innerHTML = `<div class="ctx-title">Change color</div>`;
+    items.forEach((it) => {
+      const b = document.createElement("button");
+      b.type = "button"; b.setAttribute("role", "menuitem");
+      b.innerHTML = (it.color ? `<span class="sw" style="background:${it.color}"></span>` : `<span class="sw" style="background:transparent;border-style:dashed"></span>`) + it.label;
+      b.addEventListener("click", it.fn);
+      ctxMenu.appendChild(b);
+    });
+    const host = ctxMenu.parentElement.getBoundingClientRect();
+    ctxMenu.style.left = Math.min(evt.clientX - host.left, host.width - 220) + "px";
+    ctxMenu.style.top = evt.clientY - host.top + "px";
+    ctxMenu.classList.remove("hidden");
+    ctxMenu.querySelector("button")?.focus();
+  });
+  document.addEventListener("pointerdown", (evt) => { if (!ctxMenu.contains(evt.target)) closeCtx(); });
+  document.addEventListener("keydown", (evt) => { if (evt.key === "Escape") closeCtx(); });
+
+  $("colorShuffle").addEventListener("click", () => { colorSeed = (Math.random() * 1e9) | 0; $("colorMix").checked = true; render(); });
   $("selRot").addEventListener("input", () => { if (sel == null) return; editOf(sel).rot = +$("selRot").value; render(); });
   $("selReset").addEventListener("click", () => { delete edits[sel]; render(); });
-  $("selRemove").addEventListener("click", () => { editOf(sel).hidden = true; sel = null; render(); });
+  $("selRemove").addEventListener("click", () => {
+    if (sel && sel.startsWith("cp:")) { const id = +sel.split(":")[1]; copies = copies.filter((c) => c.id !== id); delete edits[sel]; }
+    else editOf(sel).hidden = true;
+    sel = null; render();
+  });
   $("selDone").addEventListener("click", () => { sel = null; render(); });
-  $("selResetAll").addEventListener("click", () => { edits = {}; sel = null; render(); });
+  function npStageCount(prefix) { return Object.keys(pivots).filter((k) => k.startsWith(prefix)).length; }
+  $("modeParticle").addEventListener("click", () => { mode = "particle"; sel = null; render(); });
+  $("modeMembrane").addEventListener("click", () => { mode = "membrane"; sel = null; render(); });
+  $("memShuffle").addEventListener("click", () => { memSeed = (Math.random() * 1e9) | 0; Object.keys(edits).forEach((k) => k.startsWith("mlp:") && delete edits[k]); render(); });
+  $("shapeShuffle").addEventListener("click", () => { shapeSeed = (Math.random() * 1e9) | 0; $("headMix").checked = true; render(); });
+  $("smShuffle").addEventListener("click", () => { smSeed = (Math.random() * 1e9) | 0; Object.keys(edits).forEach((k) => k.startsWith("sm:") && delete edits[k]); render(); });
+  $("selResetAll").addEventListener("click", () => { edits = {}; copies = []; sel = null; render(); });
 
   // ---------- export ----------
   function status(msg) { $("lnp-status").textContent = msg; clearTimeout(status.t); status.t = setTimeout(() => ($("lnp-status").textContent = ""), 3500); }
-  function fileName(ext) { const p = read(); return `lipoprotein-nanoparticle-${p.n}x.${ext}`; }
+  function fileName(ext) { const p = read(); return mode === "membrane" ? `lipoprotein-membrane-${p.memLpN}x.${ext}` : `lipoprotein-nanoparticle-${p.n}x.${ext}`; }
   function download(blob, name) {
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob); a.download = name;
@@ -1038,8 +1493,83 @@
     $(id).addEventListener("change", () => { try { localStorage.setItem("lnp-" + id, $(id).value); } catch (e) {} });
   });
 
+  // Jiggle: swing each lipoprotein's linker so the protein heads overlap as little as possible.
+  // Greedy search: each lipoprotein in turn tries linker turns from -90° to 90° and keeps the one with
+  // the least overlap with every other protein head (small turns are preferred when it's a tie).
+  function jiggle() {
+    const q = lastQ; if (!q) return;
+    const d0 = dims(q), pv = [d0.C[0] / 2, d0.C[1] / 2];
+    const keys = Object.keys(pivots).filter((k) => molInfo(k).kind === "lp" && pivots[k].head);
+    if (keys.length < 2) { status("Need at least two lipoproteins to jiggle."); return; }
+    const cache = {};
+    const localC = (lr) => cache[lr] || (cache[lr] = dims(Object.assign({}, q, { linkerAngle: q.linkerAngle + lr })).C);
+    function centre(k, lr) {
+      const e = edits[k] || {}, P = pivots[k], C = localC(lr);
+      const rr = rad(e.rot || 0), cr = Math.cos(rr), sr = Math.sin(rr);
+      const lx = pv[0] + (C[0] - pv[0]) * cr - (C[1] - pv[1]) * sr, ly = pv[1] + (C[0] - pv[0]) * sr + (C[1] - pv[1]) * cr;
+      const a = rad(P.ang), ax = P.ax + (e.dx || 0) * q.u, ay = P.ay + (e.dy || 0) * q.u;
+      return [ax + lx * Math.cos(a) - ly * Math.sin(a), ay + lx * Math.sin(a) + ly * Math.cos(a)];
+    }
+    const rHead = d0.big + q.headStroke / 2, minD = 2 * rHead * 1.08;
+    const lr = {}, pos = {};
+    keys.forEach((k) => { lr[k] = (edits[k] || {}).linkerRot || 0; pos[k] = centre(k, lr[k]); });
+    // other lipid parts are obstacles too (phospholipid heads and tails, lipoprotein tails),
+    // so proteins don't swing into the membrane, the core or each other's lipids
+    const obstacles = [];
+    function toGlobal(k, pvx, x, y) {
+      const e = edits[k] || {}, P = pivots[k], rr = rad(e.rot || 0), cr = Math.cos(rr), sr = Math.sin(rr);
+      const lx = pvx[0] + (x - pvx[0]) * cr - (y - pvx[1]) * sr, ly = pvx[1] + (x - pvx[0]) * sr + (y - pvx[1]) * cr;
+      const a = rad(P.ang), ax = P.ax + (e.dx || 0) * q.u, ay = P.ay + (e.dy || 0) * q.u;
+      return [ax + lx * Math.cos(a) - ly * Math.sin(a), ay + lx * Math.sin(a) + ly * Math.cos(a)];
+    }
+    const pd = plDims(q), tl = pd.L + pd.hr * 0.6, ppv = [(pd.hr - tl) / 2, 0];
+    const lpTailR = d0.bundle / 2 + d0.amp, plTailR = pd.bundle / 2 + pd.amp;
+    Object.keys(pivots).forEach((k) => {
+      const kind = molInfo(k).kind;
+      if (kind === "pl") {
+        const h = toGlobal(k, ppv, 0, 0); obstacles.push([h[0], h[1], rHead + pd.hr, 0.6]);
+        [0.35, 0.7, 1].forEach((t) => { const g = toGlobal(k, ppv, -tl * t, 0); obstacles.push([g[0], g[1], rHead + plTailR, 0.4]); });
+      } else if (kind === "lp" && pivots[k].head) {
+        [0.15, 0.5, 0.85, 1].forEach((t) => { const g = toGlobal(k, pv, d0.L * t, 0); obstacles.push([g[0], g[1], rHead + lpTailR, 0.5]); });
+      }
+    });
+    const overlap = (k, c) => {
+      let sum = keys.reduce((acc, j) => { if (j === k) return acc; const dd = Math.hypot(c[0] - pos[j][0], c[1] - pos[j][1]); return acc + Math.max(0, minD - dd) ** 2; }, 0);
+      obstacles.forEach((o) => { const dd = Math.hypot(c[0] - o[0], c[1] - o[1]); sum += o[3] * Math.max(0, o[2] - dd) ** 2; });
+      return sum;
+    };
+    for (let pass = 0; pass < 6; pass++) {
+      let changed = false;
+      keys.forEach((k) => {
+        let best = lr[k], bestCost = Infinity;
+        for (let t = -90; t <= 90; t += 5) {
+          const cost = overlap(k, centre(k, t)) + 1e-4 * rHead * rHead * (t * t) / 100;
+          if (cost < bestCost - 1e-9) { bestCost = cost; best = t; }
+        }
+        if (best !== lr[k]) { lr[k] = best; pos[k] = centre(k, best); changed = true; }
+      });
+      if (!changed) break;
+    }
+    let left = 0;
+    keys.forEach((k) => { keys.forEach((j) => { if (j !== k) left += Math.max(0, minD - Math.hypot(pos[k][0] - pos[j][0], pos[k][1] - pos[j][1])); }); const e = editOf(k); if (lr[k]) e.linkerRot = lr[k]; else delete e.linkerRot; });
+    render(); commit();
+    status(left < 1e-6 ? "Jiggled: no protein heads overlap." : "Jiggled: overlap reduced as far as the linkers allow. Try a longer linker or fewer lipoproteins for more room.");
+  }
+  $("jiggleBtn").addEventListener("click", jiggle);
+  $("undoBtn").addEventListener("click", undo);
+  $("redoBtn").addEventListener("click", redo);
+  document.addEventListener("keydown", (evt) => {
+    if (!(evt.metaKey || evt.ctrlKey)) return;
+    const t = evt.target;
+    if (t && (t.type === "number" || t.type === "text")) return; // let text boxes keep their own undo
+    const k = evt.key.toLowerCase();
+    if (k === "z" && !evt.shiftKey) { evt.preventDefault(); undo(); }
+    else if ((k === "z" && evt.shiftKey) || k === "y") { evt.preventDefault(); redo(); }
+  });
+
   setAll(DEFAULTS);
   render();
+  commit();
 })();
     </script>
   </body>
