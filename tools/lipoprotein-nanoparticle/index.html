@@ -1,0 +1,1046 @@
+<!doctype html>
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Sharaf Lab tool: turn one lipoprotein cartoon into a lipoprotein nanoparticle figure. Choose the tail color and how many lipoproteins, then export SVG or PNG."
+    />
+    <title>Lipoprotein Nanoparticle Builder | Sharaf Lab Tools</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600&family=Montserrat:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../../styles.css" />
+    <style>
+.tool-back{display:inline-block;margin:0 0 22px;color:#0b6870;font-weight:600;text-decoration:none}
+.tool-back:hover{text-decoration:underline;text-underline-offset:4px}
+.tool-caution{max-width:1132px;margin:-60px auto 70px;padding:16px 20px;background:#fff7ec;border:1px solid #f0d2a8;border-left:4px solid #d9822b;border-radius:8px;color:#5c3b12;font-size:15px;line-height:1.6}
+.tool-caution strong{color:#8a4b0f}
+@media(max-width:1180px){.tool-caution{margin-left:24px;margin-right:24px}}
+@media(max-width:800px){.tool-caution{margin-top:-40px;margin-bottom:50px}}
+.tool-section{padding:0 max(24px,calc((100vw - 1132px)/2)) 100px;background:#f2f3f4;padding-top:40px}
+
+.lnp{font-family:"Manrope",Arial,sans-serif;color:#102a33;display:grid;grid-template-columns:340px 1fr;gap:20px;align-items:start}
+.lnp-panel{background:#fff;border:1px solid #d8e0e0;border-radius:10px;padding:20px 22px}
+.lnp-panel h2{font-family:"Montserrat",Arial,sans-serif;font-size:17px;font-weight:600;margin:0 0 6px}
+.lnp-panel h3{font-family:"Montserrat",Arial,sans-serif;font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#0b6870;margin:22px 0 4px}
+.lnp-panel h3:first-of-type{margin-top:6px}
+.lnp-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid #edf1f1;font-size:14px}
+.lnp-row:last-child{border-bottom:0}
+.lnp-row label{font-weight:600}
+.lnp-row .val{display:inline-flex;align-items:center;gap:8px}
+.lnp-row output{min-width:30px;text-align:right;font-variant-numeric:tabular-nums;color:#586e73}
+.lnp input[type=range]{width:130px;accent-color:#0b6870}
+.lnp input[type=number]{width:64px;font:inherit;padding:6px 7px;border:1px solid #b8c8d5;border-radius:5px}
+.lnp input[type=color]{width:36px;height:30px;border:1px solid #b8c8d5;border-radius:5px;padding:2px;background:#fff;cursor:pointer}
+.lnp select{font:inherit;padding:6px 8px;border:1px solid #b8c8d5;border-radius:5px;background:#fff}
+.lnp button,.lnp .file{border:1px solid #b8c8d5;background:#fff;border-radius:7px;padding:9px 13px;font:inherit;font-size:14px;cursor:pointer;color:#173650;position:relative}
+.lnp button:hover,.lnp .file:hover{background:#e7f7f5}
+.lnp .primary{background:#0b6870;color:#fff;border-color:#0b6870}
+.lnp .primary:hover{background:#095a61}
+.lnp :focus-visible{outline:3px solid #0b6870;outline-offset:2px}
+.lnp .file input{position:absolute;opacity:0;width:1px;height:1px}
+.lnp .file:focus-within{outline:3px solid #0b6870}
+.swatches{display:flex;gap:6px;flex-wrap:wrap;padding:4px 0 10px}
+.swatches button{width:24px;height:24px;padding:0;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px #b8c8d5}
+.swatches button[aria-pressed=true]{box-shadow:0 0 0 2px #0b6870}
+.lnp-note{font-size:13px;color:#6b7f83;line-height:1.55;margin:6px 0 0}
+.lnp-views{display:grid;grid-template-columns:220px 1fr;gap:20px}
+.lnp-view{background:#fff;border:1px solid #d8e0e0;border-radius:10px;display:flex;flex-direction:column}
+.lnp-view header{all:unset;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid #e4ebeb;font-family:"Montserrat",Arial,sans-serif;font-weight:600;font-size:15px}
+.lnp-view header small{font-family:"Manrope",Arial,sans-serif;font-weight:500;color:#6b7f83;font-size:13px}
+.lnp-stage{flex:1;display:grid;place-items:center;padding:16px;min-height:220px;background-image:linear-gradient(45deg,#f4f6f6 25%,transparent 25%),linear-gradient(-45deg,#f4f6f6 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#f4f6f6 75%),linear-gradient(-45deg,transparent 75%,#f4f6f6 75%);background-size:16px 16px;background-position:0 0,0 8px,8px -8px,-8px 0}
+.lnp-stage svg{width:100%;height:auto;display:block}
+#lnp-single-stage svg{max-width:170px}
+#lnp-pl-stage svg{max-width:120px}
+.lnp-singles{display:grid;gap:20px;align-content:start}
+#lnp-np-stage{touch-action:none}
+#lnp-np-stage [data-mol]{cursor:grab}
+.lnp-selbar{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;padding:10px 18px;border-top:1px solid #e4ebeb;font-size:13px;color:#586e73;min-height:24px}
+.lnp-selbar #selTools{display:inline-flex;flex-wrap:wrap;gap:10px;align-items:center}
+.lnp-selbar #selTools.hidden{display:none}
+.lnp-selbar strong{color:#102a33}
+.lnp-selbar label{display:inline-flex;gap:6px;align-items:center;font-size:13px}
+.lnp .mini{padding:5px 9px;font-size:12px;font-family:"Manrope",Arial,sans-serif;font-weight:600}
+#lnp-np-stage svg{max-width:560px}
+.lnp-np-controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));column-gap:28px;padding:6px 18px 10px;border-bottom:1px solid #e4ebeb}
+.lnp-np-controls .lnp-row:last-of-type{border-bottom:1px solid #edf1f1}
+.lnp-np-controls .lnp-note{grid-column:1/-1;margin:8px 0 0}
+.lnp-actions{display:flex;flex-wrap:wrap;gap:10px;padding:14px 18px;border-top:1px solid #e4ebeb;align-items:center}
+.lnp-actions label{font-size:14px;display:inline-flex;gap:6px;align-items:center}
+#lnp-status{font-size:13px;color:#0b6870;min-height:18px}
+.hidden{display:none!important}
+@media(max-width:1000px){.lnp{grid-template-columns:1fr}}
+@media(max-width:640px){.lnp-views{grid-template-columns:1fr}.lnp input[type=range]{width:100px}}
+    </style>
+  </head>
+
+  <body class="outreach-body">
+    <header>
+      <div class="nav">
+        <a class="brand" href="../../index.html" aria-label="Sharaf Lab home"
+          ><img src="../../00%20Github%20assets/sharaf-lab-logo.png" alt="Sharaf Lab"
+        /></a>
+        <nav aria-label="Primary navigation">
+          <a href="../../index.html">Home</a>
+          <a href="../../philosophy.html">Philosophy</a>
+          <a href="../../research.html">Research</a>
+          <a href="../../members.html">Lab Members</a>
+          <a href="../../photos.html">Photos</a>
+          <a href="../../links.html">Links of Interest</a>
+          <a class="active" href="../../tools.html" aria-current="page">Tools</a>
+          <a href="../../join.html">Join the Lab</a>
+        </nav>
+      </div>
+    </header>
+    <main>
+      <section class="outreach-hero">
+        <a class="tool-back" href="../../tools.html">← All lab tools</a>
+        <p class="eyebrow eyebrow-dark">Lab tools · Figures · Nanoparticles</p>
+        <h1>From one lipoprotein to a nanoparticle.</h1>
+        <p>
+          Design a single lipoprotein, choose how many copies and the color of
+          their lipid tails, and the tool arranges them into a nanoparticle
+          with the tails tucked into the core. Export the figure as SVG or PNG.
+        </p>
+      </section>
+
+      <div class="tool-caution" role="note">
+        <strong>Check every result.</strong> These tools were vibe coded: built
+        quickly with AI assistance and not independently validated. This is a
+        schematic drawing, not a physical model, so it does not reflect real
+        sizes, packing or aggregation numbers.
+      </div>
+
+      <section class="tool-section" aria-label="Lipoprotein nanoparticle builder">
+        <div class="lnp">
+          <div class="lnp-panel">
+            <h2>Lipoprotein settings</h2>
+
+            <h3>Tails</h3>
+            <div class="lnp-row">
+              <label for="tailColor">Tail color</label>
+              <span class="val"><input id="tailColor" type="color" value="#e0569a" /></span>
+            </div>
+            <div class="swatches" id="tailSwatches" aria-label="Tail color presets"></div>
+            <div class="lnp-row" id="tailOutlineRow">
+              <label for="tailOutline">Tail outline color</label>
+              <span class="val"><label style="font-weight:400;font-size:13px;display:inline-flex;gap:5px;align-items:center"><input id="outlineAuto" type="checkbox" checked />auto</label><input id="tailOutline" type="color" value="#7b3fa0" /></span>
+            </div>
+            <div class="lnp-row">
+              <label for="tails">Tails per lipoprotein</label>
+              <span class="val"><select id="tails"><option>1</option><option>2</option><option selected>3</option><option>4</option></select></span>
+            </div>
+            <div class="lnp-row">
+              <label for="tailW">Tail line width (pt)</label>
+              <span class="val"><input id="tailW" type="range" min="0.1" max="4" step="0.05" value="0.6" /><output id="tailWOut">0.6</output></span>
+            </div>
+            <div class="lnp-row" id="tailStrokeRow">
+              <label for="tailStroke">Tail outline width (pt)</label>
+              <span class="val"><input id="tailStroke" type="range" min="0" max="3" step="0.05" value="0.3" /><output id="tailStrokeOut">0.3</output></span>
+            </div>
+            <div class="lnp-row">
+              <label for="tailLen">Tail length</label>
+              <span class="val"><input id="tailLen" type="range" min="14" max="80" value="34" /><output id="tailLenOut">34</output></span>
+            </div>
+            <div class="lnp-row">
+              <label for="tailGap">Tail spacing</label>
+              <span class="val"><input id="tailGap" type="range" min="2" max="24" step="0.5" value="10" /><output id="tailGapOut">10</output></span>
+            </div>
+            <div class="lnp-row">
+              <label for="waves">Waves</label>
+              <span class="val"><input id="waves" type="range" min="0" max="8" step="0.5" value="3" /><output id="wavesOut">3</output></span>
+            </div>
+            <div class="lnp-row">
+              <label for="waveAmp">Wave height</label>
+              <span class="val"><input id="waveAmp" type="range" min="0" max="8" step="0.25" value="2.5" /><output id="waveAmpOut">2.5</output></span>
+            </div>
+            <div class="lnp-row">
+              <label for="tailStyle">Tail style</label>
+              <span class="val"><select id="tailStyle"><option value="wavy" selected>Wavy</option><option value="zigzag">Zigzag</option><option value="straight">Straight</option><option value="image">My SVG / image…</option></select></span>
+            </div>
+            <div class="lnp-row" id="tailUploadRow">
+              <span style="font-weight:600">Your tail</span>
+              <label class="file">Upload SVG/PNG<input id="tailFile" type="file" accept="image/svg+xml,.svg,image/png,image/jpeg,image/webp" /></label>
+            </div>
+            <div class="lnp-row" id="tailTurnRow">
+              <label for="tailTurn">Tail points</label>
+              <span class="val"><select id="tailTurn"><option value="0" selected>Up in my file</option><option value="90">Right in my file</option><option value="180">Down in my file</option><option value="270">Left in my file</option></select></span>
+            </div>
+            <div class="lnp-row" id="tailRecolorRow">
+              <label for="tailRecolor">Recolor with tail color</label>
+              <span class="val"><input id="tailRecolor" type="checkbox" checked /></span>
+            </div>
+            <div class="lnp-row" id="tailOutlineOnRow">
+              <label for="tailOutlineOn">Add outline</label>
+              <span class="val"><input id="tailOutlineOn" type="checkbox" checked /></span>
+            </div>
+            <p class="lnp-note" id="tailUploadNote">Draw one tail with the end that joins the protein at the top (or set <em>Tail points</em> to match your file). Each tail is drawn from your file, so set <em>Tails per lipoprotein</em> to 1 if your file already shows the whole bundle. <em>Add outline</em> traces the edge of your tail in the tail outline color, using <em>Tail outline width</em>. Recoloring works on SVG files: the darkest color becomes the outline color, white stays white, and the rest become the tail color.</p>
+
+            <h3>Protein head</h3>
+            <div class="lnp-row">
+              <label for="headShape">Shape</label>
+              <span class="val"><select id="headShape"></select></span>
+            </div>
+            <div class="lnp-row" id="uploadRow">
+              <span style="font-weight:600">Your protein</span>
+              <label class="file">Upload SVG/PNG<input id="headFile" type="file" accept="image/svg+xml,.svg,image/png,image/jpeg,image/webp" /></label>
+            </div>
+            <div class="lnp-row" id="headRecolorRow">
+              <label for="headRecolor">Recolor with head color</label>
+              <span class="val"><input id="headRecolor" type="checkbox" /></span>
+            </div>
+            <div class="lnp-row" id="headOutlineOnRow">
+              <label for="headOutlineOn">Add outline</label>
+              <span class="val"><input id="headOutlineOn" type="checkbox" checked /></span>
+            </div>
+            <p class="lnp-note hidden" id="uploadNote">Use an image of just the protein, ideally with a transparent background, drawn with the side that joins the tail at the bottom. Use <em>Head turn</em> to adjust. <em>Add outline</em> traces the edge of your drawing in the head outline color, using <em>Head outline width</em>; it needs a transparent background. Recoloring works on SVG files: the darkest color becomes the outline, white stays white, and the rest become the head color.</p>
+            <div class="lnp-row" id="headColorRow">
+              <label for="headColor">Head color</label>
+              <span class="val"><input id="headColor" type="color" value="#a6a6a6" /><input id="headOutline" type="color" value="#333333" aria-label="Head outline color" /></span>
+            </div>
+            <div class="lnp-row">
+              <label for="headStroke">Head outline width (pt)</label>
+              <span class="val"><input id="headStroke" type="range" min="0" max="3" step="0.05" value="0.45" /><output id="headStrokeOut">0.45</output></span>
+            </div>
+            <div class="lnp-row">
+              <label for="headSize">Head size</label>
+              <span class="val"><input id="headSize" type="range" min="10" max="50" value="22" /><output id="headSizeOut">22</output></span>
+            </div>
+            <div class="lnp-row" id="headStretchRow">
+              <label for="headStretch">Shape stretch</label>
+              <span class="val"><input id="headStretch" type="range" min="0.5" max="2" step="0.05" value="1" /><output id="headStretchOut">1</output></span>
+            </div>
+            <div class="lnp-row">
+              <label for="headTurn">Head turn</label>
+              <span class="val"><input id="headTurn" type="range" min="-180" max="180" value="55" /><output id="headTurnOut">55°</output></span>
+            </div>
+            <h3>Linker</h3>
+            <div class="lnp-row">
+              <label for="linkerColor">Linker color</label>
+              <span class="val"><label style="font-weight:400;font-size:13px;display:inline-flex;gap:5px;align-items:center"><input id="linkerOn" type="checkbox" checked />show</label><input id="linkerColor" type="color" value="#5aaed6" /></span>
+            </div>
+            <div class="lnp-row">
+              <label for="linkerW">Linker line width (pt)</label>
+              <span class="val"><input id="linkerW" type="range" min="0.1" max="4" step="0.05" value="0.6" /><output id="linkerWOut">0.6</output></span>
+            </div>
+            <div class="lnp-row">
+              <label for="linkerLen">Linker length</label>
+              <span class="val"><input id="linkerLen" type="range" min="2" max="40" step="1" value="9" /><output id="linkerLenOut">9</output></span>
+            </div>
+            <div class="lnp-row">
+              <label for="linkerAngle">Lipid to linker angle</label>
+              <span class="val"><input id="linkerAngle" type="range" min="-180" max="180" step="1" value="60" /><output id="linkerAngleOut">60°</output></span>
+            </div>
+            <div class="lnp-row">
+              <label for="headAngle">Linker to protein angle</label>
+              <span class="val"><input id="headAngle" type="range" min="-90" max="90" step="1" value="0" /><output id="headAngleOut">0°</output></span>
+            </div>
+            <h3>Phospholipids</h3>
+            <div class="lnp-row">
+              <label for="plOn">Add phospholipids</label>
+              <span class="val"><input id="plOn" type="checkbox" checked /></span>
+            </div>
+            <div id="plRows">
+            <div class="lnp-row">
+              <label for="plN">Number</label>
+              <span class="val"><input id="plN" type="range" min="0" max="60" step="1" value="8" /><output id="plNOut">8</output></span>
+            </div>
+            <div class="lnp-row">
+              <label for="plHeadColor">Head color</label>
+              <span class="val"><input id="plHeadColor" type="color" value="#452a75" /><input id="plHeadOutline" type="color" value="#231f20" aria-label="Phospholipid head outline color" /></span>
+            </div>
+            <div class="lnp-row">
+              <label for="plHeadStroke">Head outline width (pt)</label>
+              <span class="val"><input id="plHeadStroke" type="range" min="0" max="3" step="0.05" value="0" /><output id="plHeadStrokeOut">0</output></span>
+            </div>
+            <div class="lnp-row">
+              <label for="plHeadSize">Head size</label>
+              <span class="val"><input id="plHeadSize" type="range" min="3" max="30" step="0.5" value="12" /><output id="plHeadSizeOut">12</output></span>
+            </div>
+            <div class="lnp-row">
+              <label for="plTailColor">Tail color</label>
+              <span class="val"><input id="plTailColor" type="color" value="#452a75" /></span>
+            </div>
+            <div class="lnp-row">
+              <label for="plTails">Tails</label>
+              <span class="val"><select id="plTails"><option>1</option><option selected>2</option><option>3</option></select></span>
+            </div>
+            <div class="lnp-row">
+              <label for="plTailW">Tail line width (pt)</label>
+              <span class="val"><input id="plTailW" type="range" min="0.1" max="4" step="0.05" value="0.6" /><output id="plTailWOut">0.6</output></span>
+            </div>
+            <div class="lnp-row">
+              <label for="plTailLen">Tail length</label>
+              <span class="val"><input id="plTailLen" type="range" min="6" max="90" step="1" value="34" /><output id="plTailLenOut">34</output></span>
+            </div>
+            <div class="lnp-row">
+              <label for="plTailGap">Tail spacing</label>
+              <span class="val"><input id="plTailGap" type="range" min="1" max="20" step="0.5" value="5" /><output id="plTailGapOut">5</output></span>
+            </div>
+            <div class="lnp-row">
+              <label for="plWaves">Waves</label>
+              <span class="val"><input id="plWaves" type="range" min="0" max="8" step="0.5" value="3.5" /><output id="plWavesOut">3.5</output></span>
+            </div>
+            <div class="lnp-row">
+              <label for="plWaveAmp">Wave height</label>
+              <span class="val"><input id="plWaveAmp" type="range" min="0" max="6" step="0.25" value="1.5" /><output id="plWaveAmpOut">1.5</output></span>
+            </div>
+            <div class="lnp-row">
+              <label for="plTop">Draw on top of lipoproteins</label>
+              <span class="val"><input id="plTop" type="checkbox" checked /></span>
+            </div>
+            <p class="lnp-note">Phospholipids sit between the lipoproteins with their tails pointing into the core. Turn them with <em>Rotate phospholipids</em> above the figure; at 0° they sit halfway between neighbouring lipoproteins.</p>
+            </div>
+            <p class="lnp-note"><button id="resetBtn" type="button">Reset to defaults</button></p>
+          </div>
+
+          <div class="lnp-views">
+            <div class="lnp-singles">
+            <div class="lnp-view">
+              <header>One lipoprotein <button class="mini" id="copyLp" type="button">Copy SVG</button></header>
+              <div class="lnp-stage" id="lnp-single-stage"></div>
+            </div>
+            <div class="lnp-view" id="plView">
+              <header>One phospholipid <button class="mini" id="copyPl" type="button">Copy SVG</button></header>
+              <div class="lnp-stage" id="lnp-pl-stage"></div>
+            </div>
+            </div>
+            <div class="lnp-view">
+              <header>Nanoparticle <small id="lnp-count"></small></header>
+              <div class="lnp-np-controls">
+            <div class="lnp-row">
+              <label for="n">Lipoproteins</label>
+              <span class="val"><input id="n" type="range" min="2" max="30" value="8" /><input id="nNum" type="number" min="2" max="30" value="8" aria-label="Lipoproteins (number)" /></span>
+            </div>
+            <div class="lnp-row">
+              <label for="spacing" title="Drag below 0 to let the tails overlap in the core">Core spacing</label>
+              <span class="val"><input id="spacing" type="range" min="-100" max="80" value="6" /><output for="spacing" id="spacingOut">6</output></span>
+            </div>
+            <div class="lnp-row">
+              <label for="rotation">Rotate lipoproteins</label>
+              <span class="val"><input id="rotation" type="range" min="0" max="360" value="0" /><output id="rotationOut">0°</output></span>
+            </div>
+                <div class="lnp-row" id="plAngleRow">
+                  <label for="plAngle">Rotate phospholipids</label>
+                  <span class="val"><input id="plAngle" type="range" min="-180" max="180" step="1" value="0" /><output id="plAngleOut">0°</output></span>
+                </div>
+                <div class="lnp-row" id="plRadialRow">
+                  <label for="plRadial" title="Lower values push the phospholipids deeper into the core">Phospholipid core packing</label>
+                  <span class="val"><input id="plRadial" type="range" min="-120" max="80" step="1" value="0" /><output id="plRadialOut">0</output></span>
+                </div>
+            <div class="lnp-row">
+              <label for="jitter">Hand-drawn look</label>
+              <span class="val"><input id="jitter" type="range" min="0" max="10" value="0" /><button id="reshuffle" type="button" title="New random arrangement">↻</button></span>
+            </div>
+
+                <p class="lnp-note">Drag <em>Core spacing</em> below 0 to let the tails overlap in the core. Lower <em>Phospholipid core packing</em> pushes the phospholipids deeper into the core.</p>
+              </div>
+              <div class="lnp-stage" id="lnp-np-stage"></div>
+              <div class="lnp-selbar" id="selBar">
+                <span id="selHint">Click a lipoprotein or phospholipid to select it. Drag it to move it, or drag its round handle to rotate it (hold Shift to snap to 15°).</span>
+                <span id="selTools" class="hidden">
+                  <strong id="selName"></strong>
+                  <label for="selRot">Rotate <input id="selRot" type="range" min="-180" max="180" step="1" value="0" /><output id="selRotOut">0°</output></label>
+                  <button class="mini" id="selReset" type="button">Reset position</button>
+                  <button class="mini" id="selRemove" type="button">Remove</button>
+                  <button class="mini" id="selDone" type="button">Done</button>
+                </span>
+                <button class="mini hidden" id="selResetAll" type="button">Reset all positions</button>
+              </div>
+              <div class="lnp-actions">
+                <button class="primary" id="dlSvg" type="button">Download SVG</button>
+                <button id="dlPng" type="button">Download PNG</button>
+                <button id="copySvg" type="button">Copy SVG</button>
+                <label for="exportIn">Size <input id="exportIn" type="number" min="0.2" max="20" step="0.05" value="0.8" style="width:70px" /> in</label>
+                <label for="dpi">Document DPI <input id="dpi" type="number" min="1" max="2400" step="1" value="360" style="width:76px" /></label>
+                <label><input id="pngWhite" type="checkbox" /> White PNG background</label>
+                <p class="lnp-note" style="flex-basis:100%;margin:0">The SVG is exported at this size, with line widths in points (pt). Set <em>Document DPI</em> to your Affinity document's DPI (File &rsaquo; Document Setup) so pastes land at the right size; use 72 for Illustrator.</p>
+                <span id="lnp-status" role="status"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>© 2026 Sharaf Lab. Hosted on GitHub Pages. Created with the assistance of AI.</footer>
+
+    <script>
+(function () {
+  "use strict";
+  const $ = (id) => document.getElementById(id);
+  const NS = "http://www.w3.org/2000/svg";
+  const DEFAULTS = {
+    n: 8, spacing: 6, rotation: 0, jitter: 0,
+    tailColor: "#b3b3b3", outlineAuto: true, tailOutline: "#7a7a7a",
+    tails: 3, tailLen: 38, tailStyle: "wavy", tailTurn: 0, tailRecolor: true, headRecolor: false, headOutlineOn: true, tailOutlineOn: true,
+    tailW: 1.3, tailGap: 10.5, waves: 2.5, waveAmp: 2.2, tailStroke: 1.3,
+    headShape: "circle", headColor: "#452a75", headOutline: "#231f20", headStroke: 1.3,
+    headSize: 22, headStretch: 1, headTurn: 0, linkerOn: true, linkerColor: "#a7a9ac", linkerW: 1.3, linkerLen: 12,
+    linkerAngle: 60, headAngle: 0,
+    plOn: true, plN: 8, plHeadColor: "#452a75", plHeadOutline: "#231f20", plHeadStroke: 0, plHeadSize: 12,
+    plTailColor: "#452a75", plTails: 2, plTailW: 1.3, plTailLen: 34, plTailGap: 5, plWaves: 3.5, plWaveAmp: 1.5,
+    plRadial: 0, plAngle: 0, plTop: true
+  };
+  const SWATCHES = ["#b3b3b3", "#e0569a", "#d94040", "#f08c2e", "#e8c32a", "#4caf6a", "#2a9d8f", "#3a7bd5", "#7b4fc9", "#555555"];
+  let headImg = null; // {href, w, h, svg?}
+  let tailImg = null;
+  let edits = {};       // "lp:3" / "pl:5" -> { dx, dy, rot, hidden }
+  let sel = null, dragK = null, drag = null, lastK = 0.2, pivots = {};
+  let seed = 7;
+
+  // ---------- helpers ----------
+  const f = (v) => +v.toFixed(2);
+  function rng(s) { return function () { s |= 0; s = (s + 0x6d2b79f5) | 0; let t = Math.imul(s ^ (s >>> 15), 1 | s); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+  function darken(hex, k) {
+    const n = parseInt(hex.slice(1), 16);
+    let r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+    // shift slightly toward purple-ish shade like the reference figure, then darken
+    r = Math.round(r * (1 - k)); g = Math.round(g * (1 - k * 1.1)); b = Math.round(Math.min(255, b * (1 - k * 0.6) + 20));
+    g = Math.max(0, g);
+    return "#" + [r, g, b].map((x) => x.toString(16).padStart(2, "0")).join("");
+  }
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;"); }
+
+  // ---------- uploaded SVG / image inputs ----------
+  const colorCtx = document.createElement("canvas").getContext("2d");
+  function normColor(c) {
+    c = c.trim();
+    if (!c || /^(none|transparent|inherit|currentcolor)$/i.test(c) || /^url\(/i.test(c)) return null;
+    colorCtx.fillStyle = "#010203"; colorCtx.fillStyle = c;
+    const v = colorCtx.fillStyle;
+    if (v === "#010203" && c.toLowerCase() !== "#010203") return null;
+    return v.startsWith("#") ? v.toLowerCase() : v;
+  }
+  function lum(c) {
+    const m = c.match(/^#([0-9a-f]{6})$/i);
+    if (m) { const n = parseInt(m[1], 16); return 0.299 * ((n >> 16) & 255) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255); }
+    const r = c.match(/[\d.]+/g) || [0, 0, 0]; return 0.299 * r[0] + 0.587 * r[1] + 0.114 * r[2];
+  }
+  const COLOR_RE = /(fill|stroke|stop-color)(\s*(?:=\s*["']|:\s*))([^;"'<>}]+)/gi;
+  function recolorSVG(text, main, outline) {
+    const found = new Set();
+    text.replace(COLOR_RE, (all, prop, sep, val) => { const c = normColor(val); if (c) found.add(c); return all; });
+    // white and near-white stay as they are, so highlights and holes survive
+    const list = [...found].filter((c) => lum(c) < 240).sort((a, b) => lum(a) - lum(b));
+    const map = {};
+    list.forEach((c, i) => (map[c] = list.length > 1 && i === 0 ? outline : main));
+    let outText = text.replace(COLOR_RE, (all, prop, sep, val) => { const c = normColor(val); return c && map[c] ? prop + sep + map[c] : all; });
+    if (!found.size) outText = outText.replace(/<svg\b/i, `<svg fill="${main}"`); // unstyled SVGs default to black fill
+    return outText;
+  }
+  function svgDataURL(text) { return "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(text))); }
+  function imgHref(img, recolor, main, outline) {
+    if (!img.svg || !recolor) return img.href;
+    const key = main + outline;
+    if (img.cacheKey !== key) { img.cacheKey = key; img.cacheHref = svgDataURL(recolorSVG(img.svg, main, outline)); }
+    return img.cacheHref;
+  }
+  function loadImageFile(file, done) {
+    const isSVG = file.type === "image/svg+xml" || /\.svg$/i.test(file.name);
+    const fr = new FileReader();
+    fr.onerror = () => status("That file could not be read.");
+    if (isSVG) {
+      fr.onload = () => {
+        const doc = new DOMParser().parseFromString(fr.result, "image/svg+xml");
+        const root = doc.documentElement;
+        if (!root || root.nodeName.toLowerCase() !== "svg" || doc.getElementsByTagName("parsererror").length) { status("That SVG could not be read."); return; }
+        let w = parseFloat(root.getAttribute("width")), h = parseFloat(root.getAttribute("height"));
+        const vb = (root.getAttribute("viewBox") || "").split(/[\s,]+/).map(Number);
+        if (vb.length === 4 && vb[2] > 0 && vb[3] > 0) {
+          if (!(w > 0 && h > 0) || /%/.test(root.getAttribute("width") || "")) { w = vb[2]; h = vb[3]; }
+        } else if (w > 0 && h > 0) root.setAttribute("viewBox", `0 0 ${w} ${h}`);
+        if (!(w > 0 && h > 0)) { w = 100; h = 100; }
+        root.setAttribute("width", w); root.setAttribute("height", h);
+        root.removeAttribute("style");
+        root.querySelectorAll("script").forEach((n) => n.remove());
+        const svg = new XMLSerializer().serializeToString(root);
+        done({ svg, href: svgDataURL(svg), w, h });
+      };
+      fr.readAsText(file);
+    } else {
+      fr.onload = () => {
+        const im = new Image();
+        im.onload = () => done({ href: fr.result, w: im.naturalWidth || 100, h: im.naturalHeight || 100 });
+        im.onerror = () => status("That image could not be read.");
+        im.src = fr.result;
+      };
+      fr.readAsDataURL(file);
+    }
+  }
+
+  function read() {
+    return {
+      n: +$("n").value, spacing: +$("spacing").value, rotation: +$("rotation").value, jitter: +$("jitter").value, exportIn: +$("exportIn").value || 0.8,
+      plOn: $("plOn").checked, plN: +$("plN").value, plHeadColor: $("plHeadColor").value, plHeadOutline: $("plHeadOutline").value,
+      plHeadStroke: +$("plHeadStroke").value, plHeadSize: +$("plHeadSize").value, plTailColor: $("plTailColor").value, plTails: +$("plTails").value,
+      plTailW: +$("plTailW").value, plTailLen: +$("plTailLen").value, plTailGap: +$("plTailGap").value, plWaves: +$("plWaves").value,
+      plWaveAmp: +$("plWaveAmp").value, plRadial: +$("plRadial").value, plAngle: +$("plAngle").value, plTop: $("plTop").checked, dpi: +$("dpi").value || 72,
+      tailColor: $("tailColor").value, outlineAuto: $("outlineAuto").checked, tailOutline: $("tailOutline").value,
+      tails: +$("tails").value, tailLen: +$("tailLen").value, tailStyle: $("tailStyle").value, tailTurn: +$("tailTurn").value, tailRecolor: $("tailRecolor").checked, headRecolor: $("headRecolor").checked, headOutlineOn: $("headOutlineOn").checked, tailOutlineOn: $("tailOutlineOn").checked,
+      headShape: $("headShape").value, headColor: $("headColor").value, headOutline: $("headOutline").value,
+      headSize: +$("headSize").value, headStretch: +$("headStretch").value, headTurn: +$("headTurn").value,
+      linkerOn: $("linkerOn").checked, linkerColor: $("linkerColor").value,
+      linkerW: +$("linkerW").value, linkerLen: +$("linkerLen").value, tailW: +$("tailW").value, tailGap: +$("tailGap").value, waves: +$("waves").value, waveAmp: +$("waveAmp").value, linkerAngle: +$("linkerAngle").value, headAngle: +$("headAngle").value, tailStroke: +$("tailStroke").value, headStroke: +$("headStroke").value,
+      get stroke() { return Math.max(this.tailStroke, this.headStroke); } // used for padding only
+    };
+  }
+
+  // ---------- geometry of one lipoprotein ----------
+  // Local frame: x axis points outward from the core. Tail tips sit at x = 0 and
+  // the tails meet at the branch point (L, 0). The linker leaves the branch point
+  // at "Lipid to linker angle" (0 = straight on), and the protein sits at its end,
+  // offset by "Linker to protein angle" (0 = linker points at the protein's center).
+  const rad = (a) => (a * Math.PI) / 180;
+  function dims(p) {
+    const R = p.headSize, L = p.tailLen;
+    let tw = p.tailW, gap = Math.max(p.tailGap, tw * 1.8), tailFit = null;
+    if (p.tailStyle === "image" && tailImg) {
+      const side = p.tailTurn % 180 === 0;
+      const s = L / (side ? tailImg.h : tailImg.w);
+      tailFit = { s, w: tailImg.w * s, h: tailImg.h * s, across: (side ? tailImg.w : tailImg.h) * s };
+      tw = tailFit.across;
+      gap = Math.max(p.tailGap, tw * 0.92 + 0.5 * p.u + (p.tailOutlineOn && p.tailStroke > 0 ? p.tailStroke + 1.2 * p.u : 0));
+    }
+    const amp = p.tailStyle === "straight" || tailFit ? 0 : p.waveAmp;
+    const fork = p.tails > 1 && !tailFit ? Math.min(L * 0.3, gap * 0.55) : 0;
+    const linkLen = p.linkerOn ? p.linkerLen : 0;
+    const a = rad(p.linkerAngle);
+    const E = [L + linkLen * Math.cos(a), linkLen * Math.sin(a)];
+    const dir = a + rad(p.headAngle);
+    const tt = rad(p.headTurn), big = R * Math.max(1, p.headStretch);
+    let half = (Math.abs(Math.cos(tt)) * R * p.headStretch + Math.abs(Math.sin(tt)) * R) * 0.96;
+    if (p.headShape === "image" && headImg) {
+      // seat the uploaded protein against the linker, whatever its shape and turn
+      const sc = (2 * R) / Math.max(headImg.w, headImg.h), t = rad(p.headTurn);
+      half = (Math.abs(Math.cos(t)) * headImg.w * sc / 2 + Math.abs(Math.sin(t)) * headImg.h * sc / 2) * 0.92;
+    }
+    const C = [E[0] + half * Math.cos(dir), E[1] + half * Math.sin(dir)];
+    const bundle = (p.tails - 1) * gap + tw;
+    return { R, L, tw, gap, amp, fork, linkLen, a, dir, E, C, bundle, tailFit, big };
+  }
+
+  // points (x, y, radius) that bound one lipoprotein, for sizing the drawing
+  function unitBounds(p, d) {
+    const hb = d.bundle / 2 + d.amp + p.u;
+    return [[0, -hb, 0], [0, hb, 0], [d.L, -hb, 0], [d.L, hb, 0], [d.E[0], d.E[1], p.linkerW], [d.C[0], d.C[1], d.big * 1.3 + p.headStroke]];
+  }
+
+  function tailPath(p, d, yk, wob) {
+    const pts = [[d.L, 0]];
+    const x0 = d.L - d.fork;
+    if (d.fork > 0) pts.push([x0, yk]);
+    const steps = Math.max(30, Math.round((x0 / p.u) * 1.5 + p.waves * 12));
+    for (let i = 1; i <= steps; i++) {
+      const t = i / steps, x = x0 * (1 - t);
+      let w = 0;
+      if (p.tailStyle !== "straight" && p.waves > 0) {
+        const ph = p.waves * Math.max(0, t - 0.08) / 0.92 + wob;
+        if (p.tailStyle === "zigzag") { const q = ((ph % 1) + 1) % 1; w = q < 0.25 ? 4 * q : q < 0.75 ? 2 - 4 * q : 4 * q - 4; }
+        else w = Math.sin(2 * Math.PI * ph);
+      }
+      // short straight run after the fork, then ease into the waves
+      const u = Math.max(0, Math.min(1, (t - 0.08) / 0.12)), env = u * u * (3 - 2 * u);
+      pts.push([x, yk + d.amp * w * env]);
+    }
+    return "M" + pts.map((q) => f(q[0]) + "," + f(q[1])).join("L");
+  }
+
+  // ---------- protein head shapes ----------
+  // Each shape is drawn around (0, 0) with +x pointing away from the linker.
+  // Coordinates are in units of the head size; "stretch" widens along x.
+  function regPts(n, rot, k) { const a = []; for (let i = 0; i < n; i++) { const t = rot + (2 * Math.PI * i) / n; a.push([k * Math.cos(t), k * Math.sin(t)]); } return a; }
+  function starPts(n, inner, rot) { const a = []; for (let i = 0; i < 2 * n; i++) { const t = rot + (Math.PI * i) / n, k = i % 2 ? inner : 1; a.push([k * Math.cos(t), k * Math.sin(t)]); } return a; }
+  function shapeLib(rx, ry) {
+    const P = (x, y) => `${f(x * rx)},${f(y * ry)}`;
+    const poly = (pts) => "M" + pts.map((q) => P(q[0], q[1])).join("L") + "Z";
+    const roundPoly = (pts, c) => {
+      const n = pts.length, lerp = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
+      let d = "";
+      pts.forEach((v, i) => {
+        const a = lerp(v, pts[(i - 1 + n) % n], c), b = lerp(v, pts[(i + 1) % n], c);
+        d += (i ? "L" : "M") + P(a[0], a[1]) + "Q" + P(v[0], v[1]) + " " + P(b[0], b[1]);
+      });
+      return d + "Z";
+    };
+    const smooth = (pts) => { // closed Catmull-Rom curve through the points
+      const n = pts.length; let d = "M" + P(pts[0][0], pts[0][1]);
+      for (let i = 0; i < n; i++) {
+        const p0 = pts[(i - 1 + n) % n], p1 = pts[i], p2 = pts[(i + 1) % n], p3 = pts[(i + 2) % n];
+        d += "C" + P(p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6) + " " + P(p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6) + " " + P(p2[0], p2[1]);
+      }
+      return d + "Z";
+    };
+    const ell = (k) => `M${P(k, 0)}A${f(k * rx)},${f(k * ry)} 0 1 1 ${P(-k, 0)}A${f(k * rx)},${f(k * ry)} 0 1 1 ${P(k, 0)}Z`;
+    const pill = (w, h) => { const r = h; return `M${P(-w + r * ry / rx, -h)}L${P(w - r * ry / rx, -h)}A${f(r * ry)},${f(r * ry)} 0 0 1 ${P(w - r * ry / rx, h)}L${P(-w + r * ry / rx, h)}A${f(r * ry)},${f(r * ry)} 0 0 1 ${P(-w + r * ry / rx, -h)}Z`; };
+    // single outlines
+    const S = {
+      circle: () => ell(1),
+      oval: () => `M${P(1.3, 0)}A${f(1.3 * rx)},${f(0.8 * ry)} 0 1 1 ${P(-1.3, 0)}A${f(1.3 * rx)},${f(0.8 * ry)} 0 1 1 ${P(1.3, 0)}Z`,
+      pill: () => pill(1.25, 0.65),
+      roundsq: () => roundPoly([[-0.9, -0.9], [0.9, -0.9], [0.9, 0.9], [-0.9, 0.9]], 0.35),
+      square: () => poly([[-0.88, -0.88], [0.88, -0.88], [0.88, 0.88], [-0.88, 0.88]]),
+      diamond: () => roundPoly(regPts(4, 0, 1.12), 0.08),
+      triangle: () => roundPoly(regPts(3, Math.PI, 1.15), 0.06),
+      roundtri: () => roundPoly(regPts(3, Math.PI, 1.2), 0.3),
+      pentagon: () => roundPoly(regPts(5, Math.PI, 1.04), 0.08),
+      hexagon: () => roundPoly(regPts(6, 0, 1.02), 0.08),
+      octagon: () => roundPoly(regPts(8, Math.PI / 8, 1.01), 0.06),
+      star: () => roundPoly(starPts(5, 0.5, Math.PI), 0.06),
+      star6: () => roundPoly(starPts(6, 0.6, 0), 0.06),
+      blob: () => { const a = []; for (let i = 0; i < 12; i++) { const t = (2 * Math.PI * i) / 12; const k = 1 + 0.11 * Math.sin(3 * t + 0.6) + 0.07 * Math.sin(5 * t + 1.9); a.push([k * Math.cos(t), k * Math.sin(t)]); } return smooth(a); },
+      pac: () => { const m = rad(68), a0 = m / 2, a1 = 2 * Math.PI - m / 2; return `M${P(0.12, 0)}L${P(Math.cos(a0), Math.sin(a0))}A${f(rx)},${f(ry)} 0 1 1 ${P(Math.cos(a1), Math.sin(a1))}Z`; },
+      notchsq: () => roundPoly([[-0.9, -0.9], [0.9, -0.9], [0.9, -0.32], [0.3, 0], [0.9, 0.32], [0.9, 0.9], [-0.9, 0.9]], 0.18),
+      bean: () => `M${P(-1.05, 0)}C${P(-1.05, -1.05)} ${P(1.05, -1.05)} ${P(1.05, 0)}C${P(1.05, 0.86)} ${P(0.37, 0.9)} ${P(0, 0.35)}C${P(-0.37, 0.9)} ${P(-1.05, 0.86)} ${P(-1.05, 0)}Z`,
+      crescent: () => `M${P(0.5333, -0.8459)}A${f(rx)},${f(ry)} 0 1 0 ${P(0.5333, 0.8459)}A${f(0.85 * rx)},${f(0.85 * ry)} 0 1 1 ${P(0.5333, -0.8459)}Z`,
+      donut: () => ell(1) + ell(0.45),
+      heart: () => { const T = (u, v) => P(-v, u); return `M${T(0, 1)}C${T(-1.4, 0.1)} ${T(-1.1, -0.95)} ${T(0, -0.45)}C${T(1.1, -0.95)} ${T(1.4, 0.1)} ${T(0, 1)}Z`; }
+    };
+    // shapes built from overlapping pieces; drawn as one silhouette
+    const C = (x, y, r) => ({ c: [x, y, r] }), Ln = (x1, y1, x2, y2, w) => ({ l: [x1, y1, x2, y2, w] });
+    const K = {
+      dumbbell: () => [C(-0.48, 0, 0.6), C(0.55, 0, 0.55), Ln(-0.4, 0, 0.5, 0, 0.32)],
+      trefoil: () => [C(-0.45, 0, 0.5), C(0.38, -0.5, 0.5), C(0.38, 0.5, 0.5), C(0.1, 0, 0.45)],
+      cloud: () => [C(-0.5, 0.25, 0.48), C(0, -0.35, 0.55), C(0.55, 0.15, 0.5), C(0.05, 0.4, 0.5), C(-0.45, -0.3, 0.42)],
+      flower: () => [...regPts(6, 0, 0.62).map((q) => C(q[0], q[1], 0.42)), C(0, 0, 0.5)],
+      helix: () => [Ln(-0.75, -0.62, 0.75, -0.62, 0.3), Ln(-0.75, 0, 0.75, 0, 0.3), Ln(-0.75, 0.62, 0.75, 0.62, 0.3)],
+      antibody: () => [Ln(-1, 0, -0.05, 0, 0.27), Ln(0, 0, 0.8, -0.78, 0.27), Ln(0, 0, 0.8, 0.78, 0.27)],
+      cross: () => [Ln(-0.95, 0, 0.95, 0, 0.32), Ln(0, -0.95, 0, 0.95, 0.32)]
+    };
+    return { S, K, P, rx, ry, pill };
+  }
+  const SHAPE_GROUPS = [
+    ["Basic", [["circle", "Circle"], ["oval", "Oval"], ["pill", "Capsule"], ["roundsq", "Rounded square"], ["square", "Square"], ["diamond", "Diamond"]]],
+    ["Polygons and stars", [["triangle", "Triangle"], ["roundtri", "Rounded triangle"], ["pentagon", "Pentagon"], ["hexagon", "Hexagon"], ["octagon", "Octagon"], ["star", "Star"], ["star6", "Six-point star"]]],
+    ["Protein-like", [["blob", "Globular blob"], ["pac", "Cut-out circle"], ["notchsq", "Notched square"], ["bean", "Bean"], ["dumbbell", "Two domains"], ["trefoil", "Three lobes"], ["helix", "Helix bundle"], ["barrel", "Beta barrel"], ["antibody", "Y-shaped (antibody)"]]],
+    ["Other", [["crescent", "Crescent"], ["donut", "Ring"], ["heart", "Heart"], ["cloud", "Cloud"], ["flower", "Flower"], ["cross", "Cross"]]]
+  ];
+
+  function headMarkup(p, d) {
+    const R = d.R, sw = p.headStroke;
+    const g = (inner) => `<g transform="translate(${f(d.C[0])},${f(d.C[1])}) rotate(${f(p.headTurn + (d.dir * 180) / Math.PI)})">${inner}</g>`;
+    if (p.headShape === "image" && headImg) {
+      const s = (2 * R) / Math.max(headImg.w, headImg.h);
+      const w = headImg.w * s, h = headImg.h * s;
+      return g(`<image href="${imgHref(headImg, p.headRecolor, p.headColor, p.headOutline)}" x="${f(-w / 2)}" y="${f(-h / 2)}" width="${f(w)}" height="${f(h)}" preserveAspectRatio="xMidYMid meet"${p.headOutlineOn && p.headStroke > 0 ? ' filter="url(#lnpOlHead)"' : ""}/>`);
+    }
+    const L = shapeLib(R * p.headStretch, R);
+    const ol = sw > 0 ? p.headOutline : "none";
+    const st = `fill="${p.headColor}" stroke="${ol}" stroke-width="${f(sw)}" stroke-linejoin="round"`;
+    if (p.headShape === "barrel") {
+      const stripes = [-0.55, -0.1, 0.35].map((x) => `<line x1="${f(x * L.rx)}" y1="${f(-0.45 * R)}" x2="${f((x + 0.22) * L.rx)}" y2="${f(0.45 * R)}" stroke="${p.headOutline}" stroke-width="${f(Math.max(0.15, sw * 0.7))}" stroke-linecap="round"/>`).join("");
+      return g(`<path ${st} d="${L.pill(1.1, 0.82)}"/>` + stripes);
+    }
+    if (L.K[p.headShape]) {
+      const items = L.K[p.headShape](), k = (L.rx + L.ry) / 2;
+      const draw = (grow, color) => items.map((it) => it.c
+        ? `<ellipse cx="${f(it.c[0] * L.rx)}" cy="${f(it.c[1] * L.ry)}" rx="${f(Math.max(0.1, it.c[2] * k + grow))}" ry="${f(Math.max(0.1, it.c[2] * k + grow))}" fill="${color}"/>`
+        : `<line x1="${f(it.l[0] * L.rx)}" y1="${f(it.l[1] * L.ry)}" x2="${f(it.l[2] * L.rx)}" y2="${f(it.l[3] * L.ry)}" stroke="${color}" stroke-width="${f(Math.max(0.2, 2 * it.l[4] * k + 2 * grow))}" stroke-linecap="round"/>`).join("");
+      return g((sw > 0 ? draw(sw / 2, p.headOutline) : "") + draw(sw > 0 ? -sw / 2 : 0, p.headColor));
+    }
+    const shape = L.S[p.headShape] || L.S.circle;
+    return g(`<path ${st} fill-rule="evenodd" d="${shape()}"/>`);
+  }
+
+  function unitMarkup(p, d, r) {
+    const out = p.outlineAuto ? darken(p.tailColor, 0.35) : p.tailOutline;
+    const parts = [];
+    if (d.tailFit) {
+      const href = imgHref(tailImg, p.tailRecolor, p.tailColor, out);
+      const tf = d.tailFit;
+      for (let k = 0; k < p.tails; k++) {
+        const yC = (k - (p.tails - 1) / 2) * d.gap * 0.8 + (r() - 0.5) * p.jitterLen * 0.25;
+        parts.push(`<image href="${href}" x="${f(-tf.w / 2)}" y="${f(-tf.h / 2)}" width="${f(tf.w)}" height="${f(tf.h)}" transform="translate(${f(d.L / 2)},${f(yC)}) rotate(${90 + p.tailTurn})" preserveAspectRatio="none"${p.tailOutlineOn && p.tailStroke > 0 ? ' filter="url(#lnpOlTail)"' : ""}/>`);
+      }
+    } else {
+      for (let k = 0; k < p.tails; k++) {
+        const yk = (k - (p.tails - 1) / 2) * d.gap + (r() - 0.5) * p.jitterLen * 0.25;
+        parts.push(`<path d="${tailPath(p, d, yk, r() * p.jitter * 0.04)}" fill="none" stroke="${p.tailColor}" stroke-width="${f(d.tw)}" stroke-linecap="round" stroke-linejoin="round"/>`);
+      }
+      if (p.tails > 1 || p.linkerOn) parts.push(`<circle cx="${f(d.L)}" cy="0" r="${f(d.tw / 2)}" fill="${p.tailColor}"/>`);
+    }
+    if (p.linkerOn) {
+      // drawn before the head so the head covers its far end
+      const tuck = Math.min(d.R * 0.3, Math.hypot(d.C[0] - d.E[0], d.C[1] - d.E[1]));
+      parts.push(`<line x1="${f(d.L)}" y1="0" x2="${f(d.E[0] + tuck * Math.cos(d.dir))}" y2="${f(d.E[1] + tuck * Math.sin(d.dir))}" stroke="${p.linkerColor}" stroke-width="${f(p.linkerW)}" stroke-linecap="butt"/>`);
+    }
+    parts.push(headMarkup(p, d));
+    return parts.join("");
+  }
+
+  // ---------- outline filters for uploaded drawings ----------
+  // Grows the drawing's silhouette by the line width and fills it with the outline color, behind the drawing.
+  function outlineFilter(id, color, w) {
+    return `<filter id="${id}" x="-50%" y="-50%" width="200%" height="200%" color-interpolation-filters="sRGB"><feMorphology in="SourceAlpha" operator="dilate" radius="${f(w)}" result="grown"/><feFlood flood-color="${color}"/><feComposite in2="grown" operator="in" result="edge"/><feMerge><feMergeNode in="edge"/><feMergeNode in="SourceGraphic"/></feMerge></filter>`;
+  }
+  function defsMarkup(p) {
+    let out = "";
+    if (p.headShape === "image" && headImg && p.headOutlineOn && p.headStroke > 0) out += outlineFilter("lnpOlHead", p.headOutline, p.headStroke * 0.6);
+    if (p.tailStyle === "image" && tailImg && p.tailOutlineOn && p.tailStroke > 0) out += outlineFilter("lnpOlTail", p.outlineAuto ? darken(p.tailColor, 0.35) : p.tailOutline, p.tailStroke * 0.5);
+    return out ? `<defs>${out}</defs>` : "";
+  }
+
+  // ---------- phospholipid ----------
+  // Local frame: head centre at (0, 0), tails run toward -x (into the core).
+  function plDims(p) {
+    const hr = p.plHeadSize, L = p.plTailLen, gap = Math.max(p.plTailGap, p.plTailW * 1.8);
+    const amp = p.plWaves > 0 ? p.plWaveAmp : 0;
+    return { hr, L, gap, amp, fork: p.plTails > 1 ? Math.min(L * 0.25, gap * 0.5) : 0, bundle: (p.plTails - 1) * gap + p.plTailW };
+  }
+  function plMarkup(p, pd) {
+    const tp = { tailStyle: "wavy", waves: p.plWaves, u: p.u }, td = { L: pd.L, fork: pd.fork, amp: pd.amp };
+    const parts = [];
+    for (let k = 0; k < p.plTails; k++) {
+      const yk = (k - (p.plTails - 1) / 2) * pd.gap;
+      parts.push(`<path d="${tailPath(tp, td, yk, 0)}" fill="none" stroke="${p.plTailColor}" stroke-width="${f(p.plTailW)}" stroke-linecap="round" stroke-linejoin="round"/>`);
+    }
+    const sw = p.plHeadStroke;
+    return `<g transform="translate(${f(-(pd.L + pd.hr * 0.6))},0)">${parts.join("")}</g><circle cx="0" cy="0" r="${f(pd.hr)}" fill="${p.plHeadColor}" stroke="${sw > 0 ? p.plHeadOutline : "none"}" stroke-width="${f(sw)}"/>`;
+  }
+  function plBounds(p, pd) {
+    const hb = pd.bundle / 2 + pd.amp + p.plTailW;
+    return [[-(pd.L + pd.hr * 0.6) - p.plTailW, -hb, 0], [-(pd.L + pd.hr * 0.6) - p.plTailW, hb, 0], [0, 0, pd.hr + p.plHeadStroke]];
+  }
+  function plSVG(p, opts) {
+    const pd = plDims(p);
+    let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+    plBounds(p, pd).forEach(([x, y, k]) => { x0 = Math.min(x0, y - k); x1 = Math.max(x1, y + k); y0 = Math.min(y0, -x - k); y1 = Math.max(y1, -x + k); });
+    const pad = 3 * p.u, w = x1 - x0 + 2 * pad, h = y1 - y0 + 2 * pad;
+    const wh = opts && opts.sized ? ` width="${f(w)}" height="${f(h)}"` : "";
+    return `<svg xmlns="${NS}" viewBox="${f(x0 - pad)} ${f(y0 - pad)} ${f(w)} ${f(h)}"${wh} role="img" aria-label="One phospholipid"><g transform="rotate(-90)">${plMarkup(p, pd)}</g></svg>`;
+  }
+
+  // ---------- builders ----------
+  function singleSVG(p, opts) {
+    const d = dims(p);
+    const r = rng(seed);
+    // stand it upright (tails down): local (x, y) is drawn at (y, -x)
+    let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+    unitBounds(p, d).forEach(([x, y, k]) => { x0 = Math.min(x0, y - k); x1 = Math.max(x1, y + k); y0 = Math.min(y0, -x - k); y1 = Math.max(y1, -x + k); });
+    const pad = 6 * p.u, w = x1 - x0 + 2 * pad, h = y1 - y0 + 2 * pad;
+    const wh = opts && opts.sized ? ` width="${f(w)}" height="${f(h)}"` : "";
+    return `<svg xmlns="${NS}" viewBox="${f(x0 - pad)} ${f(y0 - pad)} ${f(w)} ${f(h)}"${wh} role="img" aria-label="One lipoprotein">${defsMarkup(p)}<g transform="rotate(-90)">${unitMarkup(p, d, r)}</g></svg>`;
+  }
+
+  function particle(p, opts) {
+    const d = dims(p);
+    const n = p.n;
+    const preview = !!(opts && opts.preview), sel = opts && opts.sel;
+    // inner radius: tail bundles must fit around the core, then grow until neighbouring proteins don't touch
+    let rIn = Math.max((n * (d.bundle + 2 * d.amp) * 1.1) / (2 * Math.PI), 3 * p.u);
+    const need = 2 * (d.big + p.headStroke) * 1.04;
+    for (let i = 0; i < 6000; i++) {
+      const rh = Math.hypot(rIn + d.C[0], d.C[1]);
+      if (n < 2 || 2 * rh * Math.sin(Math.PI / n) >= need) break;
+      rIn += 0.5 * p.u;
+    }
+    rIn = Math.max(0, rIn + p.spacing); // negative spacing pulls the lipoproteins in so tails overlap
+    const r = rng(seed);
+    let ext = 0;
+    const hs = p.sizePt ? p.sizePt * 0.014 : 2 * p.u; // size of the on-screen handle
+    pivots = {};
+
+    // One molecule: anchored at distance rr along angle ang, then moved by (dx, dy) and
+    // turned by rot around its own centre (pv, in the molecule's frame).
+    function place(key, ang, rr, pv, reach, tipX, inner) {
+      const e = edits[key] || {};
+      if (e.hidden) return "";
+      const ax = rr * Math.cos(rad(ang)) + (e.dx || 0) * p.u, ay = rr * Math.sin(rad(ang)) + (e.dy || 0) * p.u;
+      const c = Math.cos(rad(ang)), s = Math.sin(rad(ang));
+      const px = ax + pv[0] * c - pv[1] * s, py = ay + pv[0] * s + pv[1] * c;
+      pivots[key] = { x: px, y: py, ang };
+      if (e.dx || e.dy || e.rot) ext = Math.max(ext, Math.hypot(px, py) + reach);
+      let extra = "";
+      if (preview && key === sel) {
+        const lw = hs * 0.28, hx = tipX + hs * 3;
+        extra = `<circle cx="${f(pv[0])}" cy="${f(pv[1])}" r="${f(reach)}" fill="none" stroke="#0b6870" stroke-width="${f(lw)}" stroke-dasharray="${f(hs)} ${f(hs * 0.7)}"/>` +
+          `<line x1="${f(pv[0])}" y1="${f(pv[1])}" x2="${f(hx)}" y2="${f(pv[1])}" stroke="#0b6870" stroke-width="${f(lw)}"/>` +
+          `<circle data-handle="1" cx="${f(hx)}" cy="${f(pv[1])}" r="${f(hs)}" fill="#ffffff" stroke="#0b6870" stroke-width="${f(lw * 1.6)}" style="cursor:grab"/>`;
+      }
+      const spin = e.rot ? ` translate(${f(pv[0])},${f(pv[1])}) rotate(${f(e.rot)}) translate(${f(-pv[0])},${f(-pv[1])})` : "";
+      const hit = preview ? `<circle cx="${f(pv[0])}" cy="${f(pv[1])}" r="${f(reach * 0.7)}" fill="transparent"/>` : "";
+      return `<g${preview ? ` data-mol="${key}"` : ""} transform="translate(${f(ax)},${f(ay)}) rotate(${f(ang)})${spin}">${hit}${inner}${extra}</g>`;
+    }
+
+    const groups = [];
+    const lpPv = [d.C[0] / 2, d.C[1] / 2];
+    const lpReach = Math.hypot(d.C[0], d.C[1]) / 2 + d.big + p.headStroke;
+    for (let i = 0; i < n; i++) {
+      const ang = p.rotation + (360 * i) / n + (r() - 0.5) * p.jitter * (180 / n) * 0.18;
+      const rr = rIn + (r() - 0.5) * p.jitterLen * 1.2;
+      groups.push(place("lp:" + i, ang, rr, lpPv, lpReach, Math.max(d.C[0] + d.big, d.L), unitMarkup(p, d, r)));
+    }
+    unitBounds(p, d).forEach(([x, y, k]) => (ext = Math.max(ext, Math.hypot(rIn + x, y) + k)));
+    const pls = [];
+    if (p.plOn && p.plN > 0) {
+      const pd = plDims(p);
+      const rp = Math.max(0, rIn + d.L + pd.hr * 0.2 + p.plRadial); // head sits around the lipoprotein branch point
+      const tail = pd.L + pd.hr * 0.6;
+      const plPv = [(pd.hr - tail) / 2, 0];
+      const plReach = (tail + pd.hr) / 2 + pd.bundle / 2 + pd.amp + p.plTailW;
+      for (let i = 0; i < p.plN; i++) {
+        const ang = 180 / n + (360 * i) / p.plN + p.plAngle + (r() - 0.5) * p.jitter * (180 / p.plN) * 0.18;
+        const rr = rp + (r() - 0.5) * p.jitterLen * 1.2;
+        pls.push(place("pl:" + i, ang, rr, plPv, plReach, pd.hr, plMarkup(p, pd)));
+      }
+      plBounds(p, pd).forEach(([x, y, k]) => (ext = Math.max(ext, Math.hypot(rp + x, y) + k)));
+    }
+    ext += p.jitterLen * 1.2 + 8 * p.u;
+    const lp = groups.join(""), pl = pls.join("");
+    // keep the selected molecule on top in the preview so its handle can be grabbed
+    let body = p.plTop ? lp + pl : pl + lp;
+    if (preview && sel) {
+      const m = body.match(new RegExp(`<g data-mol="${sel}"[\\s\\S]*?data-handle="1"[^>]*/></g>`));
+      if (m) body = body.replace(m[0], "") + m[0];
+    }
+    return { ext, body };
+  }
+
+  // Line widths are in points at the export size. Lengths are scaled so the whole
+  // nanoparticle fits the export size, which keeps every stroke at the width you set.
+  function scaled(p, k, m) {
+    return Object.assign({}, p, {
+      tailW: p.tailW * m, tailStroke: p.tailStroke * m, headStroke: p.headStroke * m, linkerW: p.linkerW * m,
+      plTailW: p.plTailW * m, plHeadStroke: p.plHeadStroke * m,
+      plHeadSize: p.plHeadSize * k, plTailLen: p.plTailLen * k, plTailGap: p.plTailGap * k, plWaveAmp: p.plWaveAmp * k, plRadial: p.plRadial * k,
+      u: k, headSize: p.headSize * k, tailLen: p.tailLen * k, tailGap: p.tailGap * k, waveAmp: p.waveAmp * k,
+      linkerLen: p.linkerLen * k, spacing: p.spacing * k, jitterLen: p.jitter * k
+    });
+  }
+  function physical(p) {
+    // Work in pixels at the document DPI: Affinity reads SVG units as pixels at the document's DPI,
+    // so a figure N inches wide is N x DPI units, and a w pt line is w x DPI / 72 units.
+    const dpi = Math.max(1, p.dpi || 72), m = dpi / 72;
+    const sizePt = Math.max(0.1, p.exportIn || 0.8) * dpi;
+    let k = 0.2;
+    if (dragK) k = dragK; // keep the scale steady while a phospholipid is being dragged
+    else for (let i = 0; i < 6; i++) k *= sizePt / 2 / particle(scaled(p, k, m)).ext;
+    const q = scaled(p, k, m);
+    q.sizePt = sizePt; q.dpi = dpi;
+    return q;
+  }
+
+  function npSVG(p, opts) {
+    const { body } = particle(p, opts);
+    const ext = p.sizePt / 2; // viewBox in pixels at the chosen DPI
+    const size = 2 * ext;
+    const wh = opts && opts.px ? ` width="${opts.px}" height="${opts.px}"` : opts && opts.inch ? ` width="${f(opts.inch * p.dpi)}" height="${f(opts.inch * p.dpi)}"` : "";
+    const bg = opts && opts.bg ? `<rect x="${f(-ext)}" y="${f(-ext)}" width="${f(size)}" height="${f(size)}" fill="${opts.bg}"/>` : "";
+    return `<svg xmlns="${NS}" viewBox="${f(-ext)} ${f(-ext)} ${f(size)} ${f(size)}"${wh} role="img" aria-label="Lipoprotein nanoparticle with ${p.n} lipoproteins">${defsMarkup(p)}${bg}${body}</svg>`;
+  }
+
+  // ---------- UI ----------
+  function render() {
+    const p = read();
+    $("nNum").value = p.n;
+    $("spacingOut").textContent = p.spacing;
+    $("rotationOut").textContent = p.rotation + "°";
+    $("tailLenOut").textContent = p.tailLen;
+    $("headSizeOut").textContent = p.headSize;
+    $("headTurnOut").textContent = p.headTurn + "°";
+    $("headStretchOut").textContent = p.headStretch;
+    $("headStretchRow").classList.toggle("hidden", p.headShape === "image");
+    $("tailWOut").textContent = p.tailW;
+    $("tailStrokeOut").textContent = p.tailStroke;
+    $("linkerWOut").textContent = p.linkerW;
+    $("tailGapOut").textContent = p.tailGap;
+    $("wavesOut").textContent = p.waves;
+    $("waveAmpOut").textContent = p.waveAmp;
+    $("linkerAngleOut").textContent = p.linkerAngle + "°";
+    $("headAngleOut").textContent = p.headAngle + "°";
+    $("linkerLenOut").textContent = p.linkerLen;
+    $("headStrokeOut").textContent = p.headStroke;
+    $("tailOutline").disabled = p.outlineAuto;
+    if (p.outlineAuto) $("tailOutline").value = darken(p.tailColor, 0.35);
+    const img = p.headShape === "image";
+    $("uploadRow").classList.toggle("hidden", !img);
+    $("uploadNote").classList.toggle("hidden", !img);
+    $("headRecolorRow").classList.toggle("hidden", !img);
+    $("headColorRow").classList.toggle("hidden", img && !p.headRecolor && !p.headOutlineOn);
+    $("headOutlineOnRow").classList.toggle("hidden", !img);
+    if (img && !headImg) p.headShape = "pac";
+    const timg = p.tailStyle === "image";
+    ["tailUploadRow", "tailTurnRow", "tailRecolorRow", "tailOutlineOnRow", "tailOutlineRow", "tailStrokeRow", "tailUploadNote"].forEach((id) => $(id).classList.toggle("hidden", !timg));
+    if (timg && !tailImg) p.tailStyle = "wavy";
+    document.querySelectorAll("#tailSwatches button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.c === p.tailColor)));
+    const q = physical(p);
+    $("lnp-single-stage").innerHTML = singleSVG(q);
+    $("lnp-pl-stage").innerHTML = plSVG(q);
+    $("plView").classList.toggle("hidden", !p.plOn);
+    $("plRows").classList.toggle("hidden", !p.plOn);
+    $("plAngleRow").classList.toggle("hidden", !p.plOn);
+    $("plRadialRow").classList.toggle("hidden", !p.plOn);
+    ["plN", "plHeadStroke", "plHeadSize", "plTailW", "plTailLen", "plTailGap", "plWaves", "plWaveAmp", "plRadial"].forEach((id) => ($(id + "Out").textContent = p[id]));
+    $("plAngleOut").textContent = p.plAngle + "°";
+    lastK = q.u;
+    if (sel != null) { const [t, i] = sel.split(":"); if ((t === "pl" && (+i >= p.plN || !p.plOn)) || (t === "lp" && +i >= p.n)) sel = null; }
+    $("lnp-np-stage").innerHTML = npSVG(q, { preview: true, sel });
+    const e = sel != null ? edits[sel] || {} : {};
+    $("selHint").classList.toggle("hidden", sel != null);
+    $("selTools").classList.toggle("hidden", sel == null);
+    if (sel != null) { const [t, i] = sel.split(":"); $("selName").textContent = `${t === "lp" ? "Lipoprotein" : "Phospholipid"} ${+i + 1}`; $("selRot").value = e.rot || 0; $("selRotOut").textContent = (e.rot || 0) + "°"; }
+    $("selResetAll").classList.toggle("hidden", !Object.keys(edits).length);
+    $("lnp-count").textContent = `${p.n} lipoproteins` + (p.plOn && p.plN ? ` · ${p.plN} phospholipids` : "");
+  }
+
+  function setAll(v) {
+    for (const k in v) {
+      const el = $(k); if (!el) continue;
+      if (el.type === "checkbox") el.checked = v[k]; else el.value = v[k];
+    }
+    $("nNum").value = v.n;
+  }
+
+  (function fillShapes() {
+    const sel = $("headShape");
+    SHAPE_GROUPS.forEach(([label, list]) => {
+      const og = document.createElement("optgroup"); og.label = label;
+      list.forEach(([v, t]) => { const o = document.createElement("option"); o.value = v; o.textContent = t; og.appendChild(o); });
+      sel.appendChild(og);
+    });
+    const o = document.createElement("option"); o.value = "image"; o.textContent = "My SVG / image…"; sel.appendChild(o);
+  })();
+
+  SWATCHES.forEach((c) => {
+    const b = document.createElement("button");
+    b.type = "button"; b.dataset.c = c; b.style.background = c; b.title = c; b.setAttribute("aria-label", "Tail color " + c);
+    b.addEventListener("click", () => { $("tailColor").value = c; render(); });
+    $("tailSwatches").appendChild(b);
+  });
+
+  document.querySelectorAll(".lnp input, .lnp select").forEach((el) => {
+    if (el.id === "headFile" || el.id === "tailFile" || el.id === "pngWhite" || el.id === "selRot") return;
+    el.addEventListener("input", () => {
+      if (el.id === "nNum") { const v = Math.max(2, Math.min(30, Math.round(+el.value || 2))); $("n").value = v; }
+      render();
+    });
+  });
+  $("reshuffle").addEventListener("click", () => { seed = (Math.random() * 1e9) | 0; if (+$("jitter").value === 0) $("jitter").value = 4; render(); });
+  $("resetBtn").addEventListener("click", () => { setAll(DEFAULTS); seed = 7; edits = {}; sel = null; render(); });
+
+  $("headFile").addEventListener("change", (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    loadImageFile(file, (img) => { headImg = img; $("headTurn").value = 90; status(file.name + " loaded."); render(); });
+  });
+  $("tailFile").addEventListener("change", (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    loadImageFile(file, (img) => { tailImg = img; $("tailStyle").value = "image"; status(file.name + (img.svg ? " loaded." : " loaded. Recoloring needs an SVG file.")); render(); });
+  });
+
+  // ---------- select, place and rotate molecules ----------
+  const npStage = $("lnp-np-stage");
+  function svgPoint(evt) {
+    const svg = npStage.querySelector("svg"), pt = svg.createSVGPoint();
+    pt.x = evt.clientX; pt.y = evt.clientY;
+    return pt.matrixTransform(svg.getScreenCTM().inverse());
+  }
+  const editOf = (key) => (edits[key] = edits[key] || {});
+  npStage.addEventListener("pointerdown", (evt) => {
+    const handle = evt.target.closest("[data-handle]");
+    const g = evt.target.closest("[data-mol]");
+    if (!g) { if (sel != null) { sel = null; render(); } return; }
+    const key = g.dataset.mol, pt = svgPoint(evt), e = edits[key] || {};
+    sel = key;
+    dragK = lastK;
+    if (handle && pivots[key]) drag = { mode: "rotate", key };
+    else drag = { mode: "move", key, x: pt.x, y: pt.y, dx: e.dx || 0, dy: e.dy || 0 };
+    npStage.setPointerCapture(evt.pointerId);
+    evt.preventDefault();
+    render();
+  });
+  npStage.addEventListener("pointermove", (evt) => {
+    if (!drag) return;
+    const pt = svgPoint(evt), e = editOf(drag.key);
+    if (drag.mode === "move") {
+      e.dx = drag.dx + (pt.x - drag.x) / dragK;
+      e.dy = drag.dy + (pt.y - drag.y) / dragK;
+    } else {
+      const pv = pivots[drag.key];
+      if (!pv) return;
+      let a = (Math.atan2(pt.y - pv.y, pt.x - pv.x) * 180) / Math.PI - pv.ang;
+      a = ((((a + 180) % 360) + 360) % 360) - 180;
+      e.rot = Math.round(evt.shiftKey ? Math.round(a / 15) * 15 : a); // hold Shift to snap to 15°
+    }
+    render();
+  });
+  const endDrag = () => { if (!drag) return; drag = null; dragK = null; render(); };
+  npStage.addEventListener("pointerup", endDrag);
+  npStage.addEventListener("pointercancel", endDrag);
+  $("selRot").addEventListener("input", () => { if (sel == null) return; editOf(sel).rot = +$("selRot").value; render(); });
+  $("selReset").addEventListener("click", () => { delete edits[sel]; render(); });
+  $("selRemove").addEventListener("click", () => { editOf(sel).hidden = true; sel = null; render(); });
+  $("selDone").addEventListener("click", () => { sel = null; render(); });
+  $("selResetAll").addEventListener("click", () => { edits = {}; sel = null; render(); });
+
+  // ---------- export ----------
+  function status(msg) { $("lnp-status").textContent = msg; clearTimeout(status.t); status.t = setTimeout(() => ($("lnp-status").textContent = ""), 3500); }
+  function fileName(ext) { const p = read(); return `lipoprotein-nanoparticle-${p.n}x.${ext}`; }
+  function download(blob, name) {
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob); a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  }
+  $("dlSvg").addEventListener("click", () => {
+    const p = read(); const svg = '<?xml version="1.0" encoding="UTF-8"?>\n' + npSVG(physical(p), { inch: p.exportIn });
+    download(new Blob([svg], { type: "image/svg+xml" }), fileName("svg")); status("SVG downloaded.");
+  });
+  async function copySVGText(svg, label) {
+    try {
+      await navigator.clipboard.write([new ClipboardItem({ "image/svg+xml": new Blob([svg], { type: "image/svg+xml" }), "text/plain": new Blob([svg], { type: "text/plain" }) })]);
+      status(label + " copied.");
+    } catch (e) {
+      try { await navigator.clipboard.writeText(svg); status(label + " copied."); }
+      catch (e2) { status("Copy failed; use Download SVG instead."); }
+    }
+  }
+  // single molecules are copied at the same scale as the nanoparticle, so they match in a figure
+  $("copyLp").addEventListener("click", () => copySVGText('<?xml version="1.0" encoding="UTF-8"?>\n' + singleSVG(physical(read()), { sized: true }), "Lipoprotein"));
+  $("copyPl").addEventListener("click", () => copySVGText('<?xml version="1.0" encoding="UTF-8"?>\n' + plSVG(physical(read()), { sized: true }), "Phospholipid"));
+  $("copySvg").addEventListener("click", async () => {
+    const p = read();
+    const svg = '<?xml version="1.0" encoding="UTF-8"?>\n' + npSVG(physical(p), { inch: p.exportIn });
+    // offer both an SVG image and the SVG code, so apps that paste images and apps that paste code both get it at size
+    try {
+      await navigator.clipboard.write([new ClipboardItem({ "image/svg+xml": new Blob([svg], { type: "image/svg+xml" }), "text/plain": new Blob([svg], { type: "text/plain" }) })]);
+      status(`SVG copied (${p.exportIn} in).`);
+    } catch (e) {
+      try { await navigator.clipboard.writeText(svg); status(`SVG copied (${p.exportIn} in).`); }
+      catch (e2) { status("Copy failed; use Download SVG instead."); }
+    }
+  });
+  $("dlPng").addEventListener("click", () => {
+    const px = 2400;
+    const svg = npSVG(physical(read()), { px, bg: $("pngWhite").checked ? "#ffffff" : null });
+    const url = URL.createObjectURL(new Blob([svg], { type: "image/svg+xml" }));
+    const im = new Image();
+    im.onload = () => {
+      const c = document.createElement("canvas"); c.width = px; c.height = px;
+      c.getContext("2d").drawImage(im, 0, 0, px, px);
+      URL.revokeObjectURL(url);
+      c.toBlob((b) => { if (b) { download(b, fileName("png")); status("PNG downloaded (2400 × 2400)."); } else status("PNG export failed."); }, "image/png");
+    };
+    im.onerror = () => { URL.revokeObjectURL(url); status("PNG export failed."); };
+    im.src = url;
+  });
+
+  // remember the export size and DPI in this browser
+  ["exportIn", "dpi"].forEach((id) => {
+    try { const v = localStorage.getItem("lnp-" + id); if (v) $(id).value = v; } catch (e) {}
+    $(id).addEventListener("change", () => { try { localStorage.setItem("lnp-" + id, $(id).value); } catch (e) {} });
+  });
+
+  setAll(DEFAULTS);
+  render();
+})();
+    </script>
+  </body>
+</html>
