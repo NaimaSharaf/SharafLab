@@ -501,4 +501,5 @@ for(const id of ['structLigands','siteShow3d','siteDots'])$(id).addEventListener
 renderLegend();renderRenameList();updateBoxUnit();
 let restored=false;try{const saved=localStorage.getItem(STORE_KEY);if(saved){restored=applySession(JSON.parse(saved));if(restored)$('source').textContent+=' · Restored your last session in this browser'}}catch{}
 if(!restored){render();$('example').click()}
-</script></body></html>
+</script><script src="../copy-svg.js"></script>
+</body></html>

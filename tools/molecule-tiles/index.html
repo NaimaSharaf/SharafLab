@@ -1,0 +1,1150 @@
+<!doctype html>
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Sharaf Lab tool: look up molecules by CAS number, name or SMILES and tile their 2D structures into a figure with fixed fonts and 1 pt bonds. Copy as SVG."
+    />
+    <title>Structure Tiles | Sharaf Lab Tools</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600&family=Montserrat:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../../styles.css" />
+    <style>
+.tool-back{display:inline-block;margin:0 0 22px;color:#0b6870;font-weight:600;text-decoration:none}
+.tool-back:hover{text-decoration:underline;text-underline-offset:4px}
+.tool-caution{max-width:1132px;margin:-60px auto 70px;padding:16px 20px;background:#fff7ec;border:1px solid #f0d2a8;border-left:4px solid #d9822b;border-radius:8px;color:#5c3b12;font-size:15px;line-height:1.6}
+.tool-caution strong{color:#8a4b0f}
+@media(max-width:1180px){.tool-caution{margin-left:24px;margin-right:24px}}
+@media(max-width:800px){.tool-caution{margin-top:-40px;margin-bottom:50px}}
+.tool-section{padding:40px max(24px,calc((100vw - 1132px)/2)) 100px;background:#f2f3f4}
+
+.mt{font-family:"Manrope",Arial,sans-serif;color:#102a33;display:grid;grid-template-columns:380px 1fr;gap:20px;align-items:start}
+.mt-panel{background:#fff;border:1px solid #d8e0e0;border-radius:10px;padding:18px 20px;min-width:0}
+.mt-panel h2{font-family:"Montserrat",Arial,sans-serif;font-size:17px;font-weight:600;margin:0 0 4px}
+.mt-panel h3{font-family:"Montserrat",Arial,sans-serif;font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#0b6870;margin:20px 0 4px}
+.mt-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid #edf1f1;font-size:14px}
+.mt-row label{font-weight:600}
+.mt-row .val{display:inline-flex;align-items:center;gap:8px}
+.mt input[type=number]{width:74px;font:inherit;padding:6px 7px;border:1px solid #b8c8d5;border-radius:5px}
+.mt input[type=text]{font:inherit;padding:7px 8px;border:1px solid #b8c8d5;border-radius:5px;min-width:0}
+.mt input[type=color]{width:32px;height:30px;border:1px solid #b8c8d5;border-radius:5px;padding:2px;background:#fff;cursor:pointer}
+.mt select{font:inherit;padding:6px 8px;border:1px solid #b8c8d5;border-radius:5px;background:#fff;max-width:170px}
+.mt button,.mt .file{border:1px solid #b8c8d5;background:#fff;border-radius:7px;padding:8px 12px;font:inherit;font-size:14px;cursor:pointer;color:#173650;position:relative}
+.mt button:hover,.mt .file:hover{background:#e7f7f5}
+.mt button:disabled{opacity:.45;cursor:default;background:#fff}
+.mt .primary{background:#0b6870;color:#fff;border-color:#0b6870}
+.mt .primary:hover{background:#095a61}
+.mt .mini{padding:4px 8px;font-size:12px;font-weight:600}
+.mt :focus-visible{outline:3px solid #0b6870;outline-offset:2px}
+.mt .file input{position:absolute;opacity:0;width:1px;height:1px}
+.mt-note{font-size:13px;color:#6b7f83;line-height:1.55;margin:8px 0 0}
+.mt-list{display:flex;flex-direction:column;gap:10px;margin-top:10px}
+.mt-item{border:1px solid #d8e0e0;border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:8px;background:#fbfcfc}
+.mt-item .line{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.mt-item .q{flex:1 1 150px}
+.mt-item .nm{flex:1 1 150px}
+.mt-item .msg{font-size:12px;color:#6b7f83}
+.mt-item .msg.err{color:#aa3030}
+.mt-item .num{font:700 12px "Montserrat",Arial,sans-serif;color:#0b6870;min-width:18px}
+.mt-add{display:flex;gap:8px;margin-top:10px}
+.mt-add input{flex:1}
+.mt-view{background:#fff;border:1px solid #d8e0e0;border-radius:10px;min-width:0}
+.mt-view header{all:unset;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;padding:14px 18px;border-bottom:1px solid #e4ebeb;font-family:"Montserrat",Arial,sans-serif;font-weight:600;font-size:15px}
+.mt-view header small{font-family:"Manrope",Arial,sans-serif;font-weight:500;color:#6b7f83;font-size:13px}
+.mt-stage{touch-action:none;padding:16px;overflow-x:auto;background-image:linear-gradient(45deg,#f4f6f6 25%,transparent 25%),linear-gradient(-45deg,#f4f6f6 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#f4f6f6 75%),linear-gradient(-45deg,transparent 75%,#f4f6f6 75%);background-size:16px 16px;background-position:0 0,0 8px,8px -8px,-8px 0}
+.mt-stage svg{display:block;width:100%;height:auto;box-shadow:0 0 0 1px #c9d6dc}
+.mt-actions{display:flex;flex-wrap:wrap;gap:10px;padding:14px 18px;border-top:1px solid #e4ebeb;align-items:center}
+.mt-actions label{font-size:14px;display:inline-flex;gap:6px;align-items:center}
+.mt-sel{display:inline-flex;flex-wrap:wrap;gap:8px;align-items:center;padding:6px 10px;border:1px solid #c9d6dc;border-radius:8px;background:#f4fbfa;font-size:13px}
+.mt-figgrid{display:grid;grid-template-columns:244px minmax(0,1fr);gap:0;align-items:start}
+.mt-canvases{min-width:0;border-left:1px solid #e4ebeb}
+.mt-libcol{padding:12px 10px 12px 18px;max-height:calc(100vh - 120px);overflow-y:auto;position:sticky;top:90px}
+.mt-libcol .mt-list{gap:6px;margin-top:8px}
+.mt-libtools{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.mt-libpaste{margin-top:8px;font-size:13px}
+.mt-libpaste summary{cursor:pointer;color:#0b6870;font-weight:600}
+.mt-libpaste textarea{width:100%;margin:6px 0;font:12px ui-monospace,Menlo,Consolas,monospace;padding:6px;border:1px solid #b8c8d5;border-radius:5px;box-sizing:border-box}
+.mt-libcol .mt-lib{padding:5px 6px;gap:6px;flex-wrap:wrap}
+.mt-libcol .mt-lib .nm{flex:1 1 80px;white-space:normal;overflow:visible}
+.mt-lib .btns{display:flex;gap:4px;flex-wrap:wrap}
+.mt-libcol .mt-lib .btns{flex-basis:100%}
+.mt-libcol .mt-lib .btns .mini{padding:4px 7px}
+.mt-libcol .mt-lib .thumb{width:52px;height:38px}
+.mt-libcol .mt-lib .thumb svg{max-width:52px;max-height:38px}
+@media(max-width:640px){.mt-figgrid{grid-template-columns:1fr}.mt-libcol{position:static;max-height:260px;border-bottom:1px solid #e4ebeb}.mt-canvases{border-left:0}}
+.mt-sub{border-bottom:1px solid #e4ebeb;border-left:4px solid transparent}
+.mt-sub.active{border-left-color:#0b6870}
+.mt-subhead{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 18px 0;font:600 14px "Montserrat",Arial,sans-serif}
+.mt-subhead small{font:500 13px "Manrope",Arial,sans-serif;color:#6b7f83;flex:1}
+.mt-mode{display:inline-flex;border:1px solid #b8c8d5;border-radius:7px;overflow:hidden}
+.mt .mt-mode button{border:0;border-radius:0;padding:6px 12px;font:600 13px "Montserrat",Arial,sans-serif;background:#fff;color:#173650}
+.mt .mt-mode button[aria-pressed=true]{background:#0b6870;color:#fff}
+.mt-lib{display:flex;align-items:center;gap:8px;border:1px solid #d8e0e0;border-radius:8px;padding:6px 8px;background:#fbfcfc}
+.mt-lib .thumb{width:64px;height:44px;flex:none;display:grid;place-items:center}
+.mt-lib .thumb svg{max-width:64px;max-height:44px}
+.mt-lib .nm{flex:1;min-width:0;font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#mt-status{font-size:13px;color:#0b6870;min-height:18px}
+.hidden{display:none!important}
+@media(max-width:1000px){.mt{grid-template-columns:1fr}}
+    </style>
+  </head>
+
+  <body class="outreach-body">
+    <header>
+      <div class="nav">
+        <a class="brand" href="../../index.html" aria-label="Sharaf Lab home"
+          ><img src="../../00%20Github%20assets/sharaf-lab-logo.png" alt="Sharaf Lab"
+        /></a>
+        <nav aria-label="Primary navigation">
+          <a href="../../index.html">Home</a>
+          <a href="../../philosophy.html">Philosophy</a>
+          <a href="../../research.html">Research</a>
+          <a href="../../members.html">Lab Members</a>
+          <a href="../../photos.html">Photos</a>
+          <a href="../../links.html">Links of Interest</a>
+          <a class="active" href="../../tools.html" aria-current="page">Tools</a>
+          <a href="../../join.html">Join the Lab</a>
+        </nav>
+      </div>
+    </header>
+    <main>
+      <section class="outreach-hero">
+        <a class="tool-back" href="../../tools.html">← All lab tools</a>
+        <p class="eyebrow eyebrow-dark">Lab tools · Chemistry · Figures</p>
+        <h1>Tile chemical structures for a figure.</h1>
+        <p>
+          Type a CAS number, name or SMILES and press + to add each molecule.
+          Structures come from PubChem and are drawn with the same bond length,
+          font and 1 pt bonds, tiled across a 7 inch canvas. Drag any molecule to move it, click an empty spot to scale them all, add arrows on top, then copy the result as SVG. The blank page below the tiled figure is a 7 × 7 inch canvas: click a molecule and press Ctrl/⌘ C, click the page and press Ctrl/⌘ V to reuse it there.
+        </p>
+      </section>
+
+      <div class="tool-caution" role="note">
+        <strong>Check every result.</strong> These tools were vibe coded: built
+        quickly with AI assistance and not independently validated. Check each
+        structure against the original record, especially salts, charges and
+        tautomers, before using it in a figure or publication.
+      </div>
+
+      <section class="tool-section" aria-label="Structure tiles">
+        <div class="mt">
+          <div class="mt-panel">
+            <h2>Molecules</h2>
+            <div class="mt-add">
+              <input type="text" id="addQ" placeholder="CAS number, name or SMILES" aria-label="CAS number, name or SMILES" />
+              <button class="primary" id="addBtn" type="button" title="Look up and add">+</button>
+            </div>
+            <p class="mt-note">Press + (or Enter) to look it up on PubChem and add it. You can also <label class="file mini" style="display:inline-block">load a MOL/SDF file<input type="file" id="addFile" accept=".mol,.sdf,.mdl,chemical/x-mdl-molfile" /></label>.</p>
+            <div class="mt-list" id="list"></div>
+            <p class="mt-note" id="reloadRow"><button type="button" class="mini" id="reloadEx" title="Replace the list with the five example dyes">Reload examples</button></p>
+
+            <h3>Canvas</h3>
+            <div id="pageCanvas" class="hidden">
+              <div class="mt-row"><label for="pageW">Blank page width (in)</label><span class="val"><input id="pageW" type="number" min="0.5" max="40" step="0.1" value="7" /></span></div>
+              <div class="mt-row"><label for="pageH">Blank page height (in)</label><span class="val"><input id="pageH" type="number" min="0.5" max="40" step="0.1" value="7" /></span></div>
+            </div>
+            <div id="tileCanvas">
+            <div class="mt-row"><label for="canvasIn">Tiled figure width (in)</label><span class="val"><input id="canvasIn" type="number" min="1" max="30" step="0.1" value="7" /></span></div>
+            <div class="mt-row"><label for="perRow">Molecules per row</label><span class="val"><select id="perRow"><option value="0" selected>As many as fit</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option></select></span></div>
+            <div class="mt-row"><label for="gapPt">Space between (pt)</label><span class="val"><input id="gapPt" type="number" min="0" max="200" step="1" value="10" /></span></div>
+            <div class="mt-row"><label for="vAlign">Line up structures</label><span class="val"><select id="vAlign"><option value="middle" selected>Middle</option><option value="top">Top</option><option value="bottom">Bottom</option></select></span></div>
+            <div class="mt-row"><label for="fitW">Shrink a crowded row to fit (also shrinks text)</label><span class="val"><input id="fitW" type="checkbox" /></span></div>
+            </div>
+
+            <h3>Bonds</h3>
+            <div class="mt-row"><label for="lineW">Line width (pt)</label><span class="val"><input id="lineW" type="number" min="0.1" max="5" step="0.05" value="1" /></span></div>
+            <div class="mt-row"><label for="bondLen">Bond length (pt)</label><span class="val"><input id="bondLen" type="number" min="3" max="60" step="0.5" value="10.5" /></span></div>
+            <div class="mt-row"><label for="dblGap">Double bond spacing (%)</label><span class="val"><input id="dblGap" type="number" min="5" max="40" step="1" value="18" /></span></div>
+
+            <h3>Atom labels</h3>
+            <div class="mt-row"><label for="atomFont">Font</label><span class="val"><select id="atomFont"></select></span></div>
+            <div class="mt-row"><label for="atomSize">Size (pt)</label><span class="val"><input id="atomSize" type="number" min="3" max="40" step="0.5" value="8" /></span></div>
+
+            <h3>Names</h3>
+            <div class="mt-row"><label for="showNames">Show names</label><span class="val"><input id="showNames" type="checkbox" checked /></span></div>
+            <div class="mt-row"><label for="nameFont">Font</label><span class="val"><select id="nameFont"></select></span></div>
+            <div class="mt-row"><label for="nameSize">Size (pt)</label><span class="val"><input id="nameSize" type="number" min="3" max="60" step="0.5" value="12" /></span></div>
+            <div class="mt-row"><label for="nameBold">Bold</label><span class="val"><input id="nameBold" type="checkbox" checked /></span></div>
+            <div class="mt-row"><label for="nameGap">Space below name (pt)</label><span class="val"><input id="nameGap" type="number" min="0" max="60" step="1" value="8" /></span></div>
+            <h3>Arrows</h3>
+            <div class="mt-row"><label for="arStyle">New arrow style</label><span class="val"><select id="arStyle"><option value="straight" selected>Straight</option><option value="branch">With side input (curved)</option></select></span></div>
+            <div class="mt-row"><label for="arW">Line width (pt)</label><span class="val"><input id="arW" type="number" min="0.1" max="10" step="0.05" value="1" /></span></div>
+            <div class="mt-row"><label for="arLen">Head length (pt)</label><span class="val"><input id="arLen" type="number" min="1" max="60" step="0.5" value="8" /></span></div>
+            <div class="mt-row"><label for="arHw">Head width (pt)</label><span class="val"><input id="arHw" type="number" min="1" max="60" step="0.5" value="4.5" /></span></div>
+            <div class="mt-row"><label for="arColor">Color</label><span class="val"><input id="arColor" type="color" value="#8c8c8c" /></span></div>
+            <p class="mt-note">Fonts and sizes are the same for every molecule, so labels stay consistent. They are kept as live text in the SVG.</p>
+          </div>
+
+          <div class="mt-view">
+            <header>Figures <small>Click a canvas to work on it; the buttons below act on the highlighted one.</small></header>
+            <div class="mt-figgrid">
+            <div id="libPanel" class="mt-libcol">
+                  <p class="mt-note" style="margin:0">Library: every molecule you've added. <strong>+ Page</strong> places it on the blank page, <strong>+ Tiles</strong> adds it to the tiled figure.</p>
+                  <div class="mt-libtools">
+                  <label class="file mini">Import list<input type="file" id="libImport" accept=".txt,.csv,text/plain" /></label>
+                  <button type="button" class="mini" id="libSave" title="Download the library as a list of CAS numbers">Save list</button>
+                  <button type="button" class="mini" id="libCopy" title="Copy the CAS list to the clipboard">Copy list</button>
+                </div>
+                <details class="mt-libpaste"><summary>Paste a CAS list</summary>
+                  <textarea id="libPasteText" rows="4" placeholder="One CAS number (or name) per line" aria-label="CAS numbers, one per line"></textarea>
+                  <button type="button" class="mini primary" id="libPasteGo">Add to library</button>
+                </details>
+                <input type="text" id="libSearch" placeholder="Filter the library" aria-label="Filter the library" style="width:100%;margin-top:8px" />
+                  <div class="mt-list" id="libList"></div>
+                </div>
+              <div class="mt-canvases">
+            <div class="mt-sub" id="subTiles">
+              <div class="mt-subhead"><span>Tiled figure</span> <small id="countTiles"></small> <button type="button" class="mini" id="jiggleTiles" title="Line up molecules that are nearly in a row or column and push apart any that overlap">Jiggle</button> <button type="button" class="mini" id="copyTiles">Copy SVG</button></div>
+              <div class="mt-stage" id="stage"></div>
+            </div>
+            <div class="mt-sub" id="subPage">
+              <div class="mt-subhead"><span>Blank page</span> <small id="countPage"></small> <button type="button" class="mini" id="jigglePage" title="Line up molecules that are nearly in a row or column and push apart any that overlap">Jiggle</button> <button type="button" class="mini" id="copyPage">Copy SVG</button></div>
+              <div class="mt-stage" id="stage2"></div>
+            </div>
+              </div>
+            </div>
+            <div class="mt-actions">
+              <button class="primary" id="copySvg" type="button">Copy SVG (highlighted)</button>
+              <button id="dlSvg" type="button">Download SVG</button>
+              <button id="resetPos" type="button" title="Put every molecule back in its tile">Reset positions</button>
+              <button id="clearPage" type="button" class="hidden" title="Remove everything from the blank page">Clear page</button>
+              <button id="addArrow" type="button" title="Add an arrow; drag its ends to place it">+ Arrow</button>
+              <button id="branchArrow" type="button" class="hidden" title="Add or remove the curved side input on the selected arrow">Side input</button>
+              <button id="delArrow" type="button" class="hidden">Delete arrow</button>
+              <label for="dpi">Document DPI <input id="dpi" type="number" min="1" max="2400" step="1" value="360" style="width:76px" /></label>
+              <span id="allSel" class="mt-sel hidden">
+                <strong>All molecules</strong>
+                <label for="allScale">Scale <input type="range" id="allScale" min="25" max="300" step="5" value="100" style="width:160px;accent-color:#0b6870" /><output id="allScaleOut">100%</output></label>
+                <span style="color:#6b7f83">fonts and lines stay the same</span>
+                <button type="button" class="mini" id="allDone">Done</button>
+              </span>
+              <span id="pageSel" class="mt-sel hidden">
+                <strong id="pageSelName"></strong>
+                <label>Size <input type="number" id="psSize" min="20" max="400" step="5" style="width:58px" />%</label>
+                <button type="button" class="mini" id="psRl" title="Rotate left 15°">⟲</button>
+                <button type="button" class="mini" id="psRr" title="Rotate right 15°">⟳</button>
+                <button type="button" class="mini" id="psFp" title="Flip left–right">⇋</button>
+                <input type="color" id="psColor" title="Color" aria-label="Color of the selected molecule" />
+                <label><input type="checkbox" id="psName" /> Name</label>
+                <button type="button" class="mini" id="psDup">Duplicate</button>
+                <button type="button" class="mini" id="psDel">Remove</button>
+              </span>
+              <span id="mt-status" role="status"></span>
+              <p class="mt-note" style="flex-basis:100%;margin:0">The SVG is the canvas width you set. Line widths and font sizes are in points at that size. Set <em>Document DPI</em> to your Affinity document's DPI (File &rsaquo; Document Setup); use 72 for Illustrator.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>© 2026 Sharaf Lab. Hosted on GitHub Pages. Created with the assistance of AI.</footer>
+
+    <script>
+const EXAMPLES = [{"name": "Rose Bengal (RB)", "cas": "632-69-9", "mol": "\n     RDKit          2D\n\n 37 39  0  0  0  0  0  0  0  0999 V2000\n    1.8303    2.3021    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0\n    1.1119    1.6025    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    1.2305    0.5889    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0\n    0.3357    0.1663    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    1.2163   -0.3467    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    2.0971    0.1157    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    2.9503   -0.4267    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    3.8413   -0.0177    0.0000 I   0  0  0  0  0  0  0  0  0  0  0  0\n    2.9089   -1.4289    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    3.7271   -2.0203    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0\n    2.0349   -1.8899    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    1.9527   -2.9133    0.0000 I   0  0  0  0  0  0  0  0  0  0  0  0\n    1.1919   -1.3581    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    0.3387   -1.8455    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0\n   -0.5005   -1.3537    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n   -1.3595   -1.8457    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n   -1.4097   -2.8071    0.0000 I   0  0  0  0  0  0  0  0  0  0  0  0\n   -2.1973   -1.3437    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n   -3.1039   -1.7101    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0\n   -2.1677   -0.3633    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n   -2.9683    0.2597    0.0000 I   0  0  0  0  0  0  0  0  0  0  0  0\n   -1.3001    0.1065    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n   -0.5053   -0.3569    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n   -0.3803    0.9651    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n   -1.4025    0.9953    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n   -1.8477    0.5855    0.0000 Cl  0  0  0  0  0  0  0  0  0  0  0  0\n   -1.8857    1.8709    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n   -2.9223    1.8317    0.0000 Cl  0  0  0  0  0  0  0  0  0  0  0  0\n   -1.3765    2.7189    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n   -1.9075    3.5711    0.0000 Cl  0  0  0  0  0  0  0  0  0  0  0  0\n   -0.3739    2.7025    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    0.0933    3.5605    0.0000 Cl  0  0  0  0  0  0  0  0  0  0  0  0\n    0.1229    1.8163    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    4.7271   -2.0203    0.0000 Na  0  0  0  0  0 15  0  0  0  0  0  0\n   -4.1039   -1.7101    0.0000 Na  0  0  0  0  0 15  0  0  0  0  0  0\n    2.1659    1.0883    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n   -0.9601    0.3193    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n  1  2  2  0\n  2  3  1  0\n  3  4  1  0\n  4  5  1  0\n  5  6  1  0\n  6  7  2  0\n  7  8  1  0\n  7  9  1  0\n  9 10  1  0\n  9 11  2  0\n 11 12  1  0\n 11 13  1  0\n 13 14  1  0\n 14 15  1  0\n 15 16  1  0\n 16 17  1  0\n 16 18  2  0\n 18 19  1  0\n 18 20  1  0\n 20 21  1  0\n 20 22  2  0\n 22 23  1  0\n  4 24  1  0\n 24 25  2  0\n 25 26  1  0\n 25 27  1  0\n 27 28  1  0\n 27 29  2  0\n 29 30  1  0\n 29 31  1  0\n 31 32  1  0\n 31 33  2  0\n 33  2  1  0\n 23  4  1  0\n 33 24  1  0\n 13  5  2  0\n 23 15  2  0\n  6 36  1  0\n 22 37  1  0\nM  CHG  4  10  -1  19  -1  34   1  35   1\nM  END\n"}, {"name": "Phloxine B", "cas": "18472-87-2", "mol": "\n     RDKit          2D\n\n 37 39  0  0  0  0  0  0  0  0999 V2000\n    1.8303    2.3021    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0\n    1.1119    1.6025    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    1.2305    0.5889    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0\n    0.3357    0.1663    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    1.2163   -0.3467    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    2.0971    0.1157    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    2.9503   -0.4267    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    3.8413   -0.0177    0.0000 Br  0  0  0  0  0  0  0  0  0  0  0  0\n    2.9089   -1.4289    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    3.7271   -2.0203    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0\n    2.0349   -1.8899    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    1.9527   -2.9133    0.0000 Br  0  0  0  0  0  0  0  0  0  0  0  0\n    1.1919   -1.3581    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    0.3387   -1.8455    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0\n   -0.5005   -1.3537    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n   -1.3595   -1.8457    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n   -1.4097   -2.8071    0.0000 Br  0  0  0  0  0  0  0  0  0  0  0  0\n   -2.1973   -1.3437    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n   -3.1039   -1.7101    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0\n   -2.1677   -0.3633    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n   -2.9683    0.2597    0.0000 Br  0  0  0  0  0  0  0  0  0  0  0  0\n   -1.3001    0.1065    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n   -0.5053   -0.3569    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n   -0.3803    0.9651    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n   -1.4025    0.9953    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n   -1.8477    0.5855    0.0000 Cl  0  0  0  0  0  0  0  0  0  0  0  0\n   -1.8857    1.8709    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n   -2.9223    1.8317    0.0000 Cl  0  0  0  0  0  0  0  0  0  0  0  0\n   -1.3765    2.7189    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n   -1.9075    3.5711    0.0000 Cl  0  0  0  0  0  0  0  0  0  0  0  0\n   -0.3739    2.7025    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    0.0933    3.5605    0.0000 Cl  0  0  0  0  0  0  0  0  0  0  0  0\n    0.1229    1.8163    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    4.7271   -2.0203    0.0000 Na  0  0  0  0  0 15  0  0  0  0  0  0\n   -4.1039   -1.7101    0.0000 Na  0  0  0  0  0 15  0  0  0  0  0  0\n    2.1659    1.0883    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n   -0.9601    0.3193    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n  1  2  2  0\n  2  3  1  0\n  3  4  1  0\n  4  5  1  0\n  5  6  1  0\n  6  7  2  0\n  7  8  1  0\n  7  9  1  0\n  9 10  1  0\n  9 11  2  0\n 11 12  1  0\n 11 13  1  0\n 13 14  1  0\n 14 15  1  0\n 15 16  1  0\n 16 17  1  0\n 16 18  2  0\n 18 19  1  0\n 18 20  1  0\n 20 21  1  0\n 20 22  2  0\n 22 23  1  0\n  4 24  1  0\n 24 25  2  0\n 25 26  1  0\n 25 27  1  0\n 27 28  1  0\n 27 29  2  0\n 29 30  1  0\n 29 31  1  0\n 31 32  1  0\n 31 33  2  0\n 33  2  1  0\n 23  4  1  0\n 33 24  1  0\n 13  5  2  0\n 23 15  2  0\n  6 36  1  0\n 22 37  1  0\nM  CHG  4  10  -1  19  -1  34   1  35   1\nM  END\n"}, {"name": "Erythrosin B", "cas": "16423-68-0", "mol": "\n     RDKit          2D\n\n 37 41  0  0  0  0  0  0  0  0999 V2000\n    1.6249    2.5049    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0\n    0.9071    1.8047    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    1.0263    0.7907    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0\n    0.1327    0.3679    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    1.0141   -0.1453    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    1.8953    0.3167    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    2.7483   -0.2265    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    3.6397    0.1823    0.0000 I   0  0  0  0  0  0  0  0  0  0  0  0\n    2.7059   -1.2289    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    3.4943   -1.8561    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0\n    1.8319   -1.6889    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    1.7495   -2.7121    0.0000 I   0  0  0  0  0  0  0  0  0  0  0  0\n    0.9895   -1.1565    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    0.1359   -1.6445    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0\n   -0.7035   -1.1527    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n   -1.5631   -1.6453    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n   -1.6129   -2.6065    0.0000 I   0  0  0  0  0  0  0  0  0  0  0  0\n   -2.4011   -1.1427    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n   -3.3387   -1.4841    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0\n   -2.3709   -0.1627    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n   -3.1717    0.4605    0.0000 I   0  0  0  0  0  0  0  0  0  0  0  0\n   -1.5029    0.3081    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n   -0.7079   -0.1553    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n   -0.5841    1.1661    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n   -1.6065    1.1953    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n   -2.0903    2.0705    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n   -1.5819    2.9189    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n   -0.5791    2.9033    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n   -0.0817    2.0175    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    1.9645    1.2893    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n    4.4035   -1.5453    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n   -4.1217   -0.7733    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n   -1.1635    0.5201    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n   -2.0511    0.7863    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n   -3.1265    2.0323    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n   -2.1127    3.7711    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n   -0.1123    3.7611    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n  1  2  2  0\n  2  3  1  0\n  3  4  1  0\n  4  5  1  0\n  5  6  1  0\n  6  7  2  0\n  7  8  1  0\n  7  9  1  0\n  9 10  1  0\n  9 11  2  0\n 11 12  1  0\n 11 13  1  0\n 13 14  1  0\n 14 15  1  0\n 15 16  1  0\n 16 17  1  0\n 16 18  2  0\n 18 19  1  0\n 18 20  1  0\n 20 21  1  0\n 20 22  2  0\n 22 23  1  0\n  4 24  1  0\n 24 25  2  0\n 25 26  1  0\n 26 27  2  0\n 27 28  1  0\n 28 29  2  0\n 29  2  1  0\n 23  4  1  0\n 29 24  1  0\n 13  5  2  0\n 23 15  2  0\n  6 30  1  0\n 10 31  1  0\n 19 32  1  0\n 22 33  1  0\n 25 34  1  0\n 26 35  1  0\n 27 36  1  0\n 28 37  1  0\nM  END\n"}, {"name": "Rhodamine B", "cas": "81-88-9", "mol": "\n     RDKit          2D\n\n 65 67  0  0  0  0  0  0  0  0999 V2000\n    4.4298    2.8607    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    3.5518    2.2805    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    3.5234    1.2417    0.0000 N   0  0  0  0  0  0  0  0  0  0  0  0\n    4.3726    0.6387    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    5.2268    0.9857    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    2.6128    0.7627    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    2.6244   -0.2321    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    1.7662   -0.7349    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    0.8878   -0.2447    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    0.0140   -0.7529    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n   -0.0574   -1.9287    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n   -0.9452   -2.3941    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n   -0.9912   -3.3913    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n   -0.1474   -3.9259    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    0.7410   -3.4659    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    0.7836   -2.4675    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    1.3072   -2.1381    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    1.0608   -1.1891    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0\n    2.2162   -2.5793    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0\n   -0.8610   -0.2489    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n   -1.7320   -0.7433    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n   -2.5892   -0.2375    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n   -2.5792    0.7579    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n   -3.5434    1.3045    0.0000 N   0  0  0  0  0  0  0  0  0  0  0  0\n   -4.4146    0.7835    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n   -5.3236    1.2711    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n   -3.6164    2.3509    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n   -2.8508    2.8871    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n   -1.7064    1.2467    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n   -0.8516    0.7453    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    0.0132    1.2457    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0\n    0.8808    0.7507    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    1.7420    1.2563    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n   -5.5434    3.3045    0.0000 Cl  0  0  0  0  0  0  0  0  0  0  0  0\n    3.8666    3.6811    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n    4.8484    3.7613    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n    5.3412    2.4543    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n    2.5514    2.2723    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n    3.0228    3.1247    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n    3.8324   -0.0963    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n    4.7612   -0.2869    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n    4.7986    1.8191    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n    5.7966    1.7945    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n    6.0294    0.3847    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n    3.4488   -0.7983    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n    1.9918   -1.5809    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n   -1.4288   -2.0421    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n   -1.8780   -3.8513    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n   -0.1924   -4.9259    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n    1.5822   -4.0045    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n    3.0512   -2.0229    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n   -1.6996   -1.2953    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n   -3.4528   -0.7283    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n   -3.9034   -0.0673    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n   -4.8928   -0.0929    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n   -5.7876    0.3891    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n   -6.3178    1.2285    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n   -5.3748    2.2843    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n   -4.5718    2.2809    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n   -4.1756    3.1763    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n   -2.4012    2.0617    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n   -1.8822    2.9121    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n   -2.8938    3.8825    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n   -1.5790    2.1707    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n    1.7344    2.2553    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n  1  2  1  0\n  2  3  1  0\n  3  4  1  0\n  4  5  1  0\n  3  6  1  0\n  6  7  1  0\n  7  8  2  0\n  8  9  1  0\n  9 10  1  0\n 10 11  1  0\n 11 12  2  0\n 12 13  1  0\n 13 14  2  0\n 14 15  1  0\n 15 16  2  0\n 16 17  1  0\n 17 18  2  0\n 17 19  1  0\n 10 20  2  0\n 20 21  1  0\n 21 22  2  0\n 22 23  1  0\n 23 24  2  3\n 24 25  1  0\n 25 26  1  0\n 24 27  1  0\n 27 28  1  0\n 23 29  1  0\n 29 30  2  0\n 30 31  1  0\n 31 32  1  0\n 32 33  1  0\n 33  6  2  0\n 32  9  2  0\n 16 11  1  0\n 30 20  1  0\n  1 35  1  0\n  1 36  1  0\n  1 37  1  0\n  2 38  1  0\n  2 39  1  0\n  4 40  1  0\n  4 41  1  0\n  5 42  1  0\n  5 43  1  0\n  5 44  1  0\n  7 45  1  0\n  8 46  1  0\n 12 47  1  0\n 13 48  1  0\n 14 49  1  0\n 15 50  1  0\n 19 51  1  0\n 21 52  1  0\n 22 53  1  0\n 25 54  1  0\n 25 55  1  0\n 26 56  1  0\n 26 57  1  0\n 26 58  1  0\n 27 59  1  0\n 27 60  1  0\n 28 61  1  0\n 28 62  1  0\n 28 63  1  0\n 29 64  1  0\n 33 65  1  0\nM  CHG  2  24   1  34  -1\nM  END\n"}, {"name": "Fluorescein", "cas": "518-47-8", "mol": "\n     RDKit          2D\n\n 37 38  0  0  0  0  0  0  0  0999 V2000\n   -3.1917    1.5140    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0\n   -2.3272    1.0156    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n   -2.3265    0.0177    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n   -1.4658   -0.4855    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n   -0.6030    0.0090    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    0.2626   -0.4984    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    0.2634   -2.0977    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    1.1331   -2.5916    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    1.1454   -3.5927    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    0.2837   -4.0998    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n   -0.5881   -3.6102    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n   -0.5963   -2.6092    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n   -1.4900   -2.1428    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n   -1.5364   -1.1812    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0\n   -2.3340   -2.6750    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0\n    1.1278   -0.0011    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    1.9956   -0.4996    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    2.8600    0.0035    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    2.8609    1.0036    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    3.7248    1.5072    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0\n    1.9929    1.4998    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    1.1277    0.9976    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    0.2626    1.4991    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0\n   -0.6022    1.0088    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n   -1.4627    1.5100    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n   -4.1447    2.0634    0.0000 Na  0  0  0  0  0 15  0  0  0  0  0  0\n   -3.2644   -3.2617    0.0000 Na  0  0  0  0  0 15  0  0  0  0  0  0\n   -3.1937   -0.4803    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n   -1.4700   -1.4855    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n    1.9943   -2.0833    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n    2.0165   -4.0838    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n    0.2938   -5.0998    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n   -1.4491   -4.1188    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n    1.9984   -1.4996    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n    3.7267   -0.4953    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n    1.9896    2.4998    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n   -1.4587    2.5100    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n  1  2  1  0\n  2  3  1  0\n  3  4  2  0\n  4  5  1  0\n  5  6  1  0\n  6  7  1  0\n  7  8  2  0\n  8  9  1  0\n  9 10  2  0\n 10 11  1  0\n 11 12  2  0\n 12 13  1  0\n 13 14  2  0\n 13 15  1  0\n  6 16  2  0\n 16 17  1  0\n 17 18  2  0\n 18 19  1  0\n 19 20  2  0\n 19 21  1  0\n 21 22  2  0\n 22 23  1  0\n 23 24  1  0\n 24 25  1  0\n 25  2  2  0\n 24  5  2  0\n 12  7  1  0\n 22 16  1  0\n  3 28  1  0\n  4 29  1  0\n  8 30  1  0\n  9 31  1  0\n 10 32  1  0\n 11 33  1  0\n 17 34  1  0\n 18 35  1  0\n 21 36  1  0\n 25 37  1  0\nM  CHG  4   1  -1  15  -1  26   1  27   1\nM  END\n"}];
+    </script>
+    <script>
+(function () {
+  "use strict";
+  const $ = (id) => document.getElementById(id);
+  const NS = "http://www.w3.org/2000/svg";
+  const f = (v) => +v.toFixed(2);
+  const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  const FONTS = ["Helvetica", "Arial", "Helvetica Neue", "Myriad Pro", "Calibri", "Segoe UI", "Verdana", "Times New Roman", "Georgia", "Source Sans 3"];
+  ["atomFont", "nameFont"].forEach((id) => { FONTS.forEach((fn) => { const o = document.createElement("option"); o.textContent = fn; $(id).appendChild(o); }); $(id).value = "Helvetica"; });
+
+  // ---------- reading MOL / SDF ----------
+  function parseMol(text) {
+    const lines = text.replace(/\r/g, "").split("\n");
+    let i = lines.findIndex((l) => /V2000/.test(l));
+    if (i < 0) throw new Error("Only V2000 MOL/SDF files are supported.");
+    const na = parseInt(lines[i].slice(0, 3)), nb = parseInt(lines[i].slice(3, 6));
+    const chgMap = { 1: 3, 2: 2, 3: 1, 5: -1, 6: -2, 7: -3 };
+    const atoms = [], bonds = [];
+    for (let k = 0; k < na; k++) {
+      const l = lines[i + 1 + k];
+      atoms.push({ x: parseFloat(l.slice(0, 10)), y: parseFloat(l.slice(10, 20)), el: l.slice(31, 34).trim(), charge: chgMap[parseInt(l.slice(36, 39)) || 0] || 0 });
+    }
+    for (let k = 0; k < nb; k++) {
+      const l = lines[i + 1 + na + k];
+      bonds.push({ a: parseInt(l.slice(0, 3)) - 1, b: parseInt(l.slice(3, 6)) - 1, order: parseInt(l.slice(6, 9)), stereo: parseInt(l.slice(9, 12)) || 0 });
+    }
+    let reset = false;
+    for (let k = i + 1 + na + nb; k < lines.length; k++) {
+      const l = lines[k];
+      if (l.startsWith("M  END")) break;
+      if (l.startsWith("M  CHG")) {
+        if (!reset) { atoms.forEach((a) => (a.charge = 0)); reset = true; }
+        const n = parseInt(l.slice(6, 9));
+        for (let j = 0; j < n; j++) { const a = parseInt(l.slice(10 + j * 8, 13 + j * 8)) - 1, c = parseInt(l.slice(14 + j * 8, 17 + j * 8)); if (atoms[a]) atoms[a].charge = c; }
+      }
+    }
+    return { atoms, bonds };
+  }
+
+  // ---------- chemistry: hide hydrogens on carbon, count H on heteroatoms ----------
+  const VALENCE = { O: 2, S: 2, N: 3, P: 3, B: 3, Se: 2 };
+  function prepare(mol) {
+    const { atoms, bonds } = mol;
+    const hasH = atoms.some((a) => a.el === "H");
+    const heavy = atoms.map((a, i) => ({ ...a, i, hc: 0, nb: [] }));
+    const keep = heavy.map((a) => a.el !== "H");
+    bonds.forEach((b) => {
+      const A = heavy[b.a], B = heavy[b.b];
+      if (A.el === "H" && B.el !== "H") { B.hc++; keep[b.a] = false; }
+      else if (B.el === "H" && A.el !== "H") { A.hc++; keep[b.b] = false; }
+    });
+    // an H with no heavy neighbour (e.g. H+ or H2) stays
+    heavy.forEach((a, i) => { if (a.el === "H" && !bonds.some((b) => (b.a === i && heavy[b.b].el !== "H") || (b.b === i && heavy[b.a].el !== "H"))) keep[i] = true; });
+    const idx = []; heavy.forEach((a, i) => { if (keep[i]) idx[i] = idx.length; });
+    const A = heavy.filter((a, i) => keep[i]).map((a) => ({ x: a.x, y: a.y, el: a.el, charge: a.charge, hc: a.hc, nb: [] }));
+    const B = [];
+    bonds.forEach((b) => { if (keep[b.a] && keep[b.b]) { const bb = { a: idx[b.a], b: idx[b.b], order: b.order, stereo: b.stereo }; B.push(bb); A[bb.a].nb.push(bb.b); A[bb.b].nb.push(bb.a); } });
+    if (!hasH) { // files without hydrogens: fill in H on heteroatoms from usual valences
+      A.forEach((a, i) => {
+        const v = VALENCE[a.el]; if (!v) return;
+        const used = B.reduce((s, b) => s + (b.a === i || b.b === i ? (b.order === 4 ? 1.5 : b.order) : 0), 0);
+        const adj = a.el === "N" || a.el === "P" ? a.charge : -Math.abs(a.charge);
+        a.hc = Math.max(0, Math.round(v + adj - used));
+      });
+    }
+    return { atoms: A, bonds: B };
+  }
+
+  // is the bond part of a ring? (are its ends still connected without it)
+  function inRing(m, bi) {
+    const { a, b } = m.bonds[bi], seen = new Set([a]), st = [a];
+    while (st.length) {
+      const x = st.pop();
+      for (const y of m.atoms[x].nb) {
+        if ((x === a && y === b) || (x === b && y === a)) continue;
+        if (y === b) return true;
+        if (!seen.has(y)) { seen.add(y); st.push(y); }
+      }
+    }
+    return false;
+  }
+
+  // smallest ring through a bond (ties go to the ring with more double bonds), or null
+  function bondRing(m, bi) {
+    const { a, b } = m.bonds[bi];
+    let best = null;
+    m.atoms[a].nb.forEach((n0) => {
+      if (n0 === b) return;
+      const prev = new Map([[n0, -1]]), q = [n0];
+      while (q.length) {
+        const x = q.shift();
+        if (x === b) break;
+        for (const y of m.atoms[x].nb) { if (y === a || prev.has(y)) continue; prev.set(y, x); q.push(y); }
+      }
+      if (!prev.has(b)) return;
+      const ring = [a]; for (let x = b; x !== -1; x = prev.get(x)) ring.push(x);
+      if (ring.length > 8) return;
+      const dbl = m.bonds.filter((bb) => (bb.order === 2 || bb.order === 4) && ring.includes(bb.a) && ring.includes(bb.b)).length;
+      if (!best || ring.length < best.ring.length || (ring.length === best.ring.length && dbl > best.dbl)) best = { ring, dbl };
+    });
+    return best && best.ring;
+  }
+
+  // ---------- text measuring for live-text labels ----------
+  const mctx = document.createElement("canvas").getContext("2d");
+  function tw(text, size, family, bold) { mctx.font = `${bold ? "700 " : ""}${size}px "${family}", Helvetica, Arial, sans-serif`; return mctx.measureText(text).width; }
+
+  // ---------- draw one molecule (units: pixels at the document DPI) ----------
+  function drawMolecule(item, S) {
+    const m = item.prep;
+    const showLabel = (a) => a.el !== "C" || a.nb.length === 0 || a.charge !== 0;
+    // scale so the median bond is the set bond length
+    const lens = m.bonds.map((b) => Math.hypot(m.atoms[b.a].x - m.atoms[b.b].x, m.atoms[b.a].y - m.atoms[b.b].y)).sort((p, q) => p - q);
+    const med = lens.length ? lens[Math.floor(lens.length / 2)] : 1.5;
+    const sc = (S.bond / (med || 1)) * ((item.size || 100) / 100); // size changes the drawing only; fonts and lines stay fixed
+    const rot = ((item.rot || 0) * Math.PI) / 180, cr = Math.cos(rot), sr = Math.sin(rot), fl = item.flip ? -1 : 1;
+    const P = m.atoms.map((a) => { const x = a.x * fl, y = -a.y; return [(x * cr - y * sr) * sc, (x * sr + y * cr) * sc]; });
+    const color = item.color || "#000000";
+    const fs = S.atomSize, fam = S.atomFont, lw = S.lineW;
+    const parts = [];
+    let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+    const grow = (x, y, r = 0) => { x0 = Math.min(x0, x - r); x1 = Math.max(x1, x + r); y0 = Math.min(y0, y - r); y1 = Math.max(y1, y + r); };
+    const labelR = fs * 0.62; // how far bonds stop short of a label
+    const cut = (i) => (showLabel(m.atoms[i]) ? labelR : 0);
+    const line = (ax, ay, bx, by) => parts.push(`<line x1="${f(ax)}" y1="${f(ay)}" x2="${f(bx)}" y2="${f(by)}"/>`);
+
+    m.bonds.forEach((bd, bi) => {
+      const [ax, ay] = P[bd.a], [bx, by] = P[bd.b];
+      const L = Math.hypot(bx - ax, by - ay) || 1, ux = (bx - ax) / L, uy = (by - ay) / L, nx = -uy, ny = ux;
+      const ca = cut(bd.a), cb = cut(bd.b);
+      const sx = ax + ux * ca, sy = ay + uy * ca, ex = bx - ux * cb, ey = by - uy * cb;
+      const off = S.bond * S.dbl;
+      grow(ax, ay); grow(bx, by);
+      if (bd.order === 2 || bd.order === 4) {
+        // which side are the neighbours on? ring bonds put the second line inside the ring
+        let side = 0;
+        const add = (i, other) => m.atoms[i].nb.forEach((k) => { if (k === other) return; const cx = (P[k][0] - ax) * uy - (P[k][1] - ay) * ux; side += cx > 0 ? -1 : cx < 0 ? 1 : 0; });
+        add(bd.a, bd.b); add(bd.b, bd.a);
+        const ringAtoms = bondRing(m, bi), ring = !!ringAtoms;
+        if (ring) {
+          let gx = 0, gy = 0; ringAtoms.forEach((k) => { gx += P[k][0]; gy += P[k][1]; }); gx /= ringAtoms.length; gy /= ringAtoms.length;
+          const cx = (gx - ax) * uy - (gy - ay) * ux; side = cx > 0 ? -1 : 1;
+        }
+        if (ring) {
+          const s = Math.sign(side), sh = L * 0.14;
+          const ia = showLabel(m.atoms[bd.a]) ? ca : sh, ib = showLabel(m.atoms[bd.b]) ? cb : sh;
+          line(sx, sy, ex, ey);
+          line(ax + ux * ia + nx * off * s, ay + uy * ia + ny * off * s, bx - ux * ib + nx * off * s, by - uy * ib + ny * off * s);
+        } else if (!ring && side !== 0 && !showLabel(m.atoms[bd.a]) && !showLabel(m.atoms[bd.b]) && m.atoms[bd.a].nb.length > 1 && m.atoms[bd.b].nb.length > 1) {
+          const s = Math.sign(side), sh = L * 0.14;
+          line(sx, sy, ex, ey);
+          line(ax + ux * sh + nx * off * s, ay + uy * sh + ny * off * s, bx - ux * sh + nx * off * s, by - uy * sh + ny * off * s);
+        } else {
+          const h = off / 2;
+          line(sx + nx * h, sy + ny * h, ex + nx * h, ey + ny * h);
+          line(sx - nx * h, sy - ny * h, ex - nx * h, ey - ny * h);
+        }
+      } else if (bd.order === 3) {
+        line(sx, sy, ex, ey);
+        line(sx + nx * off, sy + ny * off, ex + nx * off, ey + ny * off);
+        line(sx - nx * off, sy - ny * off, ex - nx * off, ey - ny * off);
+      } else if (bd.stereo === 1) { // wedge
+        const w = S.bond * 0.13;
+        parts.push(`<path d="M${f(sx)},${f(sy)}L${f(ex + nx * w)},${f(ey + ny * w)}L${f(ex - nx * w)},${f(ey - ny * w)}Z" fill="${color}" stroke="none"/>`);
+      } else if (bd.stereo === 6) { // hash
+        const w = S.bond * 0.13, n = 6;
+        for (let k = 1; k <= n; k++) { const t = k / n, cx = sx + (ex - sx) * t, cy = sy + (ey - sy) * t, ww = w * t; line(cx + nx * ww, cy + ny * ww, cx - nx * ww, cy - ny * ww); }
+      } else line(sx, sy, ex, ey);
+    });
+
+    // atom labels as live text: symbol centred on the atom, H count on the open side, charge as superscript
+    const labels = [];
+    m.atoms.forEach((a, i) => {
+      if (!showLabel(a)) return;
+      const [x, y] = P[i];
+      let dx = 0; a.nb.forEach((k) => (dx += P[k][0] - x));
+      const hLeft = a.hc > 0 && dx > 0.01 * S.bond;
+      const wSym = tw(a.el, fs, fam), hTxt = a.hc ? "H" : "", hSub = a.hc > 1 ? String(a.hc) : "";
+      const wH = hTxt ? tw("H", fs, fam) : 0, wSub = hSub ? tw(hSub, fs * 0.7, fam) : 0;
+      const chg = a.charge ? (Math.abs(a.charge) > 1 ? Math.abs(a.charge) : "") + (a.charge > 0 ? "+" : "−") : "";
+      const wChg = chg ? tw(chg, fs * 0.7, fam) : 0;
+      const base = y + fs * 0.36;
+      let start = x - wSym / 2, inner = "";
+      const sub = (t) => `<tspan font-size="${f(fs * 0.7)}" dy="${f(fs * 0.25)}">${t}</tspan><tspan dy="${f(-fs * 0.25)}"></tspan>`;
+      const sup = (t) => `<tspan font-size="${f(fs * 0.7)}" dy="${f(-fs * 0.42)}">${esc(t)}</tspan>`;
+      if (hLeft) { start -= wH + wSub; inner = hTxt + (hSub ? sub(hSub) : "") + esc(a.el) + (chg ? sup(chg) : ""); }
+      else inner = esc(a.el) + hTxt + (hSub ? sub(hSub) : "") + (chg ? sup(chg) : "");
+      const total = wSym + wH + wSub + wChg;
+      grow(start, y - fs * 0.75); grow(start + total, y + fs * 0.55);
+      labels.push(`<text x="${f(start)}" y="${f(base)}">${inner}</text>`);
+    });
+    if (!isFinite(x0)) { x0 = y0 = 0; x1 = y1 = 1; }
+    const pad = lw;
+    x0 -= pad; y0 -= pad; x1 += pad; y1 += pad;
+    const svg = `<g stroke="${color}" stroke-width="${f(lw)}" stroke-linecap="round" fill="none">${parts.join("")}</g>` +
+      (labels.length ? `<g fill="${color}" font-family="${esc(fam)}" font-size="${f(fs)}">${labels.join("")}</g>` : "");
+    return { svg, x0, y0, w: x1 - x0, h: y1 - y0 };
+  }
+
+  // ---------- state ----------
+  let items = [];
+  let arrows = [], arrowSel = null, nextArrow = 1; // arrows: { id, x1, y1, x2, y2 } in points on the canvas
+  // blank page: molecules placed from the library; each is { id, lib, x, y (centre, pt), size, rot, flip, color, showName }
+  const boxes = { tiles: {}, page: {} }; // last drawn size of each molecule, in points (for Jiggle)
+  let tileSel = null, clip = null; // selected tile; internal clipboard for copy/paste between the two pages
+  let mode = "tiles", library = [], page = [], tileArrows = [], pageArrows = [], pageSel = null, nextPage = 1;
+  const syncArrows = () => { if (mode === "page") pageArrows = arrows; else tileArrows = arrows; };
+  const libKey = (o) => (o.name || o.q || "molecule") + "|" + (o.mol || "").length;
+  function addToLibrary(it) {
+    if (!it.mol || !it.prep) return null;
+    const key = libKey(it);
+    const old = library.find((l) => l.key === key);
+    if (old) { old.name = it.name || old.name; return old; }
+    const e = { key, name: it.name || it.q || "Molecule", q: it.q || "", mol: it.mol, color: it.color || "#000000", prep: it.prep };
+    library.push(e); return e;
+  }
+  const libPrep = (l) => l.prep || (l.prep = prepare(parseMol(l.mol)));
+  let nextId = 1;
+  function save() {
+    syncArrows();
+    try {
+      localStorage.setItem("mt-items", JSON.stringify(items.map(({ prep, ...rest }) => rest)));
+      localStorage.setItem("mt-arrows", JSON.stringify(tileArrows));
+      localStorage.setItem("mt-page", JSON.stringify(page));
+      localStorage.setItem("mt-page-arrows", JSON.stringify(pageArrows));
+      localStorage.setItem("mt-library", JSON.stringify(library.map(({ prep, ...rest }) => rest)));
+    } catch (e) {}
+  }
+  function addItem(o) { const it = Object.assign({ id: nextId++, q: "", name: "", color: "#000000", size: items.length ? items[items.length - 1].size || 100 : 100, rot: 0, flip: false, mol: "", msg: "" }, o); if (it.mol) { try { it.prep = prepare(parseMol(it.mol)); } catch (e) { it.msg = e.message; } } items.push(it); return it; }
+
+  function settings() {
+    const dpi = Math.max(1, +$("dpi").value || 72), m = dpi / 72;
+    return {
+      dpi, m, W: (+$("canvasIn").value || 7) * dpi, perRow: +$("perRow").value, gap: (+$("gapPt").value || 0) * m,
+      lineW: (+$("lineW").value || 1) * m, bond: (+$("bondLen").value || 10) * m, dbl: (+$("dblGap").value || 18) / 100,
+      atomFont: $("atomFont").value, atomSize: (+$("atomSize").value || 8) * m,
+      showNames: $("showNames").checked, nameFont: $("nameFont").value, nameSize: (+$("nameSize").value || 12) * m, nameBold: $("nameBold").checked, nameGap: (+$("nameGap").value || 0) * m,
+      vAlign: $("vAlign").value, fit: $("fitW").checked,
+      pageW: (+$("pageW").value || 7) * dpi, pageH: (+$("pageH").value || 7) * dpi,
+      arW: (+$("arW").value || 1) * m, arLen: (+$("arLen").value || 8) * m, arHw: (+$("arHw").value || 4.5) * m, arColor: $("arColor").value
+    };
+  }
+
+  // ---------- tile the molecules across the canvas ----------
+  function buildSVG(S, sized, preview) {
+    if (mode === "page") return buildPage(S, sized, preview);
+    const tiles = items.filter((it) => it.prep).map((it) => {
+      const d = drawMolecule(it, S);
+      const nameW = S.showNames && it.name ? tw(it.name, S.nameSize, S.nameFont, S.nameBold) : 0;
+      return { it, d, w: Math.max(d.w, nameW), nameW };
+    });
+    const margin = S.gap / 2 + S.lineW;
+    const rows = [];
+    let row = [], used = 0;
+    tiles.forEach((t) => {
+      const full = S.perRow ? row.length >= S.perRow : row.length && used + S.gap + t.w > S.W - 2 * margin;
+      if (full) { rows.push(row); row = []; used = 0; }
+      used += (row.length ? S.gap : 0) + t.w; row.push(t);
+    });
+    if (row.length) rows.push(row);
+    const nameH = S.showNames && tiles.some((t) => t.it.name) ? S.nameSize * 1.2 + S.nameGap : 0;
+    let y = margin, out = "", warn = false;
+    rows.forEach((r) => {
+      let sum = r.reduce((s, t) => s + t.w, 0);
+      const avail = S.W - 2 * margin;
+      let k = 1;
+      if (sum + S.gap * (r.length - 1) > avail) { warn = true; if (S.fit) k = Math.max(0.05, (avail - S.gap * (r.length - 1)) / sum); }
+      // spread the tiles evenly across the width (equal space between and around them)
+      const spare = Math.max(0, avail - sum * k), space = spare / r.length;
+      const strH = Math.max(...r.map((t) => t.d.h * k));
+      let x = margin + space / 2;
+      r.forEach((t) => {
+        const cx = x + (t.w * k) / 2;
+        const mx = (t.it.dx || 0) * S.m, my = (t.it.dy || 0) * S.m;
+        out += `<g${preview ? ` data-i="${t.it.id}" style="cursor:grab"` : ""}${mx || my ? ` transform="translate(${f(mx)},${f(my)})"` : ""}>`;
+        if (preview) out += `<rect x="${f(cx - (t.w * k) / 2)}" y="${f(y)}" width="${f(t.w * k)}" height="${f(nameH + strH)}" fill="transparent"${tileSel === t.it.id ? ` stroke="#0b6870" stroke-width="${f(0.6 * S.m)}" stroke-dasharray="${f(2 * S.m)} ${f(2 * S.m)}"` : ""}/>`;
+        if (nameH && t.it.name) {
+          out += `<text x="${f(cx)}" y="${f(y + S.nameSize * 0.95)}" text-anchor="middle" font-family="${esc(S.nameFont)}" font-size="${f(S.nameSize)}"${S.nameBold ? ' font-weight="700"' : ""} fill="${t.it.nameColor === false ? "#000000" : t.it.color}">${esc(t.it.name)}</text>`;
+        }
+        const top = y + nameH + (S.vAlign === "top" ? 0 : S.vAlign === "bottom" ? strH - t.d.h * k : (strH - t.d.h * k) / 2);
+        const tx = cx - (t.d.w * k) / 2 - t.d.x0 * k, ty = top - t.d.y0 * k;
+        out += `<g transform="translate(${f(tx)},${f(ty)})${k !== 1 ? ` scale(${f(k)})` : ""}">${t.d.svg}</g></g>`;
+        { const bot = top + t.d.h * k; boxes.tiles[t.it.id] = { cx: cx / S.m, cy: (y + bot) / 2 / S.m, w: (t.w * k) / S.m, h: (bot - y) / S.m }; }
+        x += t.w * k + space;
+      });
+      y += nameH + strH + S.gap;
+    });
+    const H = Math.max(y - S.gap + margin, 10 * S.m);
+    out += arrowsSVG(S, preview);
+    const wh = sized ? ` width="${f(S.W)}" height="${f(H)}"` : "";
+    return { svg: `<svg xmlns="${NS}" viewBox="0 0 ${f(S.W)} ${f(H)}"${wh}>${out}</svg>`, warn, n: tiles.length, H };
+  }
+
+  // the blank page: a fixed-size canvas with molecules placed by hand
+  function buildPage(S, sized, preview) {
+    const W = S.pageW, H = S.pageH;
+    let out = "";
+    page.forEach((pi) => {
+      const lib = library.find((l) => l.key === pi.lib); if (!lib) return;
+      let d; try { d = drawMolecule({ prep: libPrep(lib), rot: pi.rot, flip: pi.flip, color: pi.color, size: pi.size }, S); } catch (e) { return; }
+      const showName = pi.showName && S.showNames && lib.name;
+      const nameH = showName ? S.nameSize * 1.2 + S.nameGap : 0;
+      const nameW = showName ? tw(lib.name, S.nameSize, S.nameFont, S.nameBold) : 0;
+      const cx = pi.x * S.m, cy = pi.y * S.m, top = cy - (nameH + d.h) / 2, w = Math.max(d.w, nameW);
+      boxes.page[pi.id] = { w: w / S.m, h: (nameH + d.h) / S.m };
+      let g = "";
+      if (preview) g += `<rect x="${f(cx - w / 2)}" y="${f(top)}" width="${f(w)}" height="${f(nameH + d.h)}" fill="transparent"${pageSel === pi.id ? ` stroke="#0b6870" stroke-width="${f(0.6 * S.m)}" stroke-dasharray="${f(2 * S.m)} ${f(2 * S.m)}"` : ""}/>`;
+      if (showName) g += `<text x="${f(cx)}" y="${f(top + S.nameSize * 0.95)}" text-anchor="middle" font-family="${esc(S.nameFont)}" font-size="${f(S.nameSize)}"${S.nameBold ? ' font-weight="700"' : ""} fill="${pi.color}">${esc(lib.name)}</text>`;
+      g += `<g transform="translate(${f(cx - d.w / 2 - d.x0)},${f(top + nameH - d.y0)})">${d.svg}</g>`;
+      out += preview ? `<g data-p="${pi.id}" style="cursor:grab">${g}</g>` : g;
+    });
+    out += arrowsSVG(S, preview);
+    const wh = sized ? ` width="${f(W)}" height="${f(H)}"` : "";
+    return { svg: `<svg xmlns="${NS}" viewBox="0 0 ${f(W)} ${f(H)}"${wh}>${out}</svg>`, warn: false, n: page.length, H, W };
+  }
+
+  // arrows sit on top: a line that stops where the tall triangular head begins
+  function arrowsSVG(S, preview) {
+    let out = "";
+    arrows.forEach((a) => {
+      const x1 = a.x1 * S.m, y1 = a.y1 * S.m, x2 = a.x2 * S.m, y2 = a.y2 * S.m;
+      const L = Math.hypot(x2 - x1, y2 - y1) || 1, ux = (x2 - x1) / L, uy = (y2 - y1) / L, hl = S.arLen, hw = S.arHw / 2;
+      const bx = x2 - ux * hl, by = y2 - uy * hl;
+      const tuck = Math.min(S.arW, hl / 2); // the line runs a little under the head so there is no gap
+      let g = (L > hl ? `<line x1="${f(x1)}" y1="${f(y1)}" x2="${f(bx + ux * tuck)}" y2="${f(by + uy * tuck)}" stroke="${S.arColor}" stroke-width="${f(S.arW)}" stroke-linecap="butt"/>` : "") +
+        `<path d="M${f(x2)},${f(y2)}L${f(bx - uy * hw)},${f(by + ux * hw)}L${f(bx + uy * hw)},${f(by - ux * hw)}Z" fill="${S.arColor}"/>`;
+      // curved side input: starts off the shaft and bends in a quarter circle until it runs along the shaft
+      const nx = -uy, ny = ux, P = (t, h) => [x1 + ux * t + nx * h, y1 + uy * t + ny * h];
+      let bs = null;
+      if (a.branch) {
+        if (a.bf == null) a.bf = a.bt != null ? a.bt / (L / S.m) : 0.22; // older arrows stored a distance
+        const room = Math.max(0, L - hl - 2 * S.m);
+        let r = Math.min(Math.abs(a.bh * S.m), room);
+        let bt = Math.min(a.bf * L, Math.max(0, room - r));
+        const bh = Math.sign(a.bh || -1) * r;
+        const s0 = P(bt, bh), e0 = P(bt + r, 0), c0 = P(bt + r, bh);
+        const cz = (s0[0] - c0[0]) * (e0[1] - c0[1]) - (s0[1] - c0[1]) * (e0[0] - c0[0]);
+        g = `<path d="M${f(s0[0])},${f(s0[1])}A${f(r)},${f(r)} 0 0 ${cz > 0 ? 1 : 0} ${f(e0[0])},${f(e0[1])}" fill="none" stroke="${S.arColor}" stroke-width="${f(S.arW)}" stroke-linecap="butt"/>` + g;
+        bs = s0;
+      }
+      if (preview) {
+        g = `<line x1="${f(x1)}" y1="${f(y1)}" x2="${f(x2)}" y2="${f(y2)}" stroke="transparent" stroke-width="${f(Math.max(S.arHw, 12 * S.m))}"/>` + g;
+        if (arrowSel === a.id) {
+          const r = 3.5 * S.m;
+          g += `<line x1="${f(x1)}" y1="${f(y1)}" x2="${f(x2)}" y2="${f(y2)}" stroke="#0b6870" stroke-width="${f(0.6 * S.m)}" stroke-dasharray="${f(2 * S.m)} ${f(2 * S.m)}"/>` +
+            `<circle data-end="1" cx="${f(x1)}" cy="${f(y1)}" r="${f(r)}" fill="#fff" stroke="#0b6870" stroke-width="${f(0.8 * S.m)}" style="cursor:move"/>` +
+            `<circle data-end="2" cx="${f(x2)}" cy="${f(y2)}" r="${f(r)}" fill="#fff" stroke="#0b6870" stroke-width="${f(0.8 * S.m)}" style="cursor:move"/>` +
+            (bs ? `<rect data-end="3" x="${f(bs[0] - r)}" y="${f(bs[1] - r)}" width="${f(2 * r)}" height="${f(2 * r)}" fill="#fff" stroke="#d9822b" stroke-width="${f(0.8 * S.m)}" style="cursor:move"/>` : "");
+        }
+        g = `<g data-arrow="${a.id}" style="cursor:grab">${g}</g>`;
+      }
+      out += g;
+    });
+    return out;
+  }
+
+  // ---------- list UI ----------
+  function renderList() {
+    const list = $("list");
+    list.innerHTML = "";
+    items.forEach((it, idx) => {
+      const el = document.createElement("div");
+      el.className = "mt-item";
+      el.innerHTML = `
+        <div class="line"><span class="num">${idx + 1}</span>
+          <input type="text" class="q" value="${esc(it.q)}" placeholder="CAS, name or SMILES" aria-label="Lookup for molecule ${idx + 1}" />
+          <button type="button" class="mini look" title="Look up again">Look up</button>
+          <input type="color" class="col" value="${esc(it.color)}" aria-label="Color for molecule ${idx + 1}" title="Color" />
+        </div>
+        <div class="line">
+          <input type="text" class="nm" value="${esc(it.name)}" placeholder="Name shown above" aria-label="Name for molecule ${idx + 1}" />
+          <label class="mini" style="font-size:12px;display:inline-flex;gap:4px;align-items:center">Size <input type="number" class="sz" min="20" max="400" step="5" value="${it.size || 100}" style="width:58px" aria-label="Size of molecule ${idx + 1} in percent" />%</label>
+          <button type="button" class="mini rl" title="Rotate left 15°">⟲</button>
+          <button type="button" class="mini rr" title="Rotate right 15°">⟳</button>
+          <button type="button" class="mini fp" title="Flip left–right">⇋</button>
+          <button type="button" class="mini up" title="Move earlier" ${idx === 0 ? "disabled" : ""}>↑</button>
+          <button type="button" class="mini dn" title="Move later" ${idx === items.length - 1 ? "disabled" : ""}>↓</button>
+          <button type="button" class="mini rm" title="Remove">✕</button>
+        </div>
+        <div class="msg${it.err ? " err" : ""}">${esc(it.msg || "")}${it.rot ? ` · rotated ${it.rot}°` : ""}${it.flip ? " · flipped" : ""}${it.dx || it.dy ? " · moved" : ""}</div>`;
+      const q = el.querySelector(".q");
+      q.addEventListener("keydown", (e) => { if (e.key === "Enter") lookup(it, q.value); });
+      el.querySelector(".look").addEventListener("click", () => lookup(it, q.value));
+      el.querySelector(".col").addEventListener("input", (e) => { it.color = e.target.value; draw(); });
+      el.querySelector(".sz").addEventListener("input", (e) => { it.size = Math.max(20, Math.min(400, +e.target.value || 100)); draw(); });
+      el.querySelector(".nm").addEventListener("input", (e) => { it.name = e.target.value; draw(); });
+      el.querySelector(".rl").addEventListener("click", () => { it.rot = ((it.rot || 0) - 15) % 360; update(); });
+      el.querySelector(".rr").addEventListener("click", () => { it.rot = ((it.rot || 0) + 15) % 360; update(); });
+      el.querySelector(".fp").addEventListener("click", () => { it.flip = !it.flip; update(); });
+      el.querySelector(".up").addEventListener("click", () => { items.splice(idx, 1); items.splice(idx - 1, 0, it); update(); });
+      el.querySelector(".dn").addEventListener("click", () => { items.splice(idx, 1); items.splice(idx + 1, 0, it); update(); });
+      el.querySelector(".rm").addEventListener("click", () => { items.splice(idx, 1); update(); });
+      list.appendChild(el);
+    });
+  }
+  // draw something as if the given canvas were active (each canvas has its own arrows and selection)
+  function withMode(m, fn) {
+    if (m === mode) return fn();
+    const keep = { mode, arrows, arrowSel, pageSel, tileSel };
+    syncArrows();
+    mode = m; arrows = m === "page" ? pageArrows : tileArrows; arrowSel = null; pageSel = null; tileSel = null;
+    try { return fn(); } finally { mode = keep.mode; arrows = keep.arrows; arrowSel = keep.arrowSel; pageSel = keep.pageSel; tileSel = keep.tileSel; }
+  }
+  function draw() {
+    const S = settings();
+    const rt = withMode("tiles", () => buildSVG(S, false, true));
+    const rp = withMode("page", () => buildSVG(S, false, true));
+    $("stage").innerHTML = rt.svg;
+    $("stage2").innerHTML = rp.svg;
+    $("countTiles").textContent = `${rt.n} molecule${rt.n === 1 ? "" : "s"} · ${$("canvasIn").value} × ${(rt.H / S.dpi).toFixed(2)} in` + (rt.warn ? (S.fit ? " · a row was shrunk to fit" : " · a row is wider than the canvas") : "");
+    $("countPage").textContent = `${rp.n} molecule${rp.n === 1 ? "" : "s"} · ${$("pageW").value} × ${$("pageH").value} in`;
+    const ps = mode === "page" && page.find((x) => x.id === pageSel);
+    $("pageSel").classList.toggle("hidden", !ps);
+    if (ps) {
+      const lib = library.find((l) => l.key === ps.lib);
+      $("pageSelName").textContent = lib ? lib.name : "Molecule";
+      if (document.activeElement !== $("psSize")) $("psSize").value = ps.size;
+      $("psColor").value = ps.color; $("psName").checked = ps.showName;
+    }
+    save();
+  }
+  function update() { renderList(); renderLibrary(); draw(); }
+
+  // ---------- library (for the blank page) ----------
+  const thumbS = () => Object.assign(settings(), { dpi: 72, m: 1, lineW: 1, bond: 7, atomSize: 5 });
+  function renderLibrary() {
+    const box = $("libList"); if (!box) return;
+    const q = $("libSearch").value.trim().toLowerCase();
+    box.innerHTML = "";
+    library.filter((l) => !q || (l.name + " " + l.q).toLowerCase().includes(q)).forEach((l) => {
+      const row = document.createElement("div"); row.className = "mt-lib";
+      let thumb = "";
+      try { const d = drawMolecule({ prep: libPrep(l), color: l.color }, thumbS()); thumb = `<svg xmlns="${NS}" viewBox="${f(d.x0)} ${f(d.y0)} ${f(d.w)} ${f(d.h)}">${d.svg}</svg>`; } catch (e) {}
+      row.innerHTML = `<span class="thumb">${thumb}</span><span class="nm" title="${esc(l.name)}${l.q ? " · " + esc(l.q) : ""}">${esc(l.name)}</span><span class="btns"><button type="button" class="mini primary pl" title="Place on the blank page">+ Page</button><button type="button" class="mini primary tl" title="Add to the tiled figure">+ Tiles</button><button type="button" class="mini cs" title="Copy this molecule as SVG (current settings, real size)">Copy</button><button type="button" class="mini rm" title="Remove from library">✕</button></span>`;
+      row.querySelector(".pl").addEventListener("click", () => placeOnPage(l));
+      row.querySelector(".cs").addEventListener("click", () => copyOne(l));
+      row.querySelector(".tl").addEventListener("click", () => {
+        const it = addItem({ q: l.q, name: l.name, mol: l.mol, color: l.color || "#000000", msg: "From library" });
+        tileSel = it.id; update(); status(`${l.name} added to the tiled figure.`);
+      });
+      row.querySelector(".rm").addEventListener("click", () => { library = library.filter((x) => x !== l); page = page.filter((x) => x.lib !== l.key); update(); });
+      box.appendChild(row);
+    });
+    if (!library.length) box.innerHTML = `<p class="mt-note">No molecules yet. Add one above with a CAS number, name or SMILES.</p>`;
+  }
+  $("libSearch").addEventListener("input", renderLibrary);
+  // ---------- library as a CAS list: save, copy, import ----------
+  const isCAS = (x) => /^\d{2,7}-\d{2}-\d$/.test(x);
+  function libraryList() { return library.map((l) => (l.q && l.q !== l.name && !/\.(mol|sdf|mdl)$/i.test(l.q) ? l.q : l.name)).join("\n") + "\n"; }
+  $("libSave").addEventListener("click", () => {
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([libraryList()], { type: "text/plain" }));
+    a.download = "molecule-library.txt"; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    status(`Saved ${library.length} molecules as molecule-library.txt.`);
+  });
+  $("libCopy").addEventListener("click", async () => {
+    try { await navigator.clipboard.writeText(libraryList()); status(`Copied ${library.length} CAS numbers.`); } catch (e) { status("Copy failed; use Save list instead."); }
+  });
+  async function importList(text) {
+    const entries = text.split(/\r?\n/).map((l) => l.split(/[\t,;]/)[0].trim()).filter((l) => l && !l.startsWith("#") && !/^cas/i.test(l));
+    let added = 0, failed = [];
+    for (let i = 0; i < entries.length; i++) {
+      const q = entries[i];
+      if (library.some((l) => l.q === q || l.name.toLowerCase() === q.toLowerCase())) continue;
+      status(`Importing ${i + 1} of ${entries.length}: ${q}…`);
+      const ex = EXAMPLES.find((x) => x.cas === q);
+      if (ex) { addToLibrary({ q: ex.cas, name: ex.name, mol: ex.mol, prep: prepare(parseMol(ex.mol)) }); added++; continue; }
+      const tmp = { q, name: "", color: "#000000" };
+      await lookup(tmp, q);
+      if (tmp.prep) added++; else failed.push(q);
+    }
+    update();
+    status(`Added ${added} to the library` + (failed.length ? `; couldn't find ${failed.join(", ")}.` : "."));
+  }
+  $("libImport").addEventListener("change", (e) => {
+    const file = e.target.files && e.target.files[0]; if (!file) return;
+    const fr = new FileReader(); fr.onload = () => importList(String(fr.result)); fr.readAsText(file); e.target.value = "";
+  });
+  $("libPasteGo").addEventListener("click", () => { const t = $("libPasteText").value; if (t.trim()) { importList(t); $("libPasteText").value = ""; } });
+
+  // one library molecule as its own SVG, drawn with the current settings at real size (name included if names are on)
+  function moleculeSVG(l) {
+    const S = settings();
+    const d = drawMolecule({ prep: libPrep(l), color: l.color || "#000000" }, S);
+    const showName = S.showNames && l.name;
+    const nameH = showName ? S.nameSize * 1.2 + S.nameGap : 0, nameW = showName ? tw(l.name, S.nameSize, S.nameFont, S.nameBold) : 0;
+    const pad = S.lineW, w = Math.max(d.w, nameW) + 2 * pad, h = d.h + nameH + 2 * pad, cx = w / 2;
+    let out = showName ? `<text x="${f(cx)}" y="${f(pad + S.nameSize * 0.95)}" text-anchor="middle" font-family="${esc(S.nameFont)}" font-size="${f(S.nameSize)}"${S.nameBold ? ' font-weight="700"' : ""} fill="${l.color || "#000000"}">${esc(l.name)}</text>` : "";
+    out += `<g transform="translate(${f(cx - d.w / 2 - d.x0)},${f(pad + nameH - d.y0)})">${d.svg}</g>`;
+    return `<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="${NS}" viewBox="0 0 ${f(w)} ${f(h)}" width="${f(w)}" height="${f(h)}">${out}</svg>`;
+  }
+  async function copyOne(l) {
+    const svg = moleculeSVG(l);
+    try {
+      await navigator.clipboard.write([new ClipboardItem({ "image/svg+xml": new Blob([svg], { type: "image/svg+xml" }), "text/plain": new Blob([svg], { type: "text/plain" }) })]);
+    } catch (e) {
+      try { await navigator.clipboard.writeText(svg); } catch (e2) { status("Copy failed."); return; }
+    }
+    status(`${l.name} copied as SVG.`);
+  }
+
+  function placeOnPage(l) {
+    const S = settings(), n = page.length;
+    const last = page[page.length - 1];
+    const pi = { id: nextPage++, lib: l.key, x: S.pageW / S.m / 2 + ((n % 5) - 2) * 18, y: S.pageH / S.m / 2 + (Math.floor(n / 5) % 5 - 2) * 18, size: last ? last.size : 100, rot: 0, flip: false, color: l.color || "#000000", showName: last ? last.showName : true };
+    page.push(pi); pageSel = pi.id; draw();
+  }
+  function setMode(m, quiet) {
+    if (quiet && m === mode) return;
+    closeScale();
+    syncArrows();
+    MODE_SET.forEach((id) => (modeSettings[mode][id] = valOf($(id))));
+    mode = m; tileSel = null;
+    applyModeSettings(mode); arrows = mode === "page" ? pageArrows : tileArrows; arrowSel = null; pageSel = null;
+    $("delArrow").classList.add("hidden"); $("branchArrow").classList.add("hidden");
+    $("subTiles").classList.toggle("active", mode === "tiles");
+    $("subPage").classList.toggle("active", mode === "page");
+    try { localStorage.setItem("mt-mode", mode); } catch (e) {}
+    if (!quiet) update();
+  }
+  ["pageCanvas", "clearPage"].forEach((id) => $(id).classList.remove("hidden"));
+  const selPage = () => page.find((x) => x.id === pageSel);
+  $("psSize").addEventListener("input", (e) => { const p = selPage(); if (p) { p.size = Math.max(20, Math.min(400, +e.target.value || 100)); draw(); } });
+  $("psRl").addEventListener("click", () => { const p = selPage(); if (p) { p.rot = (p.rot - 15) % 360; draw(); } });
+  $("psRr").addEventListener("click", () => { const p = selPage(); if (p) { p.rot = (p.rot + 15) % 360; draw(); } });
+  $("psFp").addEventListener("click", () => { const p = selPage(); if (p) { p.flip = !p.flip; draw(); } });
+  $("psColor").addEventListener("input", (e) => { const p = selPage(); if (p) { p.color = e.target.value; draw(); } });
+  $("psName").addEventListener("change", (e) => { const p = selPage(); if (p) { p.showName = e.target.checked; draw(); } });
+  $("psDup").addEventListener("click", () => { const p = selPage(); if (!p) return; const c = { ...p, id: nextPage++, x: p.x + 18, y: p.y + 18 }; page.push(c); pageSel = c.id; draw(); });
+  function removeSelected() { page = page.filter((x) => x.id !== pageSel); pageSel = null; draw(); }
+  $("psDel").addEventListener("click", removeSelected);
+  let clearArmed = null;
+  $("clearPage").addEventListener("click", () => {
+    const b = $("clearPage");
+    if (!clearArmed) { b.textContent = "Click again to clear"; clearArmed = setTimeout(() => { clearArmed = null; b.textContent = "Clear page"; }, 3000); return; }
+    clearTimeout(clearArmed); clearArmed = null; b.textContent = "Clear page";
+    page = []; arrows = []; syncArrows(); pageSel = null; arrowSel = null; $("delArrow").classList.add("hidden"); $("branchArrow").classList.add("hidden"); draw(); status("Page cleared.");
+  });
+
+  // ---------- PubChem lookup ----------
+  const PUG = "https://pubchem.ncbi.nlm.nih.gov/rest/pug";
+  const looksLikeSmiles = (s) => /[=#()\[\]@\\/]/.test(s) || (/^[A-Za-z0-9]+$/.test(s) && /[a-z]/.test(s) && /\d/.test(s) && !/^\d+-\d+-\d$/.test(s) && /c\d/.test(s));
+  async function getCid(q) {
+    let res;
+    if (looksLikeSmiles(q)) res = await fetch(`${PUG}/compound/smiles/cids/JSON`, { method: "POST", body: new URLSearchParams({ smiles: q }) });
+    else res = await fetch(`${PUG}/compound/name/${encodeURIComponent(q)}/cids/JSON`);
+    if (!res.ok) throw new Error(res.status === 404 ? "PubChem has no compound for that." : `PubChem error ${res.status}.`);
+    const j = await res.json(), cid = j.IdentifierList && j.IdentifierList.CID && j.IdentifierList.CID[0];
+    if (!cid) throw new Error("PubChem has no compound for that.");
+    return cid;
+  }
+  async function lookup(it, q) {
+    q = (q || "").trim();
+    if (!q) return;
+    it.q = q; it.msg = "Looking up on PubChem…"; it.err = false; renderList();
+    try {
+      const cid = await getCid(q);
+      const [sdf, props] = await Promise.all([
+        fetch(`${PUG}/compound/cid/${cid}/SDF?record_type=2d`).then((r) => { if (!r.ok) throw new Error("No 2D structure on PubChem."); return r.text(); }),
+        fetch(`${PUG}/compound/cid/${cid}/property/Title,MolecularFormula/JSON`).then((r) => (r.ok ? r.json() : null)).catch(() => null)
+      ]);
+      it.mol = sdf; it.prep = prepare(parseMol(sdf));
+      const p = props && props.PropertyTable && props.PropertyTable.Properties[0];
+      if (!it.name && p && p.Title) it.name = p.Title;
+      it.msg = `PubChem CID ${cid}${p && p.MolecularFormula ? " · " + p.MolecularFormula : ""}`;
+      const le = addToLibrary(it);
+      if (it.onDone && le) it.onDone(le);
+    } catch (e) {
+      it.err = true;
+      if (it.onDone) status(e instanceof TypeError ? "Couldn't reach PubChem." : e.message);
+      it.msg = e instanceof TypeError ? "Couldn't reach PubChem. Check your connection, or load a MOL/SDF file." : e.message;
+    }
+    update();
+  }
+  function addFromQuery() {
+    const q = $("addQ").value.trim();
+    if (!q) { $("addQ").focus(); return; }
+    if (mode === "page") { // look it up, add it to the library and put it on the page
+      const tmp = { q, name: "", color: "#000000", onDone: (le) => { placeOnPage(le); update(); status(`${le.name} added to the library and placed.`); } };
+      $("addQ").value = ""; status("Looking up on PubChem…"); lookup(tmp, q); return;
+    }
+    const it = addItem({ q });
+    $("addQ").value = "";
+    lookup(it, q);
+  }
+  $("addBtn").addEventListener("click", addFromQuery);
+  $("addQ").addEventListener("keydown", (e) => { if (e.key === "Enter") addFromQuery(); });
+  $("addFile").addEventListener("change", (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    const fr = new FileReader();
+    fr.onload = () => {
+      const o = { q: file.name, name: file.name.replace(/\.(mol|sdf|mdl)$/i, ""), mol: String(fr.result) };
+      if (mode === "page") {
+        try { o.prep = prepare(parseMol(o.mol)); const le = addToLibrary(o); placeOnPage(le); } catch (err) { status(err.message); }
+        update(); return;
+      }
+      const it = addItem(o);
+      if (!it.prep) it.err = true; else { it.msg = "Loaded from file"; addToLibrary(it); }
+      update();
+    };
+    fr.readAsText(file);
+    e.target.value = "";
+  });
+
+  // ---------- drag molecules around the canvas ----------
+  let drag = null;
+  let stage = $("stage");
+  function svgPt(evt) { const svg = stage.querySelector("svg"), p = svg.createSVGPoint(); p.x = evt.clientX; p.y = evt.clientY; return p.matrixTransform(svg.getScreenCTM().inverse()); }
+  function onDown(evt) {
+    const ag = evt.target.closest("[data-arrow]");
+    if (ag) {
+      closeScale();
+      const a = arrows.find((x) => x.id === +ag.dataset.arrow); if (!a) return;
+      const end = evt.target.closest("[data-end]"), pt = svgPt(evt), m = settings().m;
+      arrowSel = a.id; $("delArrow").classList.remove("hidden"); $("branchArrow").classList.remove("hidden");
+      drag = { arrow: a, end: end ? +end.dataset.end : 0, x: pt.x, y: pt.y, a0: { ...a }, m };
+      if (drag.end === 3) { const L = Math.hypot(a.x2 - a.x1, a.y2 - a.y1) || 1, ux = (a.x2 - a.x1) / L, uy = (a.y2 - a.y1) / L, bt = (a.bf != null ? a.bf : 0.22) * L; drag.a0.bx0 = a.x1 + ux * bt - uy * a.bh; drag.a0.by0 = a.y1 + uy * bt + ux * a.bh; }
+      $("branchArrow").classList.remove("hidden");
+      stage.setPointerCapture(evt.pointerId); evt.preventDefault(); draw(); return;
+    }
+    if (arrowSel != null) { arrowSel = null; $("delArrow").classList.add("hidden"); $("branchArrow").classList.add("hidden"); draw(); }
+    const hitSomething = evt.target.closest("[data-arrow],[data-p],[data-i]");
+    if (!hitSomething && evt.target.closest("svg")) { if (pageSel != null || tileSel != null) { pageSel = null; tileSel = null; draw(); } openScale(); return; }
+    closeScale();
+    if (mode === "page") {
+      const pg = evt.target.closest("[data-p]");
+      if (!pg) { if (pageSel != null) { pageSel = null; draw(); } return; }
+      let pi = page.find((x) => x.id === +pg.dataset.p); if (!pi) return;
+      if (evt.shiftKey) { const c = { ...pi, id: nextPage++ }; page.push(c); pi = c; } // Shift-drag: drag out a copy
+      pageSel = pi.id;
+      const pt = svgPt(evt), m = settings().m;
+      drag = { pi, x: pt.x, y: pt.y, x0: pi.x, y0: pi.y, m };
+      stage.setPointerCapture(evt.pointerId); evt.preventDefault(); draw(); return;
+    }
+    const g = evt.target.closest("[data-i]"); if (!g) return;
+    const it = items.find((x) => x.id === +g.dataset.i); if (!it) return;
+    tileSel = it.id;
+    const pt = svgPt(evt), m = settings().m;
+    drag = { it, x: pt.x, y: pt.y, dx: it.dx || 0, dy: it.dy || 0, m };
+    stage.setPointerCapture(evt.pointerId); evt.preventDefault();
+  }
+  function onMove(evt) {
+    if (!drag) return;
+    const pt = svgPt(evt);
+    if (drag.arrow) {
+      const a = drag.arrow, a0 = drag.a0, ddx = (pt.x - drag.x) / drag.m, ddy = (pt.y - drag.y) / drag.m;
+      if (drag.end === 3) {
+        // place the side input's start: distance along the shaft and how far off it (that sets the curve's radius)
+        const L = Math.hypot(a.x2 - a.x1, a.y2 - a.y1) || 1, ux = (a.x2 - a.x1) / L, uy = (a.y2 - a.y1) / L;
+        const px = a0.bx0 + ddx - a.x1, py = a0.by0 + ddy - a.y1;
+        let t = px * ux + py * uy, h = px * -uy + py * ux;
+        const room = L - (+$("arLen").value || 8) - 2;
+        t = Math.max(0, Math.min(t, room - 2));
+        if (t + Math.abs(h) > room) h = Math.sign(h || -1) * Math.max(2, room - t);
+        if (Math.abs(h) < 2) h = Math.sign(h || -1) * 2;
+        a.bf = t / L; a.bh = h; delete a.bt; draw(); return;
+      }
+      if (drag.end === 1 || drag.end === 2) {
+        const k = drag.end === 1 ? "1" : "2", o = drag.end === 1 ? "2" : "1";
+        let nx = a0["x" + k] + ddx, ny = a0["y" + k] + ddy;
+        if (evt.shiftKey) { // hold Shift to snap the direction to 15° steps
+          const vx = nx - a0["x" + o], vy = ny - a0["y" + o], L = Math.hypot(vx, vy), an = Math.round(Math.atan2(vy, vx) / (Math.PI / 12)) * (Math.PI / 12);
+          nx = a0["x" + o] + L * Math.cos(an); ny = a0["y" + o] + L * Math.sin(an);
+        }
+        const minL = (+$("arLen").value || 8) * 1.2, vx = nx - a0["x" + o], vy = ny - a0["y" + o], vl = Math.hypot(vx, vy);
+        if (vl < minL) { const ux = vl ? vx / vl : 1, uy = vl ? vy / vl : 0; nx = a0["x" + o] + ux * minL; ny = a0["y" + o] + uy * minL; }
+        a["x" + k] = nx; a["y" + k] = ny;
+      } else { a.x1 = a0.x1 + ddx; a.y1 = a0.y1 + ddy; a.x2 = a0.x2 + ddx; a.y2 = a0.y2 + ddy; }
+      draw(); return;
+    }
+    if (drag.pi) { drag.pi.x = drag.x0 + (pt.x - drag.x) / drag.m; drag.pi.y = drag.y0 + (pt.y - drag.y) / drag.m; draw(); return; }
+    drag.it.dx = drag.dx + (pt.x - drag.x) / drag.m; drag.it.dy = drag.dy + (pt.y - drag.y) / drag.m; // stored in points
+    draw();
+  }
+  const endDrag = () => { if (!drag) return; drag = null; draw(); renderList(); };
+  [["tiles", $("stage")], ["page", $("stage2")]].forEach(([m, el]) => {
+    el.addEventListener("pointerdown", (evt) => { if (mode !== m) setMode(m, true); stage = el; onDown(evt); });
+    el.addEventListener("pointermove", (evt) => { if (stage === el) onMove(evt); });
+    el.addEventListener("pointerup", endDrag);
+    el.addEventListener("pointercancel", endDrag);
+  });
+  $("addArrow").addEventListener("click", () => {
+    const S = settings(), r = buildSVG(S, false, false), w = (mode === "page" ? S.pageW : S.W) / S.m, h = r.H / S.m;
+    const a = { id: nextArrow++, x1: w / 2 - 18, y1: h / 2, x2: w / 2 + 18, y2: h / 2 };
+    if ($("arStyle").value === "branch") { a.x1 = w / 2 - 27; a.x2 = w / 2 + 27; a.branch = true; a.bf = 0.22; a.bh = -13; }
+    arrows.push(a); arrowSel = a.id; $("delArrow").classList.remove("hidden"); $("branchArrow").classList.remove("hidden"); $("branchArrow").classList.remove("hidden"); draw();
+  });
+  function deleteArrow() { if (arrowSel == null) return; arrows = arrows.filter((a) => a.id !== arrowSel); syncArrows(); arrowSel = null; $("delArrow").classList.add("hidden"); $("branchArrow").classList.add("hidden"); draw(); }
+  $("delArrow").addEventListener("click", deleteArrow);
+  $("branchArrow").addEventListener("click", () => {
+    const a = arrows.find((x) => x.id === arrowSel); if (!a) return;
+    if (a.branch) a.branch = false;
+    else { const L = Math.hypot(a.x2 - a.x1, a.y2 - a.y1); a.branch = true; if (a.bh == null) { a.bf = 0.22; a.bh = -Math.min(L * 0.25, Math.max(4, L - (+$("arLen").value || 8) - L * 0.22 - 4)); } }
+    draw();
+  });
+  // Ctrl/⌘ C copies the selected molecule or arrow; Ctrl/⌘ V pastes it on whichever page is showing
+  function copySelected() {
+    if (arrowSel != null) { const a = arrows.find((x) => x.id === arrowSel); if (a) { clip = { kind: "arrow", a: { ...a } }; return "Arrow"; } }
+    if (mode === "page" && pageSel != null) {
+      const pi = page.find((x) => x.id === pageSel), lib = pi && library.find((l) => l.key === pi.lib);
+      if (lib) { clip = { kind: "mol", bondPt: (+$("bondLen").value || 10.5) * pi.size / 100, name: lib.name, q: lib.q, mol: lib.mol, size: pi.size, rot: pi.rot, flip: pi.flip, color: pi.color, showName: pi.showName }; return lib.name; }
+    }
+    if (mode === "tiles" && tileSel != null) {
+      const it = items.find((x) => x.id === tileSel);
+      if (it && it.mol) { clip = { kind: "mol", bondPt: (+$("bondLen").value || 10.5) * (it.size || 100) / 100, name: it.name, q: it.q, mol: it.mol, size: it.size || 100, rot: it.rot || 0, flip: !!it.flip, color: it.color, showName: true }; return it.name || "Molecule"; }
+    }
+    return null;
+  }
+  function pasteClip() {
+    if (!clip) return false;
+    // keep the molecule the same printed size it had where it was copied, even if this page uses another bond length
+    if (clip.kind === "mol" && clip.bondPt) clip.size = Math.round(Math.max(20, Math.min(400, (clip.bondPt / (+$("bondLen").value || 10.5)) * 100)));
+    if (clip.kind === "arrow") {
+      const a = { ...clip.a, id: nextArrow++, x1: clip.a.x1 + 12, y1: clip.a.y1 + 12, x2: clip.a.x2 + 12, y2: clip.a.y2 + 12 };
+      clip.a = { ...a }; arrows.push(a); syncArrows(); arrowSel = a.id; $("delArrow").classList.remove("hidden"); $("branchArrow").classList.remove("hidden"); draw(); return true;
+    }
+    if (mode === "page") {
+      let le; try { le = addToLibrary({ name: clip.name, q: clip.q, mol: clip.mol, color: clip.color, prep: prepare(parseMol(clip.mol)) }); } catch (e) { return false; }
+      placeOnPage(le);
+      const pi = page[page.length - 1]; Object.assign(pi, { size: clip.size, rot: clip.rot, flip: clip.flip, color: clip.color, showName: clip.showName });
+      update(); return true;
+    }
+    const it = addItem({ q: clip.q, name: clip.name, mol: clip.mol, color: clip.color, size: clip.size, rot: clip.rot, flip: clip.flip, msg: "Pasted" });
+    addToLibrary(it); tileSel = it.id; update(); return true;
+  }
+  document.addEventListener("keydown", (e) => {
+    if (/input|select|textarea/i.test(e.target.tagName) && e.target.type !== "checkbox" && e.target.type !== "range") return;
+    if (!(e.metaKey || e.ctrlKey) || e.altKey) return;
+    const k = e.key.toLowerCase();
+    if (k === "c") { const what = copySelected(); if (what) { e.preventDefault(); status(`Copied ${what}. Click the other canvas and press Ctrl/⌘ V to paste.`); } }
+    else if (k === "v") { if (pasteClip()) { e.preventDefault(); status("Pasted."); } }
+  });
+  document.addEventListener("keydown", (e) => {
+    if (!(e.key === "Delete" || e.key === "Backspace") || /input|select|textarea/i.test(e.target.tagName)) return;
+    if (arrowSel != null) { e.preventDefault(); deleteArrow(); }
+    else if (mode === "page" && pageSel != null) { e.preventDefault(); removeSelected(); }
+  });
+  $("resetPos").addEventListener("click", () => { items.forEach((it) => { it.dx = 0; it.dy = 0; }); update(); });
+
+  // ---------- scale tool: click an empty spot on the figure, then scale every molecule together ----------
+  // Molecule size comes from the bond length; on the blank page the layout (and arrows) scale around the centre too.
+  let scaleBase = null;
+  function openScale() {
+    const S = settings();
+    const cx = (mode === "page" ? S.pageW : S.W) / S.m / 2, cy = (mode === "page" ? S.pageH / S.m : buildSVG(S, false, false).H / S.m) / 2;
+    scaleBase = { bond: +$("bondLen").value || 10.5, cx, cy,
+      page: page.map((x) => ({ x: x.x, y: x.y })), items: items.map((x) => ({ dx: x.dx || 0, dy: x.dy || 0 })), arrows: arrows.map((a) => ({ ...a })) };
+    $("allScale").value = 100; $("allScaleOut").textContent = "100%";
+    $("allSel").classList.remove("hidden");
+  }
+  function closeScale() { scaleBase = null; $("allSel").classList.add("hidden"); }
+  $("allScale").addEventListener("input", () => {
+    if (!scaleBase) return;
+    const k = +$("allScale").value / 100, B = scaleBase;
+    $("allScaleOut").textContent = $("allScale").value + "%";
+    $("bondLen").value = +(B.bond * k).toFixed(2);
+    recordSetting("bondLen");
+    if (mode === "page") page.forEach((x, i) => { if (!B.page[i]) return; x.x = B.cx + (B.page[i].x - B.cx) * k; x.y = B.cy + (B.page[i].y - B.cy) * k; });
+    else items.forEach((x, i) => { if (!B.items[i]) return; x.dx = B.items[i].dx * k; x.dy = B.items[i].dy * k; });
+    arrows.forEach((a, i) => { const a0 = B.arrows[i]; if (!a0) return; ["1", "2"].forEach((n) => { a["x" + n] = B.cx + (a0["x" + n] - B.cx) * k; a["y" + n] = B.cy + (a0["y" + n] - B.cy) * k; }); if (a0.bh != null) a.bh = a0.bh * k; });
+    draw();
+  });
+  $("allDone").addEventListener("click", closeScale);
+
+  // ---------- export ----------
+  function status(msg) { $("mt-status").textContent = msg; clearTimeout(status.t); status.t = setTimeout(() => ($("mt-status").textContent = ""), 3500); }
+  function exportText(m) { return '<?xml version="1.0" encoding="UTF-8"?>\n' + withMode(m || mode, () => buildSVG(settings(), true).svg); }
+  async function copyCanvas(m) {
+    const svg = exportText(m);
+    try {
+      await navigator.clipboard.write([new ClipboardItem({ "image/svg+xml": new Blob([svg], { type: "image/svg+xml" }), "text/plain": new Blob([svg], { type: "text/plain" }) })]);
+    } catch (e) {
+      try { await navigator.clipboard.writeText(svg); } catch (e2) { status("Copy failed; use Download SVG instead."); return; }
+    }
+    status(m === "page" ? `Blank page copied (${$("pageW").value} × ${$("pageH").value} in).` : `Tiled figure copied (${$("canvasIn").value} in wide).`);
+  }
+  // ---------- Jiggle: line molecules up and push apart overlaps ----------
+  function jiggle(m) {
+    const S = settings();
+    const list = m === "page"
+      ? page.filter((pi) => boxes.page[pi.id]).map((pi) => ({ o: pi, cx: pi.x, cy: pi.y, w: boxes.page[pi.id].w, h: boxes.page[pi.id].h }))
+      : items.filter((it) => boxes.tiles[it.id]).map((it) => { const b = boxes.tiles[it.id]; return { o: it, bx: b.cx, by: b.cy, cx: b.cx + (it.dx || 0), cy: b.cy + (it.dy || 0), w: b.w, h: b.h }; });
+    if (list.length < 2) { status("Add at least two molecules to jiggle."); return; }
+    const med = (a) => { const s2 = [...a].sort((p, q) => p - q); return s2[Math.floor(s2.length / 2)]; };
+    // 1) molecules that are nearly in a row (or column) share one centre line
+    const snap = (key, tol) => {
+      const sorted = [...list].sort((p, q) => p[key] - q[key]);
+      let group = [sorted[0]];
+      const flush = () => { if (group.length > 1) { const mean = group.reduce((s3, g) => s3 + g[key], 0) / group.length; group.forEach((g) => (g[key] = mean)); } };
+      for (let i = 1; i < sorted.length; i++) { if (sorted[i][key] - group[group.length - 1][key] <= tol) group.push(sorted[i]); else { flush(); group = [sorted[i]]; } }
+      flush();
+    };
+    snap("cy", med(list.map((b) => b.h)) * 0.45);
+    snap("cx", med(list.map((b) => b.w)) * 0.3);
+    // 2) push overlapping molecules apart along whichever direction needs the smaller move
+    const gap = Math.max(4, (+$("gapPt").value || 10) / 2);
+    const W = (m === "page" ? S.pageW : S.W) / S.m, H = m === "page" ? S.pageH / S.m : Infinity;
+    const clamp = () => list.forEach((b) => { b.cx = Math.min(Math.max(b.cx, b.w / 2), Math.max(b.w / 2, W - b.w / 2)); if (isFinite(H)) b.cy = Math.min(Math.max(b.cy, b.h / 2), Math.max(b.h / 2, H - b.h / 2)); });
+    for (let it = 0; it < 400; it++) {
+      let moved = false;
+      for (let i = 0; i < list.length; i++) for (let j = i + 1; j < list.length; j++) {
+        const A = list[i], B = list[j], dx = B.cx - A.cx, dy = B.cy - A.cy;
+        const ox = (A.w + B.w) / 2 + gap - Math.abs(dx), oy = (A.h + B.h) / 2 + gap - Math.abs(dy);
+        if (ox <= 0 || oy <= 0) continue;
+        moved = true;
+        if (ox < oy) { const s4 = (dx >= 0 ? 1 : -1) * ox / 2; A.cx -= s4; B.cx += s4; }
+        else { const s4 = (dy >= 0 ? 1 : -1) * oy / 2; A.cy -= s4; B.cy += s4; }
+      }
+      clamp(); // stay on the canvas while pushing, so an edge can't push a molecule back into its neighbour
+      if (!moved) break;
+    }
+    list.forEach((b) => { if (m === "page") { b.o.x = b.cx; b.o.y = b.cy; } else { b.o.dx = b.cx - b.bx; b.o.dy = b.cy - b.by; } });
+    draw(); renderList();
+    status(m === "page" ? "Blank page jiggled: molecules lined up and overlaps removed." : "Tiled figure jiggled: molecules lined up and overlaps removed.");
+  }
+  $("jiggleTiles").addEventListener("click", () => jiggle("tiles"));
+  $("jigglePage").addEventListener("click", () => jiggle("page"));
+  $("copyTiles").addEventListener("click", () => copyCanvas("tiles"));
+  $("copyPage").addEventListener("click", () => copyCanvas("page"));
+  $("copySvg").addEventListener("click", async () => {
+    const svg = exportText();
+    try {
+      await navigator.clipboard.write([new ClipboardItem({ "image/svg+xml": new Blob([svg], { type: "image/svg+xml" }), "text/plain": new Blob([svg], { type: "text/plain" }) })]);
+      status(mode === "page" ? `SVG copied (${$("pageW").value} × ${$("pageH").value} in).` : `SVG copied (${$("canvasIn").value} in wide).`);
+    } catch (e) {
+      try { await navigator.clipboard.writeText(svg); status(mode === "page" ? `SVG copied (${$("pageW").value} × ${$("pageH").value} in).` : `SVG copied (${$("canvasIn").value} in wide).`); }
+      catch (e2) { status("Copy failed; use Download SVG instead."); }
+    }
+  });
+  $("dlSvg").addEventListener("click", () => {
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([exportText()], { type: "image/svg+xml" }));
+    a.download = mode === "page" ? "structures-page.svg" : "structures.svg"; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    status("SVG downloaded.");
+  });
+
+  // settings: redraw and remember in this browser
+  const SETTINGS = ["arStyle", "pageW", "pageH", "arW", "arLen", "arHw", "arColor", "canvasIn", "perRow", "gapPt", "vAlign", "fitW", "lineW", "bondLen", "dblGap", "atomFont", "atomSize", "showNames", "nameFont", "nameSize", "nameBold", "nameGap", "dpi"];
+  // all settings are shared by the tiled figure and the blank page
+  const MODE_SET = [];
+  let modeSettings = { tiles: {}, page: {} };
+  try { modeSettings = Object.assign(modeSettings, JSON.parse(localStorage.getItem("mt-modeset") || "{}")); } catch (e) {}
+  const valOf = (el) => (el.type === "checkbox" ? el.checked : el.value);
+  const setVal = (el, v) => { if (el.type === "checkbox") el.checked = !!v; else el.value = v; };
+  function recordSetting(id) {
+    if (MODE_SET.includes(id)) { modeSettings[mode][id] = valOf($(id)); try { localStorage.setItem("mt-modeset", JSON.stringify(modeSettings)); } catch (e) {} }
+    else try { localStorage.setItem("mt-" + id, $(id).type === "checkbox" ? ($(id).checked ? "1" : "0") : $(id).value); } catch (e) {}
+  }
+  function applyModeSettings(m) {
+    const set = modeSettings[m];
+    if (!Object.keys(set).length) MODE_SET.forEach((id) => (set[id] = valOf($(id)))); // first visit: start from the current values
+    MODE_SET.forEach((id) => { if (set[id] != null) setVal($(id), set[id]); });
+  }
+  SETTINGS.forEach((id) => {
+    const el = $(id);
+    if (!MODE_SET.includes(id)) try { const v = localStorage.getItem("mt-" + id); if (v != null) { if (el.type === "checkbox") el.checked = v === "1"; else el.value = v; } } catch (e) {}
+    el.addEventListener("input", () => { recordSetting(id); draw(); });
+  });
+
+  // start with the saved list, or with the example dyes
+  let saved = null;
+  try { saved = JSON.parse(localStorage.getItem("mt-items") || "null"); } catch (e) {}
+  try { arrows = JSON.parse(localStorage.getItem("mt-arrows") || "[]") || []; } catch (e) { arrows = []; }
+  try { pageArrows = JSON.parse(localStorage.getItem("mt-page-arrows") || "[]") || []; } catch (e) { pageArrows = []; }
+  tileArrows = arrows;
+  nextArrow = tileArrows.concat(pageArrows).reduce((mx, a) => Math.max(mx, a.id + 1), 1);
+  try { library = JSON.parse(localStorage.getItem("mt-library") || "[]") || []; } catch (e) { library = []; }
+  try { page = JSON.parse(localStorage.getItem("mt-page") || "[]") || []; nextPage = page.reduce((mx, x) => Math.max(mx, x.id + 1), 1); } catch (e) { page = []; }
+  if (saved && saved.length) saved.forEach((o) => addToLibrary(addItem(o)));
+  else loadExamples();
+  try {
+    if (localStorage.getItem("mt-lib-examples") !== "2") {
+      EXAMPLES.forEach((x) => { if (!library.some((l) => l.q === x.cas || l.name === x.name)) addToLibrary({ q: x.cas, name: x.name, mol: x.mol, prep: prepare(parseMol(x.mol)) }); });
+      localStorage.setItem("mt-lib-examples", "2");
+    }
+  } catch (e) {}
+  function loadExamples() { EXAMPLES.forEach((x, i) => addToLibrary(addItem({ q: x.cas, name: x.name, mol: x.mol, color: i === 0 ? "#d6338a" : "#000000", msg: "Example (CAS " + x.cas + ")" }))); }
+  // two clicks, so a stray click doesn't wipe your list
+  let armed = null;
+  $("reloadEx").addEventListener("click", () => {
+    const b = $("reloadEx");
+    if (items.length && !armed) {
+      b.textContent = "Click again to replace your list";
+      armed = setTimeout(() => { armed = null; b.textContent = "Reload examples"; }, 3000);
+      return;
+    }
+    clearTimeout(armed); armed = null; b.textContent = "Reload examples";
+    items = []; arrows = []; syncArrows(); arrowSel = null; $("delArrow").classList.add("hidden"); $("branchArrow").classList.add("hidden"); closeScale();
+    loadExamples(); update(); status("Examples reloaded.");
+  });
+  let startMode = "tiles"; try { startMode = localStorage.getItem("mt-mode") || "tiles"; } catch (e) {}
+  setMode(startMode === "page" ? "page" : "tiles");
+})();
+    </script>
+  </body>
+</html>
