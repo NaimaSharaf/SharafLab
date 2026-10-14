@@ -1,0 +1,125 @@
+<!doctype html>
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Sharaf Lab tool: open the PDF of your slides, see every slide as a picture and type notes under each one. Notes stay on your computer." />
+    <title>Slide Notes | Sharaf Lab Tools</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../../styles.css" />
+    <style>
+.tool-back{display:inline-block;margin:0 0 22px;color:#0b6870;font-weight:600;text-decoration:none}
+.tool-back:hover{text-decoration:underline;text-underline-offset:4px}
+.tool-caution{max-width:1132px;margin:-60px auto 70px;padding:16px 20px;background:#fff7ec;border:1px solid #f0d2a8;border-left:4px solid #d9822b;border-radius:8px;color:#5c3b12;font-size:15px;line-height:1.6}
+.tool-caution strong{color:#8a4b0f}
+@media(max-width:1180px){.tool-caution{margin-left:24px;margin-right:24px}}
+@media(max-width:800px){.tool-caution{margin-top:-40px;margin-bottom:50px}}
+.tool-section{padding:40px max(24px,calc((100vw - 1132px)/2)) 100px;background:#f2f3f4}
+
+/* Slide Notes, scoped to .sn */
+.sn{--accent:#0b6870;--line:#d8e0e0;font:15px/1.5 "Manrope",Arial,sans-serif;color:#102a33;max-width:1132px;margin:0 auto}
+.sn *{box-sizing:border-box}
+.sn .top{position:sticky;top:72px;z-index:5;background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px 16px;margin-bottom:16px}
+.sn .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:4px 0}
+.sn button,.sn .btn{font:inherit;font-size:14px;cursor:pointer;border:1px solid #b8c8d5;border-radius:7px;padding:8px 12px;background:#fff;color:#173650}
+.sn button:hover,.sn .btn:hover{background:#e7f7f5;border-color:var(--accent)}
+.sn button:disabled{opacity:.45;cursor:default}
+.sn .primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}.sn .primary:hover{background:#095a61}
+.sn select,.sn input[type=search]{font:inherit;font-size:14px;padding:8px 10px;border:1px solid #b8c8d5;border-radius:7px;background:#fff;min-width:0}
+.sn #deck{flex:1 1 260px}.sn #search{flex:1 1 200px}
+.sn .small{font-size:13px;color:#586e73}.sn .status{min-height:18px;margin:4px 0 0;font-size:13px;color:#8a5a00}
+.sn .status.err{color:#aa3030}.sn .status.saved{color:#2f855a}
+.sn .title{width:100%;font:600 24px "Montserrat",Arial,sans-serif;margin:4px 0 2px;padding:6px 8px;border:1px solid transparent;border-radius:6px;background:transparent;color:#102a33}
+.sn .title:hover,.sn .title:focus{border-color:#b8c8d5;background:#fff}
+.sn .lab{display:block;font:700 12px "Montserrat",Arial,sans-serif;color:var(--accent);margin:12px 0 4px;text-transform:uppercase;letter-spacing:.1em}
+.sn .note{width:100%;font:inherit;padding:10px;border:1px solid #b8c8d5;border-radius:8px;background:#fff;resize:vertical;min-height:64px;overflow:hidden;color:#102a33}
+.sn .note:focus{outline:2px solid var(--accent);outline-offset:0;border-color:transparent}.sn .general{min-height:70px}
+.sn .tools{margin-top:14px}
+.sn .slides{list-style:none;padding:0;margin:12px 0 0;display:flex;flex-direction:column;gap:14px}
+/* wide screens: picture on the left, notes on the right */
+.sn .slide{background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px;display:grid;grid-template-columns:var(--picw,48%) minmax(0,1fr);grid-template-areas:"head head" "vis note";gap:8px 16px;align-items:start}
+.sn .slide .head{grid-area:head;display:flex;justify-content:space-between;align-items:center;font-size:13px;color:#586e73}
+.sn .slide .head b{color:#102a33}.sn .slide .vis{grid-area:vis;min-width:0}.sn .slide>.note{grid-area:note;min-height:100%}
+.sn.s{--picw:32%}.sn.m{--picw:48%}.sn.l{--picw:64%}
+@media(max-width:760px){.sn .slide{grid-template-columns:1fr;grid-template-areas:"head" "vis" "note"}}
+.sn .thumb{display:block;width:100%;border:1px solid var(--line);border-radius:6px;cursor:zoom-in;background:#eef0f2;aspect-ratio:var(--ar,4/3);object-fit:contain}
+.sn .slide.hit{border-color:var(--accent)}.sn .slide.miss{display:none}
+.sn .empty{background:#fff;border:1px solid var(--line);border-radius:10px;padding:24px 28px;color:#2b3f47}.sn .empty h2{font:600 20px "Montserrat",Arial,sans-serif;margin:0 0 8px}
+.sn .zoom{position:fixed;inset:0;z-index:2000;background:#0d1a20ee;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px;color:#fff}
+.sn .zoom img{max-width:100%;max-height:80vh;border-radius:6px;background:#fff}.sn .zoom p{margin:8px 0}.sn .zoom button{background:#22343c;color:#fff;border-color:#40575f}
+.sn [hidden]{display:none!important}
+.sn .adder{display:flex;justify-content:center;margin:-6px 0}.sn .adder button{font-size:13px;padding:3px 12px;border-style:dashed;color:#586e73;background:transparent;opacity:.6}.sn .adder button:hover,.sn .adder button:focus{opacity:1;color:var(--accent)}
+.sn .slide .acts{display:flex;gap:4px;align-items:center}.sn .slide .acts button{font-size:12px;padding:3px 8px}
+.sn .tag{font-size:12px;color:#586e73;background:#eef0f2;border-radius:5px;padding:1px 6px;margin-left:6px}
+.sn .tslide{position:relative;width:100%;aspect-ratio:var(--ar,4/3);border:1px solid var(--line);border-radius:6px;padding:6% 7%;overflow:hidden;display:flex;flex-direction:column;gap:4%;cursor:text;container-type:inline-size}
+.sn .tslide .t{font-weight:700;font-size:clamp(11px,4.4cqw,26px);outline:none;min-height:1.2em}.sn .tslide .b{font-size:clamp(9px,2.8cqw,17px);outline:none;white-space:pre-wrap;flex:1;min-height:1.2em}
+.sn .tslide .t:empty:before{content:'Title';color:#9aa3b5}.sn .tslide .b:empty:before{content:'Type your slide text…';color:#9aa3b5}
+.sn .tslide .bg{position:absolute;right:6px;bottom:6px;width:22px;height:22px;padding:0;border:1px solid #b8c8d5;border-radius:50%;cursor:pointer;opacity:.7}
+.sn .menu{position:fixed;z-index:1500;background:#fff;border:1px solid #b8c8d5;border-radius:8px;box-shadow:0 6px 24px #10213333;padding:6px;display:flex;flex-direction:column;gap:4px}.sn .menu button{text-align:left;border:none}.sn .menu button:hover{background:#e7f7f5}
+.sn .reconnect-bar{width:100%;margin-top:6px;background:#fff7e0;border:1px solid #f0c36d;color:#7a5200;font-weight:600}
+    </style>
+  </head>
+
+  <body class="outreach-body">
+    <header>
+      <div class="nav">
+        <a class="brand" href="../../index.html" aria-label="Sharaf Lab home"><img src="../../00%20Github%20assets/sharaf-lab-logo.png" alt="Sharaf Lab" /></a>
+        <nav aria-label="Primary navigation">
+          <a href="../../index.html">Home</a>
+          <a href="../../philosophy.html">Philosophy</a>
+          <a href="../../research.html">Research</a>
+          <a href="../../members.html">Lab Members</a>
+          <a href="../../photos.html">Photos</a>
+          <a href="../../links.html">Links of Interest</a>
+          <a class="active" href="../../tools.html" aria-current="page">Tools</a>
+          <a href="../../join.html">Join the Lab</a>
+        </nav>
+      </div>
+    </header>
+    <main>
+      <section class="outreach-hero">
+        <a class="tool-back" href="../../tools.html">← All lab tools</a>
+        <p class="eyebrow eyebrow-dark">Lab tools · Talks · Notes</p>
+        <h1>Notes for every slide.</h1>
+        <p>Open the PDF of your slides. Every slide becomes a picture with a notes box beside it, and your notes save automatically, either to a folder on your computer or inside this browser. Nothing is uploaded.</p>
+      </section>
+
+      <div class="tool-caution" role="note">
+        <strong>Keep a backup.</strong> These tools were vibe coded: built quickly with AI assistance. Notes kept “in this browser” disappear if you clear this site's data, so use a folder (Chrome or Edge) or download your notes for anything important.
+      </div>
+
+      <section class="tool-section" aria-label="Slide notes">
+        <div class="sn m" id="sn">
+          <div class="top">
+            <div class="row"><button id="folder" class="primary">Choose notes folder</button><button id="local" class="primary">Keep notes in this browser</button><button id="reconnect" class="primary" hidden>Reconnect folder</button><span id="where" class="small"></span></div>
+            <div class="row" id="deckRow" hidden><select id="deck" aria-label="Presentation"></select><label class="btn" id="addLabel">Add PDF<input id="pdf" type="file" accept="application/pdf,.pdf" hidden></label></div>
+            <p id="status" class="status" role="status" aria-live="polite"></p>
+            <button id="reconnectBar" class="reconnect-bar" hidden></button>
+          </div>
+          <div id="main" hidden>
+            <input id="title" class="title" aria-label="Presentation title" maxlength="200">
+            <p id="meta" class="small"></p>
+            <label class="lab" for="general">Notes for the whole presentation</label>
+            <textarea id="general" class="note general" placeholder="Overall notes, reminders, timing…"></textarea>
+            <div class="row tools"><input id="search" type="search" placeholder="Search notes (or type a slide number)" aria-label="Search notes"><select id="size" aria-label="Slide picture size"><option value="s">Small slides</option><option value="m" selected>Medium slides</option><option value="l">Large slides</option></select><button id="copyAll">Copy all notes</button><button id="dlNotes">Download notes</button></div>
+            <ol id="slides" class="slides"></ol>
+          </div>
+          <section id="empty" class="empty">
+            <h2>Get started</h2>
+            <p>1. Choose where your notes are kept: a <b>folder</b> on your computer (Chrome or Edge; for example a “Presentations” folder in Documents), or <b>this browser</b> (works everywhere).</p>
+            <p>2. Click <b>Add PDF</b> and pick the PDF of your slides. Every slide appears as a picture with a notes box beside it.</p>
+            <p>Notes save automatically. In a folder you get a copy of the PDF, the slide pictures, your notes (presentation.json) and a readable notes.md.</p>
+          </section>
+          <div id="addMenu" class="menu" hidden><button data-add="text">Text slide</button><button data-add="image">Picture (choose a file)</button><button data-add="paste">Picture from clipboard</button><input id="imgFile" type="file" accept="image/png,image/jpeg,image/webp,image/gif" hidden></div>
+          <div id="zoom" class="zoom" hidden><img id="zoomImg" alt=""><p id="zoomCap"></p><div class="row"><button id="zPrev">‹ Previous</button><button id="zNext">Next ›</button><button id="zClose">Close</button></div></div>
+        </div>
+      </section>
+    </main>
+
+    <footer>© 2026 Sharaf Lab. Hosted on GitHub Pages. Created with the assistance of AI. PDFs are read with PDF.js (Mozilla, Apache 2.0).</footer>
+    <script type="module" src="app.js"></script>
+  </body>
+</html>
