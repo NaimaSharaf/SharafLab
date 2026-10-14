@@ -9,7 +9,7 @@ main{max-width:1500px;margin:auto;padding:24px 4vw}
 .vibe-caution{margin:0 0 20px;padding:14px 18px;background:#fff7ec;border:1px solid #f0d2a8;border-left:4px solid #d9822b;border-radius:8px;color:#5c3b12;font-size:15px;line-height:1.6}.vibe-caution strong{color:#8a4b0f}
 button,.file{border:1px solid #b8c8d5;background:white;border-radius:7px;padding:10px 14px;font:inherit;font-size:15px;cursor:pointer;color:#173650}button:hover,.file:hover{background:#e7f7f5}button:disabled{opacity:.5;cursor:default;background:white}
 button:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid #078c85;outline-offset:3px}
-.primary{background:#087f79;color:white;border-color:#087f79}.primary:hover{background:#066b66}.primary:disabled{background:#087f79}
+.xl{color:#c1121f;border-color:#e63946;font-weight:600}.xl:hover:not(:disabled){background:#fde8ea}.primary{background:#087f79;color:white;border-color:#087f79}.primary:hover{background:#066b66}.primary:disabled{background:#087f79}
 .toolbar{display:flex;gap:12px 14px;align-items:center;flex-wrap:wrap}label{font-size:14px}
 select,input[type=number],input[type=text],textarea{font:inherit;font-size:15px;padding:8px;border:1px solid #b8c8d5;border-radius:5px;background:white;color:#142d44}input[type=number]{width:90px}
 .file{position:relative;display:inline-block}.file input{position:absolute;opacity:0;width:1px;height:1px}.file:focus-within{outline:3px solid #078c85}
@@ -77,6 +77,10 @@ details{font-size:14px;line-height:1.6;color:#2b4459}details summary{cursor:poin
 <div class="panelhead"><h2 id="h-mol"><span class="step">+</span>Add molecules (optional)</h2><p>Other molecules, such as a drug, a dye or a small protein, drawn as spheres sized from their diameter. They never overlap anything. Changes apply the next time you press Build and run or Calculate (step 4).</p></div>
 <div class="pbody"><div id="molList" class="mol-list"></div><div class="toolbar"><button id="addMol">Add a molecule</button></div>
 <p class="note">Enter a CAS number and press Look up to fill in the name, diameter and behavior from PubChem; you can still edit them. Rough diameters by hand: small drug or dye 0.8–1.5 nm; peptide 1.5–2 nm; for a globular protein, diameter ≈ 0.132 × (mass in Da)<sup>1/3</sup> nm, so 10 kDa ≈ 2.8 nm and 50 kDa ≈ 4.9 nm. <b>Hydrophobicity</b> sets how strongly a molecule is drawn to the tails: 0 is inert (it only takes up space), 1 is as sticky as a tail residue, 2 is twice as sticky.</p></div></section>
+<section class="panel" aria-labelledby="h-lip">
+<div class="panelhead"><h2 id="h-lip"><span class="step">+</span>Add phospholipid (optional)</h2><p>Each phospholipid is a sphere for the head group, sized from the molecule like the molecules above, plus one bead chain per acyl chain. The chains act just like the protein tails: same bonds, and the same hydrophobic attraction to the tails and to each other, so lipids can join the micelle. Changes apply the next time you press Build and run or Calculate (step 4).</p></div>
+<div class="pbody"><div id="lipList" class="mol-list"></div><div class="toolbar"><button id="addLip">Add a phospholipid</button></div>
+<p class="note">Enter a CAS number and press Look up: PubChem gives the name, the molecular weight and the structure, from which the acyl chains (carbons per chain) are read. For example POPC 26853-31-6, DPPC 63-89-8, DOPC 4235-95-4. <b>Head group size</b> = whole-molecule volume (molecular weight × 1.66 Å³ per g/mol, a lipid density of 1 g/cm³) minus the acyl chains (27 Å³ per CH₂, 54 Å³ per CH₃), drawn as a sphere of that volume. Each chain bead stands for about 3.5 carbons. <b>Chain stickiness</b> 1 means as sticky as a tail residue. Set a chain to 0 for a lysolipid.</p></div></section>
 
 <section class="panel" aria-labelledby="h-tail">
 <div class="panelhead"><h2 id="h-tail"><span class="step">2</span>Choose the hydrophobic tail</h2><p>The tail must run to one end of the chain. Everything else is treated as the rigid globular head.</p></div>
@@ -118,6 +122,7 @@ details{font-size:14px;line-height:1.6;color:#2b4459}details summary{cursor:poin
 <label>Hydrophobic strength <input id="eps" type="range" min="0.5" max="4" step="0.1" value="1.6"><output id="epsOut">1.6 kT</output></label>
 </div>
 <div class="toolbar"><button id="runBtn" class="primary" disabled>Build and run</button><button id="pauseBtn" disabled>Pause</button><button id="blowBtn" disabled title="Scatter every protein copy and molecule outward, then let them reassemble">Blow up</button><button id="restartBtn" hidden>Restart from the beginning</button><button id="moreBtn" hidden>Keep going (+5,000 steps)</button><button id="fitBtn" disabled>Recenter view</button></div>
+<div class="toolbar"><label>Crosslinks <input id="xlN" type="number" min="1" max="500" step="1" value="10" style="width:5em"></label><button id="xlBtn" class="xl" disabled title="Join neighbouring protein copies with two-residue linkers (red)">Crosslink</button><button id="xlClear" hidden>Remove crosslinks</button><span id="xlCount" class="note"></span></div>
 <p id="simMsg" class="msg"></p>
 </div>
 <div id="viewer" class="viewer3d"><p id="viewerEmpty" class="viewer-empty">Load a protein to begin. Drag to rotate, scroll to zoom, right-drag to pan.</p></div>
@@ -161,6 +166,8 @@ details{font-size:14px;line-height:1.6;color:#2b4459}details summary{cursor:poin
 <details><summary>Packing parameter and copy limits</summary>
 <p><i>v</i> is the summed residue volume of the tail (Zamyatnin volumes), <i>l</i> is the tail length from the setting above, and <i>a</i>₀ is the cross-section of a sphere with the head's volume. Classic ranges: <i>p</i> &lt; ⅓ spherical micelles, ⅓–½ rods or worm-like micelles, ½–1 bilayers or vesicles.</p>
 <p>The core limit is how many tails fit in a sphere of radius <i>l</i>. The shell limit is how many heads fit around that core when packed hexagonally. The smaller of the two is the predicted maximum copies per micelle; with more copies you should expect several assemblies or non-spherical ones.</p></details>
+<details><summary>Phospholipids</summary><p>A phospholipid is one head-group sphere plus a bead chain for each acyl chain (about 3.5 carbons per bead, 3.8 Å bonds, a soft bend stiffness so chains stay fairly straight). The head group is sized from the molecule: the whole-molecule volume (molecular weight × 1.66 Å³ per g/mol) minus the acyl-chain volume (27 Å³ per CH₂, 54 Å³ per CH₃). Head groups are hydrophilic (they only take up space). Chain beads use exactly the tail rules: they repel protein heads, and attract tail beads and other chain beads with the hydrophobic strength × the chain stickiness. When a micelle is built directly, lipids start with their head groups at the core surface and chains pointing in; in self-assembly they start anywhere. A lipid counts as part of an assembly when its head group touches it or one of its chain beads touches a tail.</p></details>
+<details><summary>Crosslinks</summary><p><b>Crosslink</b> joins neighbouring copies with the number of linkers you enter (default 10). Each linker is two residues (two red beads, three 3.8 Å bonds) between surface residues of two different copies that are 0.5–1.8 nm apart, preferring residues on the outside of the assembly. The bonds pull on both rigid heads, so linked copies move together and their relative motion is restricted; linker beads cannot pass through the two proteins they join. Linked copies count as one assembly and no longer make long-range hops. Press Crosslink again to add more; Remove crosslinks takes them all away, and Blow up or Restart also removes them.</p></details>
 <details><summary>What it does not capture</summary>
 <p>No specific head–head interfaces, charges, salt, pH or concentration effects, no secondary structure in the tail and no explicit water. Treat the shapes as geometrically plausible arrangements, not predictions of a real complex.</p></details>
 </div></section>
@@ -192,6 +199,7 @@ function createSim(m,N,mode,phi,eps,mols){
   for(let c=0,t=0;c<N;c++)for(let k=0;k<nt;k++)S.tailIdx[t++]=c*nb+nh+k;
   for(let c=0;c<N;c++)for(let i=0;i<nb;i++){const b=c*nb+i;S.copyOf[b]=c;if(i<nh){S.kind[b]=0;S.tix[b]=-1;S.rad[b]=m.hr[i]}else{S.kind[b]=1;S.tix[b]=i-nh;S.sh[b]=Math.sqrt(m.h[i-nh]);S.rad[b]=RT}}
   let maxHR=0;for(let i=0;i<nh;i++)maxHR=Math.max(maxHR,m.hr[i]);S.cellA=Math.max(2*maxHR,maxHR+RT,STT);S.maxHR=maxHR;
+  S.isLip=new Uint8Array(Nm);{let b=Mp;mols.forEach(t=>{for(let k=0;k<t.count;k++,b++)if(t.lipid)S.isLip[b-Mp]=1})}
   S.maxMR=0;{let b=Mp;mols.forEach((t,ti)=>{const r=t.d*5;S.maxMR=Math.max(S.maxMR,r);for(let k=0;k<t.count;k++,b++){S.kind[b]=2;S.copyOf[b]=N+(b-Mp);S.tix[b]=-1;S.rad[b]=r;S.sh[b]=Math.sqrt(Math.max(0,t.h!=null?t.h:(t.hydro?1:0)));S.mtype[b-Mp]=ti}})}
   const MUH=MU*Math.min(1,4/Math.cbrt(m.nhRes));S.MUH=MUH;S.MUR=MUH*0.75/Math.max(25,m.rg*m.rg);
   const al=m.anchorLocal,ad=Math.hypot(...al),u=norm(al);
@@ -243,11 +251,13 @@ function createSim(m,N,mode,phi,eps,mols){
     for(let b=Mp;b<M;b++){
       const r=S.rad[b],d=norm([gauss(),gauss(),gauss()]);let rr;
       if(S.Rbox>0)rr=(S.Rbox-r)*Math.cbrt(Math.random());
+      else if(S.isLip&&S.isLip[b-Mp])rr=S._rc+r*0.6;
       else if(S.sh[b]>=0.7)rr=S._rc*Math.cbrt(Math.random());
       else rr=Math.min(S.molBox-r,S._ro+r+Math.random()*Math.max(30,4*r));
       S.P[b*3]=d[0]*rr;S.P[b*3+1]=d[1]*rr;S.P[b*3+2]=d[2]*rr;
     }
   }
+  lpSetup(S,mols);
   headsToWorld(S);
   return S;
 }
@@ -394,6 +404,7 @@ function hops(S){
   const order2=[...groups.keys()];for(let k=order2.length-1;k>0;k--){const j=Math.floor(Math.random()*(k+1));[order2[k],order2[j]]=[order2[j],order2[k]]}
   for(const gi of order2){
     const cp=groups[gi].copies,n=cp.length;
+    if(S.xlCopy&&cp.some(c=>S.xlCopy[c]))continue; // crosslinked copies don't hop
     let gx=0,gy=0,gz=0;for(const c of cp){gx+=pos[c*3];gy+=pos[c*3+1];gz+=pos[c*3+2]}gx/=n;gy/=n;gz/=n;
     const sig=5/Math.cbrt(n),dx=gauss()*sig,dy=gauss()*sig,dz=gauss()*sig;
     if(Math.hypot(gx+dx,gy+dy,gz+dz)>S.Rbox-m.rb*0.5)continue;
@@ -421,7 +432,8 @@ function hops(S){
       pos[c*3]=gx+dx+R[0]*x+R[1]*y+R[2]*z;pos[c*3+1]=gy+dy+R[3]*x+R[4]*y+R[5]*z;pos[c*3+2]=gz+dz+R[6]*x+R[7]*y+R[8]*z;
       const o=c*4,nq=qnorm(qmul(dq,[q[o],q[o+1],q[o+2],q[o+3]]));q[o]=nq[0];q[o+1]=nq[1];q[o+2]=nq[2];q[o+3]=nq[3];
     }
-    const gm=groups[gi].mols;if(gm)for(const b of gm){const b3=b*3,x=P[b3]-gx,y=P[b3+1]-gy,z=P[b3+2]-gz;P[b3]=gx+dx+R[0]*x+R[1]*y+R[2]*z;P[b3+1]=gy+dy+R[3]*x+R[4]*y+R[5]*z;P[b3+2]=gz+dz+R[6]*x+R[7]*y+R[8]*z}
+    const gm=groups[gi].mols;if(gm)for(const b of gm){const b3=b*3,x=P[b3]-gx,y=P[b3+1]-gy,z=P[b3+2]-gz;P[b3]=gx+dx+R[0]*x+R[1]*y+R[2]*z;P[b3+1]=gy+dy+R[3]*x+R[4]*y+R[5]*z;P[b3+2]=gz+dz+R[6]*x+R[7]*y+R[8]*z;
+      lpCarry(S,b,(Q,o)=>{const x=Q[o]-gx,y=Q[o+1]-gy,z=Q[o+2]-gz;Q[o]=gx+dx+R[0]*x+R[1]*y+R[2]*z;Q[o+1]=gy+dy+R[3]*x+R[4]*y+R[5]*z;Q[o+2]=gz+dz+R[6]*x+R[7]*y+R[8]*z})}
   }
 }
 /* Hard no-overlap rule. Soft forces drive the motion; this pass then pushes apart anything still overlapping:
@@ -461,9 +473,126 @@ function resolveOverlaps(S,maxIter,tol){
       for(let t=S.nh;t<nb;t++){const b3=(c*nb+t)*3;P[b3]+=dx;P[b3+1]+=dy;P[b3+2]+=dz}}
     if(moved)headsToWorld(S);
   }
+  if(S.lp)lpResolve(S); // one pass: keep acyl chains out of the protein heads
   S.maxOverlap=worst;
   return worst;
 }
+/* Crosslinks: a two-residue linker (two beads, three bonds) between surface residues of neighbouring copies.
+   The bonds pull on both rigid heads, so linked copies move together and their relative motion is restricted. */
+function addCrosslinks(S,n,maxD){
+  const {N,nh,nb,P,copyOf}=S;maxD=maxD||18;
+  if(!S.xl)S.xl={n:0,a:[],b:[],L:new Float64Array(0),F:new Float64Array(0)};
+  if(!S.xlCopy)S.xlCopy=new Uint8Array(N);
+  const X=S.xl,cs=maxD,map=new Map(),key=(x,y,z)=>x+','+y+','+z;
+  for(let c=0;c<N;c++)for(let i=0;i<nh;i++){const b=c*nb+i,b3=b*3,k=key(Math.floor(P[b3]/cs),Math.floor(P[b3+1]/cs),Math.floor(P[b3+2]/cs));let l=map.get(k);if(!l)map.set(k,l=[]);l.push(b)}
+  const cand=[],m2=maxD*maxD;
+  for(const [k,l] of map){const [x,y,z]=k.split(',').map(Number);
+    for(let dz=-1;dz<=1;dz++)for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){const l2=map.get(key(x+dx,y+dy,z+dz));if(!l2)continue;
+      for(const a of l)for(const b of l2){if(a>=b||copyOf[a]===copyOf[b])continue;
+        const ex=P[b*3]-P[a*3],ey=P[b*3+1]-P[a*3+1],ez=P[b*3+2]-P[a*3+2],d2=ex*ex+ey*ey+ez*ez;if(d2<=m2)cand.push([d2,a,b])}}}
+  // prefer residues on the outside of the assembly with a small gap between them, so the linker sits on the surface where you can see it
+  let gx=0,gy=0,gz=0;for(let c=0;c<N;c++){gx+=S.pos[c*3];gy+=S.pos[c*3+1];gz+=S.pos[c*3+2]}gx/=N;gy/=N;gz/=N;
+  const rad=b=>Math.hypot(P[b*3]-gx,P[b*3+1]-gy,P[b*3+2]-gz);
+  for(const c of cand){const d=Math.sqrt(c[0]),out=(rad(c[1])+rad(c[2]))/2;c.push(Math.abs(d-9)*1.5-out)}
+  cand.sort((u,v)=>u[3]-v[3]);
+  const usedPair=new Set(),ends=[];for(let k=0;k<X.n;k++){ends.push(X.a[k],X.b[k]);const ca=copyOf[X.a[k]],cb=copyOf[X.b[k]];usedPair.add(Math.min(ca,cb)+'-'+Math.max(ca,cb))}
+  const near=(b)=>ends.some(e=>copyOf[e]===copyOf[b]&&((P[e*3]-P[b*3])**2+(P[e*3+1]-P[b*3+1])**2+(P[e*3+2]-P[b*3+2])**2)<64);
+  const made=[];
+  for(const pass of [0,1]){for(const [d2,a,b] of cand){if(d2<25)continue;if(made.length>=n)break;
+    const ca=copyOf[a],cb=copyOf[b],pk=Math.min(ca,cb)+'-'+Math.max(ca,cb);if(pass===0&&usedPair.has(pk))continue;if(near(a)||near(b))continue;
+    usedPair.add(pk);ends.push(a,b);made.push([a,b,Math.sqrt(d2)])}}
+  if(!made.length)return {added:0};
+  const n0=X.n,L=new Float64Array((n0+made.length)*6);L.set(X.L);
+  made.forEach(([a,b],i)=>{const o=(n0+i)*6;for(let t=0;t<3;t++){const pa=P[a*3+t],pb=P[b*3+t];L[o+t]=pa+(pb-pa)/3+gauss()*0.3;L[o+3+t]=pa+2*(pb-pa)/3+gauss()*0.3}
+    X.a.push(a);X.b.push(b);S.xlCopy[copyOf[a]]=1;S.xlCopy[copyOf[b]]=1});
+  X.L=L;X.F=new Float64Array(L.length);X.n=n0+made.length;
+  const pairs=new Set(made.map(([a,b])=>Math.min(copyOf[a],copyOf[b])+'-'+Math.max(copyOf[a],copyOf[b])));
+  return {added:made.length,pairs:pairs.size,dMin:Math.min(...made.map(x=>x[2])),dMax:Math.max(...made.map(x=>x[2]))};
+}
+function clearCrosslinks(S){S.xl=null;S.xlCopy=null}
+function xlForces(S,doCluster){
+  const X=S.xl,P=S.P,F=S.F,L=X.L,XF=X.F,parent=S.parent,copyOf=S.copyOf;XF.fill(0);
+  for(let k=0;k<X.n;k++){
+    const o=k*6,pts=[[P,X.a[k]*3,F],[L,o,XF],[L,o+3,XF],[P,X.b[k]*3,F]];
+    for(let s=0;s<3;s++){const [A,ia,FA]=pts[s],[B,ib,FB]=pts[s+1],dx=B[ib]-A[ia],dy=B[ib+1]-A[ia+1],dz=B[ib+2]-A[ia+2],r=Math.sqrt(dx*dx+dy*dy+dz*dz)||1e-6,f=KB*(r-B0)/r;
+      FA[ia]+=f*dx;FA[ia+1]+=f*dy;FA[ia+2]+=f*dz;FB[ib]-=f*dx;FB[ib+1]-=f*dy;FB[ib+2]-=f*dz}
+    // linker beads stay outside the two proteins they join
+    for(const c of [copyOf[X.a[k]],copyOf[X.b[k]]])for(let i=0;i<S.nh;i++){const h3=(c*S.nb+i)*3,sg=S.rad[c*S.nb+i]+2.4,s2=sg*sg;
+      for(const lo of [o,o+3]){const dx=L[lo]-P[h3],dy=L[lo+1]-P[h3+1],dz=L[lo+2]-P[h3+2],r2=dx*dx+dy*dy+dz*dz;if(r2>=s2)continue;const r=Math.sqrt(r2)||1e-6,f=KREP*(sg-r)/r;
+        XF[lo]+=f*dx;XF[lo+1]+=f*dy;XF[lo+2]+=f*dz;F[h3]-=f*dx;F[h3+1]-=f*dy;F[h3+2]-=f*dz}}
+    if(doCluster){let x=copyOf[X.a[k]];while(parent[x]!==x)x=parent[x];let y=copyOf[X.b[k]];while(parent[y]!==y)y=parent[y];if(x!==y)parent[x]=y}
+  }
+}
+function xlMove(S){
+  const X=S.xl,L=X.L,XF=X.F,sT=Math.sqrt(2*MU);
+  for(let i=0;i<X.n*2;i++){const o=i*3;let dx=XF[o]*MU+gauss()*sT,dy=XF[o+1]*MU+gauss()*sT,dz=XF[o+2]*MU+gauss()*sT;const dl=Math.sqrt(dx*dx+dy*dy+dz*dz);if(dl>1.2){dx*=1.2/dl;dy*=1.2/dl;dz*=1.2/dl}L[o]+=dx;L[o+1]+=dy;L[o+2]+=dz}
+}
+/* Phospholipids: the head group is a molecule sphere (sized from the molecule, see the page); each acyl chain is a
+   chain of beads that behaves like a protein tail (same bonds, same hydrophobic attraction to tails and to other chains). */
+function lpSetup(S,mols){
+  const chains=[];let nQ=0,b=S.Mp;
+  mols.forEach((t,ti)=>{for(let k=0;k<t.count;k++,b++){if(!t.lipid)continue;const hs=Math.sqrt(Math.max(0,t.hc!=null?t.hc:1));
+    (t.chains||[]).forEach((c,ci)=>{if(!(c>=4))return;const n=Math.max(2,Math.round((c-1)/3.5));chains.push({h:b,o:nQ,n,sh:hs,side:ci,ty:ti});nQ+=n})}});
+  if(!chains.length){S.lp=null;return}
+  const Q=new Float64Array(nQ*3),sh=new Float64Array(nQ),ch=new Int32Array(nQ),at=new Int32Array(nQ),head=new Int32Array(nQ),byHead={},P=S.P;
+  let lastH=-1,dir=null,side=null;
+  chains.forEach((c,id)=>{
+    const h3=c.h*3,H=[P[h3],P[h3+1],P[h3+2]];
+    if(c.h!==lastH){lastH=c.h;const l=Math.hypot(...H);dir=(S.mode==='build'&&l>1)?norm([-H[0]/l+gauss()*0.15,-H[1]/l+gauss()*0.15,-H[2]/l+gauss()*0.15]):norm([gauss(),gauss(),gauss()]);
+      side=norm([dir[1]-dir[2],dir[2]-dir[0],dir[0]-dir[1]])}
+    const off=(c.side%2?-1:1)*2.6,r0=S.rad[c.h]+RT*0.6;
+    for(let k=0;k<c.n;k++){const i=c.o+k,d=r0+k*B0;Q[i*3]=H[0]+dir[0]*d+side[0]*off+gauss()*0.3;Q[i*3+1]=H[1]+dir[1]*d+side[1]*off+gauss()*0.3;Q[i*3+2]=H[2]+dir[2]*d+side[2]*off+gauss()*0.3;
+      sh[i]=c.sh;ch[i]=id;at[i]=k;head[i]=c.h}
+    (byHead[c.h]||(byHead[c.h]=[])).push(c);
+  });
+  S.lp={chains,Q,F:new Float64Array(nQ*3),n:nQ,idx:new Int32Array(nQ).map((_,i)=>i),g:{},sh,ch,at,head,byHead};
+}
+function nearPt(G,x,y,z,range,cb){
+  if(!G||!G.beg)return;const cs=G.cs,mn=G.mn,nx=G.nx,ny=G.ny,nz=G.nz,beg=G.beg,cnt=G.cnt,order=G.order;
+  const R=Math.ceil(range/cs),cx=Math.floor((x-mn[0])/cs),cy=Math.floor((y-mn[1])/cs),cz=Math.floor((z-mn[2])/cs);
+  for(let ez=Math.max(0,cz-R);ez<=Math.min(nz-1,cz+R);ez++)for(let ey=Math.max(0,cy-R);ey<=Math.min(ny-1,cy+R);ey++)for(let ex=Math.max(0,cx-R);ex<=Math.min(nx-1,cx+R);ex++){
+    const c=ex+nx*(ey+ny*ez),n=cnt[c];if(!n)continue;for(let a=beg[c],e=a+n;a<e;a++)cb(order[a])}
+}
+function lpForces(S){
+  const L=S.lp,Q=L.Q,QF=L.F,P=S.P,F=S.F,kind=S.kind,rad=S.rad,sh=S.sh;QF.fill(0);
+  const FA=S.EPS*Math.PI/(2*WC),PIW=Math.PI/WC,rcT2=(STT+WC)**2,st2=STT*STT;
+  const spring=(A,i3,FAa,B,j3,FBb,k,rest)=>{const dx=B[j3]-A[i3],dy=B[j3+1]-A[i3+1],dz=B[j3+2]-A[i3+2],r=Math.sqrt(dx*dx+dy*dy+dz*dz)||1e-6,f=k*(r-rest)/r;
+    FAa[i3]+=f*dx;FAa[i3+1]+=f*dy;FAa[i3+2]+=f*dz;FBb[j3]-=f*dx;FBb[j3+1]-=f*dy;FBb[j3+2]-=f*dz};
+  for(const c of L.chains){const h3=c.h*3,r0=rad[c.h]+RT*0.6,o=c.o;
+    spring(P,h3,F,Q,o*3,QF,KB,r0);if(c.n>1)spring(P,h3,F,Q,(o+1)*3,QF,KB*0.25,r0+B0*0.95);
+    for(let k=1;k<c.n;k++)spring(Q,(o+k-1)*3,QF,Q,(o+k)*3,QF,KB,B0);
+    for(let k=2;k<c.n;k++)spring(Q,(o+k-2)*3,QF,Q,(o+k)*3,QF,KB*0.25,2*B0*0.95)}
+  // chain–chain: like tail–tail
+  buildGrid(L.g,L.idx,STT+WC,Q);
+  {const G=L.g,beg=G.beg,cnt=G.cnt,order=G.order,pr=G.pairs,np=G.np;
+  for(let p=0;p<np;p+=2){const c=pr[p],c2=pr[p+1],s0=beg[c],e0=s0+cnt[c],same=c===c2;
+    for(let a=s0;a<e0;a++){const i=order[a],i3=i*3;for(let bb=same?a+1:beg[c2],e1=beg[c2]+cnt[c2];bb<e1;bb++){const j=order[bb],j3=j*3;let att=true;
+      if(L.ch[i]===L.ch[j]){const d=Math.abs(L.at[i]-L.at[j]);if(d<=1)continue;att=d>=3}
+      const dx=Q[j3]-Q[i3],dy=Q[j3+1]-Q[i3+1],dz=Q[j3+2]-Q[i3+2],r2=dx*dx+dy*dy+dz*dz;if(r2>=(att?rcT2:st2))continue;
+      const r=Math.sqrt(r2)||1e-6;let f=0;if(r<STT)f=KREP*(STT-r);else{const e=L.sh[i]*L.sh[j];if(e>0)f=-FA*e*Math.sin(PIW*(r-STT))}
+      if(f===0)continue;f/=r;QF[i3]-=f*dx;QF[i3+1]-=f*dy;QF[i3+2]-=f*dz;QF[j3]+=f*dx;QF[j3+1]+=f*dy;QF[j3+2]+=f*dz}}}}
+  // chains vs protein heads (repel) and protein tails (like tail–tail)
+  const reach=Math.max(S.maxHR,RT)+RT+WC;
+  for(let i=0;i<L.n;i++){const i3=i*3,x=Q[i3],y=Q[i3+1],z=Q[i3+2],si=L.sh[i];
+    nearPt(S.gA,x,y,z,reach,j=>{const kj=kind[j],j3=j*3,dx=P[j3]-x,dy=P[j3+1]-y,dz=P[j3+2]-z,r2=dx*dx+dy*dy+dz*dz;let f=0;
+      if(kj===0){const sg=rad[j]+RT;if(r2>=sg*sg)return;const r=Math.sqrt(r2)||1e-6;f=KREP*(sg-r)/r}
+      else{if(r2>=rcT2)return;const r=Math.sqrt(r2)||1e-6;if(r<STT)f=KREP*(STT-r)/r;else{const e=si*sh[j];if(e<=0)return;f=-FA*e*Math.sin(PIW*(r-STT))/r}}
+      QF[i3]-=f*dx;QF[i3+1]-=f*dy;QF[i3+2]-=f*dz;F[j3]+=f*dx;F[j3+1]+=f*dy;F[j3+2]+=f*dz})}
+  // chains vs molecule spheres (including other lipids' head groups)
+  for(let b=S.Mp;b<S.M;b++){const b3=b*3,rb=rad[b],hb=sh[b],x=P[b3],y=P[b3+1],z=P[b3+2];
+    nearPt(L.g,x,y,z,rb+RT+WC,i=>{if(L.head[i]===b)return;const i3=i*3,dx=Q[i3]-x,dy=Q[i3+1]-y,dz=Q[i3+2]-z,r2=dx*dx+dy*dy+dz*dz,sg=rb+RT,lim=hb>0?sg+WC:sg;if(r2>=lim*lim)return;
+      const r=Math.sqrt(r2)||1e-6;let f=r<sg?KREP*(sg-r):-FA*hb*L.sh[i]*Math.sin(PIW*(r-sg));f/=r;
+      F[b3]-=f*dx;F[b3+1]-=f*dy;F[b3+2]-=f*dz;QF[i3]+=f*dx;QF[i3+1]+=f*dy;QF[i3+2]+=f*dz})}
+  // wall
+  if(S.Rbox>0||S.molBox>0){const R=S.Rbox>0?S.Rbox:S.molBox;for(let i=0;i<L.n;i++){const i3=i*3,x=Q[i3],y=Q[i3+1],z=Q[i3+2],r=Math.sqrt(x*x+y*y+z*z);if(r>R){const f=-KW*(r-R)/r;QF[i3]+=f*x;QF[i3+1]+=f*y;QF[i3+2]+=f*z}}}
+}
+function lpMove(S){const L=S.lp,Q=L.Q,QF=L.F,sT=Math.sqrt(2*MU);
+  for(let i=0;i<L.n;i++){const o=i*3;let dx=QF[o]*MU+gauss()*sT,dy=QF[o+1]*MU+gauss()*sT,dz=QF[o+2]*MU+gauss()*sT;const dl=Math.sqrt(dx*dx+dy*dy+dz*dz);if(dl>1.2){dx*=1.2/dl;dy*=1.2/dl;dz*=1.2/dl}Q[o]+=dx;Q[o+1]+=dy;Q[o+2]+=dz}}
+function lpCarry(S,b,fn){const L=S.lp;if(!L)return;const cs=L.byHead[b];if(!cs)return;for(const c of cs)for(let k=0;k<c.n;k++)fn(L.Q,(c.o+k)*3)}
+function lpResolve(S){const L=S.lp,Q=L.Q,P=S.P,kind=S.kind,rad=S.rad;let worst=0;const reach=Math.max(S.maxHR,RT)+RT;
+  for(let i=0;i<L.n;i++){const i3=i*3;nearPt(S.gA,Q[i3],Q[i3+1],Q[i3+2],reach,j=>{if(kind[j]!==0)return;const j3=j*3,sg=rad[j]+RT,dx=Q[i3]-P[j3],dy=Q[i3+1]-P[j3+1],dz=Q[i3+2]-P[j3+2],r2=dx*dx+dy*dy+dz*dz;if(r2>=sg*sg)return;
+    let r=Math.sqrt(r2),nx=1,ny=0,nz=0;if(r>1e-6){nx=dx/r;ny=dy/r;nz=dz/r}const dd=sg-r;if(dd>worst)worst=dd;Q[i3]+=nx*(dd+0.02);Q[i3+1]+=ny*(dd+0.02);Q[i3+2]+=nz*(dd+0.02)})}
+  return worst}
 function step(S,doCluster){
   const {M,N,nh,nt,nb,P,F,copyOf,kind,tix,sh,pos,Rm,parent}=S;
   if(S.mode==='self'&&S.steps%10===0)doCluster=true;
@@ -472,6 +601,8 @@ function step(S,doCluster){
   buildGrid(S.gA,S.allIdx,S.cellA,P,S);forcesA(S);
   buildGrid(S.gB,S.tailIdx,STT+WC,P);forcesB(S,doCluster);
   forcesMol(S);
+  if(S.xl&&S.xl.n)xlForces(S,doCluster);
+  if(S.lp)lpForces(S);
   // wall
   if(S.Rbox>0||S.molBox>0){const R=S.Rbox>0?S.Rbox:S.molBox;for(let b=S.Rbox>0?0:S.Mp;b<M;b++){const b3=b*3,x=P[b3],y=P[b3+1],z=P[b3+2],r=Math.sqrt(x*x+y*y+z*z);if(r>R){const f=-KW*(r-R)/r;F[b3]+=f*x;F[b3+1]+=f*y;F[b3+2]+=f*z}}}
   // bonds + bodies
@@ -506,13 +637,15 @@ function step(S,doCluster){
   }
   for(let b=S.Mp;b<M;b++){const mu=MU*Math.min(1,RT/S.rad[b]),sm=Math.sqrt(2*mu),b3=b*3;let dx=F[b3]*mu+gauss()*sm,dy=F[b3+1]*mu+gauss()*sm,dz=F[b3+2]*mu+gauss()*sm;
     const dl=Math.sqrt(dx*dx+dy*dy+dz*dz);if(dl>1.2){dx*=1.2/dl;dy*=1.2/dl;dz*=1.2/dl}P[b3]+=dx;P[b3+1]+=dy;P[b3+2]+=dz}
+  if(S.xl&&S.xl.n)xlMove(S);
+  if(S.lp)lpMove(S);
   // collective moves: an assembly also drifts as a whole, more slowly the bigger it is
   const sC=Math.sqrt(2*MUH);
   for(const g of S.clusters){
     if(g.n<2)continue;
     const k=sC/Math.cbrt(g.n),dx=gauss()*k,dy=gauss()*k,dz=gauss()*k;
     for(const c of g.copies){pos[c*3]+=dx;pos[c*3+1]+=dy;pos[c*3+2]+=dz;for(let t=0;t<nt;t++){const b3=(c*nb+nh+t)*3;P[b3]+=dx;P[b3+1]+=dy;P[b3+2]+=dz}}
-    if(g.mols)for(const b of g.mols){P[b*3]+=dx;P[b*3+1]+=dy;P[b*3+2]+=dz}
+    if(g.mols)for(const b of g.mols){P[b*3]+=dx;P[b*3+1]+=dy;P[b*3+2]+=dz;lpCarry(S,b,(Q,o)=>{Q[o]+=dx;Q[o+1]+=dy;Q[o+2]+=dz})}
   }
   if(S.mode==='self'&&S.steps%10===0)hops(S);
   headsToWorld(S);
@@ -567,6 +700,7 @@ function analyze(S){
   if(S.M>S.Mp){const {Mp,M,rad,kind,copyOf}=S,reach=Math.max(S.maxHR,RT);
     for(let b=Mp;b<M;b++){const rb=rad[b],b3=b*3;let bestD=1e9,bestC=-1,tail=false;
       nearProtein(S,b,rb+reach+2,j=>{const d=Math.hypot(P[j*3]-P[b3],P[j*3+1]-P[b3+1],P[j*3+2]-P[b3+2])-rb-rad[j];if(d<2){if(kind[j]===1)tail=true;if(d<bestD){bestD=d;bestC=copyOf[j]}}});
+      if(S.lp&&S.lp.byHead[b]&&!tail)lpCarry(S,b,(Q,o)=>{nearPt(S.gA,Q[o],Q[o+1],Q[o+2],STT+2,j=>{if(kind[j]!==1)return;const d=Math.hypot(P[j*3]-Q[o],P[j*3+1]-Q[o+1],P[j*3+2]-Q[o+2])-STT;if(d<2){tail=true;if(d<bestD){bestD=d;bestC=copyOf[j]}}})});
       const k=b-Mp,gi=bestC>=0?S.clusterOf[bestC]:-1,g=gi>=0?out[gi]:null;
       if(g&&g.n>=2){S.molOf[k]=gi;S.molCore[k]=tail?1:0;g.mols.push(b);if(tail)g.molCore++;else g.molSurf++}else{S.molOf[k]=-1;S.molFree++}}}
 }
@@ -964,6 +1098,94 @@ function getMols(){
     const d=Math.min(30,Math.max(0.2,+r.querySelector('.mD').value||1));let count=Math.max(0,Math.min(2000,Math.round(+r.querySelector('.mN').value||0)));
     if(total+count>3000)count=Math.max(0,3000-total);total+=count;
     return {name:r.querySelector('.mName').value.trim()||'Molecule',d,count,h:+r.querySelector('.mH').value,hydro:+r.querySelector('.mH').value>0,color:r.querySelector('.mC').value,cas:r.dataset.cas||'',mw:r.dataset.mw||''};
+  }).filter(t=>t.count>0).concat(typeof getLipids==='function'?getLipids():[]);
+}
+
+/* ---------- phospholipids ---------- */
+let lipSeq=0;
+function addLipRow(def){
+  const i=lipSeq++,row=document.createElement('div');row.className='mol-row lip-row';
+  row.innerHTML=`<label>CAS number <input type="text" class="lCas" placeholder="e.g. 26853-31-6" size="13" spellcheck="false"></label><button class="mini lLook">Look up</button>
+<div class="mInfo lInfo"></div>
+<label>Name <input type="text" class="lName" maxlength="30" value="${def&&def.name||'Phospholipid '+(i+1)}"></label>
+<label>Head group diameter <input type="number" class="lD" min="0.2" max="5" step="0.01" value="${def&&def.d||0.87}"> nm</label>
+<label>Chain 1 <input type="number" class="lC1" min="0" max="30" step="1" value="${def&&def.c1!=null?def.c1:16}"> carbons</label>
+<label>Chain 2 <input type="number" class="lC2" min="0" max="30" step="1" value="${def&&def.c2!=null?def.c2:18}"> carbons</label>
+<label>How many <input type="number" class="lN" min="0" max="2000" step="1" value="${def&&def.count!=null?def.count:20}"></label>
+<label>Chain stickiness <input type="range" class="lH" min="0" max="2" step="0.05" value="1"><output class="lHo"></output></label>
+<label>Head color <input type="color" class="lColor" value="${def&&def.color||'#e9c46a'}"></label>
+<label>Tail color <input type="color" class="lTail" value="${def&&def.tailColor||'#f77f00'}"></label>
+<button class="mini lDel" aria-label="Remove this phospholipid">Remove</button>`;
+  const hOut=()=>{const v=+row.querySelector('.lH').value;row.querySelector('.lHo').textContent=v.toFixed(2)+(v===0?' (inert)':v<0.8?' (less than a tail)':v<1.2?' (like a tail residue)':' (stickier than a tail)')};
+  row.querySelector('.lH').addEventListener('input',hOut);hOut();
+  row.querySelector('.lDel').onclick=()=>row.remove();
+  row.querySelector('.lLook').onclick=()=>lookupLipid(row);
+  row.querySelector('.lCas').addEventListener('keydown',e=>{if(e.key==='Enter')lookupLipid(row)});
+  row.dataset.rid='lip'+i;
+  const live=()=>{if(!sim)return;for(const t of sim.mols)if(t.rid===row.dataset.rid){t.color=row.querySelector('.lColor').value;t.tailColor=row.querySelector('.lTail').value}if(meshes)applyColors()};
+  row.querySelector('.lColor').addEventListener('input',live);row.querySelector('.lTail').addEventListener('input',live);
+  $('lipList').appendChild(row);return row;
+}
+$('addLip').onclick=()=>addLipRow();
+/* Minimal SMILES reader: atoms, bonds, branches and ring closures — enough to find the acyl chains. */
+function smilesGraph(sm){
+  const atoms=[],adj=[];let prev=-1,bond=1;const stack=[],rings={};
+  const add=el=>{const i=atoms.length;atoms.push(el);adj.push([]);if(prev>=0){adj[prev].push([i,bond]);adj[i].push([prev,bond])}prev=i;bond=1};
+  for(let k=0;k<sm.length;){const ch=sm[k];
+    if(ch==='['){const e=sm.indexOf(']',k);const m=/^\[\d*([A-Z][a-z]?|[a-z])/.exec(sm.slice(k,e+1));add(m?m[1][0].toUpperCase()+m[1].slice(1):'X');k=e+1;continue}
+    const two=sm.slice(k,k+2);if(two==='Cl'||two==='Br'){add(two);k+=2;continue}
+    if(/[BCNOPSFIcnops]/.test(ch)){add(ch.toUpperCase());k++;continue}
+    if(ch==='('){stack.push(prev);k++;continue}if(ch===')'){prev=stack.pop();k++;continue}
+    if(ch==='='){bond=2;k++;continue}if(ch==='#'){bond=3;k++;continue}if('-/\\:'.includes(ch)){k++;continue}if(ch==='.'){prev=-1;k++;continue}
+    let num=null;if(/\d/.test(ch)){num=ch;k++}else if(ch==='%'){num=sm.slice(k+1,k+3);k+=3}
+    if(num!==null){if(rings[num]){const [a,bo]=rings[num];const o=Math.max(bo,bond);adj[a].push([prev,o]);adj[prev].push([a,o]);delete rings[num];bond=1}else{rings[num]=[prev,bond];bond=1}continue}
+    k++}
+  return {atoms,adj};
+}
+function acylChains(sm){
+  const {atoms,adj}=smilesGraph(sm),out=[];
+  const longest=(a,from,seen)=>{let best=0;for(const [b] of adj[a]){if(b===from||seen.has(b)||atoms[b]!=='C')continue;seen.add(b);best=Math.max(best,1+longest(b,a,seen));seen.delete(b)}return best};
+  atoms.forEach((el,a)=>{if(el!=='C')return;const nb=adj[a];
+    const dO=nb.some(([b,o])=>atoms[b]==='O'&&o===2),link=nb.find(([b,o])=>o===1&&(atoms[b]==='O'||atoms[b]==='N')&&adj[b].some(([c])=>c!==a&&atoms[c]==='C'));
+    if(!dO||!link)return;const n=1+longest(a,link[0],new Set([a]));if(n>=6)out.push(n)});
+  return out;
+}
+const ACYL={formyl:1,acetyl:2,butanoyl:4,butyryl:4,hexanoyl:6,octanoyl:8,decanoyl:10,lauroyl:12,dodecanoyl:12,myristoyl:14,tetradecanoyl:14,palmitoyl:16,hexadecanoyl:16,palmitoleoyl:16,stearoyl:18,octadecanoyl:18,oleoyl:18,elaidoyl:18,linoleoyl:18,linolenoyl:18,arachidoyl:20,arachidonoyl:20,eicosanoyl:20,behenoyl:22,docosahexaenoyl:22,erucoyl:22,lignoceroyl:24,nervonoyl:24};
+function chainsFromName(name){const out=[];const re=new RegExp(Object.keys(ACYL).sort((a,b)=>b.length-a.length).join('|'),'gi');let m;const t=String(name||'').toLowerCase();
+  const di=/\bdi(lauroyl|myristoyl|palmitoyl|stearoyl|oleoyl|linoleoyl|arachidonoyl|decanoyl|hexanoyl|octanoyl)/.exec(t);if(di)return [ACYL[di[1]],ACYL[di[1]]];
+  while((m=re.exec(t)))out.push(ACYL[m[0]]);return out.slice(0,2)}
+async function lookupLipid(row){
+  const q=row.querySelector('.lCas').value.trim(),info=row.querySelector('.lInfo');if(!q)return;
+  const ok=casValid(q);if(ok===false){info.innerHTML='<span class="msg err">That CAS number fails its check digit. Check for a typo.</span>';return}
+  info.innerHTML='<span class="note">Looking up '+q.replace(/</g,'&lt;')+' in PubChem…</span>';
+  try{
+    let c=null;
+    for(const props of ['Title,MolecularFormula,MolecularWeight,IsomericSMILES,IUPACName','Title,MolecularFormula,MolecularWeight,SMILES,IUPACName']){
+      const r=await fetch('https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/'+encodeURIComponent(q)+'/property/'+props+'/JSON');
+      if(r.status===404){info.innerHTML='<span class="msg err">PubChem has no compound with that CAS number or name.</span>';return}
+      if(r.ok){c=(await r.json()).PropertyTable.Properties[0];break}
+    }
+    if(!c)throw Error('PubChem error');
+    const mw=+c.MolecularWeight,sm=c.IsomericSMILES||c.SMILES||c.CanonicalSMILES||c.ConnectivitySMILES||'',name=(c.Title||q).slice(0,30);
+    let chains=sm?acylChains(sm):[],src='read from the structure';
+    if(!chains.length){chains=chainsFromName((c.Title||'')+' '+(c.IUPACName||''));src='read from the name'}
+    chains=chains.sort((a,b)=>a-b).slice(-2);
+    const Vtot=mw*1.66,Vch=chains.reduce((a,n)=>a+27*Math.max(0,n-2)+54,0),Vh=Math.max(120,Vtot-Vch),d=Math.round(2*Math.cbrt(3*Vh/(4*Math.PI))/10*100)/100;
+    row.querySelector('.lName').value=name;row.querySelector('.lD').value=d;
+    if(chains.length){row.querySelector('.lC1').value=chains[0];row.querySelector('.lC2').value=chains[1]||0}
+    Object.assign(row.dataset,{cas:q,cid:c.CID,mw});
+    const esc=t=>String(t).replace(/[<>&"]/g,ch=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[ch]));
+    const beads=n=>n>=4?Math.max(2,Math.round((n-1)/3.5)):0;
+    info.innerHTML=`<img alt="2D structure of ${esc(name)}" src="https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/${c.CID}/PNG?image_size=small" width="100" height="100"><div><b>${esc(name)}</b> · ${esc(c.MolecularFormula||'')} · ${mw.toFixed(1)} g/mol<br>`+
+      (chains.length?`Acyl chains ${src}: <b>${chains.join(' and ')} carbons</b> (${chains.map(beads).join(' + ')} beads).`:`<span class="msg warn">No acyl chains found; enter the carbons per chain by hand.</span>`)+
+      `<br>Volume ${Vtot.toFixed(0)} Å³ − chains ${Vch.toFixed(0)} Å³ = head group ${Vh.toFixed(0)} Å³ → sphere diameter <b>${d} nm</b>.<br><a href="https://pubchem.ncbi.nlm.nih.gov/compound/${c.CID}" target="_blank" rel="noopener">PubChem CID ${c.CID}</a></div>`;
+  }catch(e){info.innerHTML='<span class="msg err">Could not reach PubChem. Check your internet connection, or enter the head group size and chains by hand.</span>'}
+}
+function getLipids(){
+  return [...document.querySelectorAll('#lipList .lip-row')].map(r=>{
+    const d=Math.min(5,Math.max(0.2,+r.querySelector('.lD').value||0.87)),count=Math.max(0,Math.min(2000,Math.round(+r.querySelector('.lN').value||0)));
+    const chains=[+r.querySelector('.lC1').value||0,+r.querySelector('.lC2').value||0].map(x=>Math.max(0,Math.min(30,Math.round(x)))).filter(x=>x>=4);
+    return {lipid:true,name:r.querySelector('.lName').value.trim()||'Phospholipid',d,count,h:0,hydro:false,hc:+r.querySelector('.lH').value,chains,color:r.querySelector('.lColor').value,tailColor:r.querySelector('.lTail').value,rid:r.dataset.rid,cas:r.dataset.cas||'',mw:r.dataset.mw||''};
   }).filter(t=>t.count>0);
 }
 
@@ -999,7 +1221,7 @@ $('afPick').onchange=async()=>{if(!afZip)return;const n=$('afPick').value;const 
 
 /* ---------- simulation (core text is shared with the background calculators) ---------- */
 const CORE_SRC=document.getElementById('simcore').textContent;
-const {createSim,step,analyze,headsToWorld,eig3,resolveOverlaps,qmul,qnorm,qAxis,quatMat}=new Function(CORE_SRC+'\nreturn {createSim,step,analyze,headsToWorld,eig3,resolveOverlaps,qmul,qnorm,qAxis,quatMat};')();
+const {createSim,step,analyze,headsToWorld,eig3,resolveOverlaps,qmul,qnorm,qAxis,quatMat,addCrosslinks,clearCrosslinks,lpCarry}=new Function(CORE_SRC+'\nreturn {createSim,step,analyze,headsToWorld,eig3,resolveOverlaps,qmul,qnorm,qAxis,quatMat,addCrosslinks,clearCrosslinks,lpCarry};')();
 let sim=null;
 /* ---------- rendering ---------- */
 const PAL=['#2a9d8f','#4361ee','#7b2cbf','#52b788','#0096c7','#9d4edd','#2d6a4f','#5e60ce','#48cae4','#6a4c93','#74c69d','#3a0ca3','#c77dff','#40916c','#4895ef','#1b998b'];
@@ -1013,7 +1235,7 @@ scene.add(new THREE.HemisphereLight(0xffffff,0xb8c4d6,0.75));const dl=new THREE.
 const controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;
 const clipPlane=new THREE.Plane(new THREE.Vector3(0,0,-1),0);
 const mkMat=()=>new THREE.MeshPhongMaterial({shininess:30,specular:0x1c1c1c,side:THREE.DoubleSide});
-const mats={head:mkMat(),tail:mkMat(),bond:mkMat(),mol:mkMat()};
+const mats={head:mkMat(),tail:mkMat(),bond:mkMat(),mol:mkMat(),xl:mkMat()};mats.xl.color.set('#e63946');
 let meshes=null;
 function resize(){const w=view.clientWidth,h=view.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix()}
 new ResizeObserver(resize).observe(view);resize();
@@ -1077,7 +1299,50 @@ function buildMeshes(S){
   for(const m of [head,tail,bond]){m.instanceMatrix.setUsage(THREE.DynamicDrawUsage);m.frustumCulled=false;scene.add(m)}
   let mol=null;if(S.Nm){mol=new THREE.InstancedMesh(new THREE.SphereGeometry(1,28,18),mats.mol,S.Nm);mol.instanceMatrix.setUsage(THREE.DynamicDrawUsage);mol.frustumCulled=false;scene.add(mol)}
   meshes={head,tail,bond,mol,surface:surfaceMode()};
-  applyColors();updateMeshes();
+  buildXl(S);buildLp(S);applyColors();updateMeshes();
+}
+/* phospholipid acyl chains: beads + bonds, colored like hydrophobic tails */
+let lpMeshes=null;
+function buildLp(S){
+  if(lpMeshes){for(const m of [lpMeshes.bead,lpMeshes.bond]){scene.remove(m);m.geometry.dispose()}lpMeshes=null}
+  if(!S||!S.lp)return;const n=S.lp.n;
+  const bead=new THREE.InstancedMesh(new THREE.SphereGeometry(1,12,8),mats.tail,n),bond=new THREE.InstancedMesh(new THREE.CylinderGeometry(1,1,1,10,1,true),mats.bond,n);
+  for(const m of [bead,bond]){m.instanceMatrix.setUsage(THREE.DynamicDrawUsage);m.frustumCulled=false;scene.add(m)}
+  lpMeshes={bead,bond};
+}
+function updateLp(S){
+  if(!lpMeshes||!S.lp)return;const L=S.lp,Q=L.Q,P=S.P,tr=2.8,br=meshes&&meshes.surface?2.4:1.2;let i=0;
+  for(const c of L.chains){let px=P[c.h*3],py=P[c.h*3+1],pz=P[c.h*3+2];
+    for(let k=0;k<c.n;k++,i++){const o=(c.o+k)*3,x=Q[o],y=Q[o+1],z=Q[o+2];_m.makeScale(tr,tr,tr);_m.setPosition(x,y,z);lpMeshes.bead.setMatrixAt(i,_m);
+      _d.set(x-px,y-py,z-pz);const len=_d.length()||1e-3;_d.divideScalar(len);_q.setFromUnitVectors(_up,_d);_v.set((x+px)/2,(y+py)/2,(z+pz)/2);_s.set(br,len,br);_m.compose(_v,_q,_s);lpMeshes.bond.setMatrixAt(i,_m);px=x;py=y;pz=z}}
+  lpMeshes.bead.instanceMatrix.needsUpdate=true;lpMeshes.bond.instanceMatrix.needsUpdate=true;
+}
+function colorLp(S){
+  if(!lpMeshes||!S.lp)return;const L=S.lp,hide=$('tailColor').value==='hide';
+  let i=0;for(const ch of L.chains){const t=S.mols[ch.ty],c=t&&t.tailColor?new THREE.Color(t.tailColor):TAIL_POLAR.clone().lerp(TAIL_HYD,Math.min(1,ch.sh*ch.sh));
+    for(let k=0;k<ch.n;k++,i++){lpMeshes.bead.setColorAt(i,c);lpMeshes.bond.setColorAt(i,c)}}
+  lpMeshes.bead.instanceColor.needsUpdate=true;lpMeshes.bond.instanceColor.needsUpdate=true;lpMeshes.bead.visible=lpMeshes.bond.visible=!hide;
+}
+/* red crosslinks: two linker beads + three bonds each */
+let xlMeshes=null;
+function buildXl(S){
+  if(xlMeshes){for(const m of [xlMeshes.bead,xlMeshes.bond]){scene.remove(m);m.geometry.dispose()}xlMeshes=null}
+  const n=S&&S.xl?S.xl.n:0;
+  $('xlCount').textContent=n?n+' crosslink'+(n>1?'s':''):'';$('xlClear').hidden=!n;
+  if(!n)return;
+  const bead=new THREE.InstancedMesh(new THREE.SphereGeometry(1,14,10),mats.xl,n*2),bond=new THREE.InstancedMesh(new THREE.CylinderGeometry(1,1,1,10,1,true),mats.xl,n*3);
+  for(const m of [bead,bond]){m.instanceMatrix.setUsage(THREE.DynamicDrawUsage);m.frustumCulled=false;scene.add(m)}
+  xlMeshes={bead,bond};updateXl(S);
+}
+function updateXl(S){
+  if(!xlMeshes||!S.xl)return;const X=S.xl,P=S.P,L=X.L,r=2.8,br=1.5;let bi=0,ci=0;
+  for(let k=0;k<X.n;k++){
+    const pts=[[P[X.a[k]*3],P[X.a[k]*3+1],P[X.a[k]*3+2]],[L[k*6],L[k*6+1],L[k*6+2]],[L[k*6+3],L[k*6+4],L[k*6+5]],[P[X.b[k]*3],P[X.b[k]*3+1],P[X.b[k]*3+2]]];
+    for(const p of [pts[1],pts[2]]){_m.makeScale(r,r,r);_m.setPosition(p[0],p[1],p[2]);xlMeshes.bead.setMatrixAt(bi++,_m)}
+    for(let s=0;s<3;s++){const a=pts[s],b=pts[s+1];_d.set(b[0]-a[0],b[1]-a[1],b[2]-a[2]);const len=_d.length()||1e-3;_d.divideScalar(len);_q.setFromUnitVectors(_up,_d);
+      _v.set((a[0]+b[0])/2,(a[1]+b[1])/2,(a[2]+b[2])/2);_s.set(br,len,br);_m.compose(_v,_q,_s);xlMeshes.bond.setMatrixAt(ci++,_m)}
+  }
+  xlMeshes.bead.instanceMatrix.needsUpdate=true;xlMeshes.bond.instanceMatrix.needsUpdate=true;
 }
 function applyColors(){
   if(!sim||!meshes)return;
@@ -1094,6 +1359,7 @@ function applyColors(){
   if(meshes.mol){const rows=[...document.querySelectorAll('#molList .mol-row')];for(let k=0;k<S.Nm;k++){const t=S.mols[S.mtype[k]];col.set(t.color);meshes.mol.setColorAt(k,col)}}
   for(const k of ['head','tail','bond','mol'])if(meshes[k]&&meshes[k].instanceColor)meshes[k].instanceColor.needsUpdate=true;
   meshes.tail.visible=meshes.bond.visible=tc!=='hide';
+  colorLp(S);
 }
 const _m=new THREE.Matrix4(),_q=new THREE.Quaternion(),_v=new THREE.Vector3(),_s=new THREE.Vector3(),_up=new THREE.Vector3(0,1,0),_d=new THREE.Vector3();
 function updateMeshes(){
@@ -1114,6 +1380,7 @@ function updateMeshes(){
   }
   if(meshes.mol){for(let k=0;k<S.Nm;k++){const b=S.Mp+k,r=S.rad[b];_m.makeScale(r,r,r);_m.setPosition(P[b*3],P[b*3+1],P[b*3+2]);meshes.mol.setMatrixAt(k,_m)}meshes.mol.instanceMatrix.needsUpdate=true}
   for(const k of ['head','tail','bond'])meshes[k].instanceMatrix.needsUpdate=true;
+  updateXl(S);updateLp(S);
 }
 function fitView(){
   if(!sim)return;
@@ -1158,7 +1425,7 @@ let running=false,lastUI=0,lastColorSig='';
 const stepLimit=()=>Math.max(100,Math.round(+$('stepLimit').value||5000));
 function syncMore(){$('moreBtn').textContent=`Keep going (+${stepLimit().toLocaleString()} steps)`}
 $('stepLimit').addEventListener('input',syncMore);syncMore();
-function enableViewButtons(){$('svgBtn').disabled=false;$('blowBtn').disabled=false;$('pauseBtn').disabled=false;$('fitBtn').disabled=false;$('pngBtn').disabled=false;$('pdbBtn').disabled=false;$('viewerEmpty').textContent=''}
+function enableViewButtons(){$('svgBtn').disabled=false;$('blowBtn').disabled=false;$('pauseBtn').disabled=false;$('fitBtn').disabled=false;$('pngBtn').disabled=false;$('pdbBtn').disabled=false;$('xlBtn').disabled=false;$('viewerEmpty').textContent=''}
 $('runBtn').onclick=()=>{
   if(!st.model)return;
   const N=Math.max(2,Math.min(200,Math.round(+$('copies').value||2)));$('copies').value=N;
@@ -1172,7 +1439,9 @@ $('runBtn').onclick=()=>{
   $('runBtn').textContent='Restart';
   const P=predict(st.model);
   let msg=mode==='build'?`Built ${N} copies around one core and relaxing.`:`Scattered ${N} copies in a sphere ${(sim.Rbox/5).toFixed(0)} nm across; waiting for tails to find each other.`;
-  if(sim.Nm)msg+=` Added ${sim.Nm} molecule${sim.Nm>1?'s':''} (${sim.mols.map(t=>`${t.count} × ${t.name}, ${t.d} nm`).join('; ')}).`;
+  {const mo=sim.mols.filter(t=>!t.lipid),li=sim.mols.filter(t=>t.lipid),nm=mo.reduce((a,t)=>a+t.count,0),nl=li.reduce((a,t)=>a+t.count,0);
+   if(nm)msg+=` Added ${nm} molecule${nm>1?'s':''} (${mo.map(t=>`${t.count} × ${t.name}, ${t.d} nm`).join('; ')}).`;
+   if(nl)msg+=` Added ${nl} phospholipid${nl>1?'s':''} (${li.map(t=>`${t.count} × ${t.name}: ${t.d} nm head group, ${t.chains.join(' + ')} carbon chains`).join('; ')}).`}
   msg+=` It stops automatically after ${sim.limit.toLocaleString()} steps.`;
   if(mode==='build'&&N>P.nMax)msg+=` That is more than the ~${P.nMax} copies predicted to fit in one spherical micelle, so expect it to deform or crowd.`;
   if(sim.M>40000)msg+=' This is a large system, so it will run slowly.';
@@ -1217,6 +1486,7 @@ function blowUp(){
     const ax=rnd(),al=Math.hypot(...ax);spin.push([ax[0]/al,ax[1]/al,ax[2]/al,(Math.random()*2-1)*0.08])}
   for(let b=Mp;b<M;b++){const k=b-Mp;let d=[P[b*3]-cx,P[b*3+1]-cy,P[b*3+2]-cz];const l=Math.hypot(...d),j=rnd();d=l>1?[d[0]/l+0.6*j[0],d[1]/l+0.6*j[1],d[2]/l+0.6*j[2]]:j;const dl=Math.hypot(...d)||1,R=(Rnew-S.rad[b])*(0.4+0.6*Math.random());
     mt[k*3]=cx+d[0]/dl*R;mt[k*3+1]=cy+d[1]/dl*R;mt[k*3+2]=cz+d[2]/dl*R}
+  if(S.xl){clearCrosslinks(S);buildXl(S)}
   blow={frame:0,frames:45,target,mt,spin,center:[cx,cy,cz],Rnew,wasRunning:running};
   running=false;$('blowBtn').disabled=true;$('moreBtn').hidden=true;
   setMsg('simMsg','Blowing up…');
@@ -1232,12 +1502,12 @@ function blowFrame(){
     pos[c*3]+=dx;pos[c*3+1]+=dy;pos[c*3+2]+=dz;
     const o=c*4,nq=qnorm(qmul(dq,[q[o],q[o+1],q[o+2],q[o+3]]));q[o]=nq[0];q[o+1]=nq[1];q[o+2]=nq[2];q[o+3]=nq[3];
   }
-  for(let b=Mp;b<M;b++){const k=b-Mp;for(let a=0;a<3;a++)P[b*3+a]+=(B.mt[k*3+a]-P[b*3+a])*Math.min(1,f*1.8)}
+  for(let b=Mp;b<M;b++){const k=b-Mp,d=[0,0,0];for(let a=0;a<3;a++){d[a]=(B.mt[k*3+a]-P[b*3+a])*Math.min(1,f*1.8);P[b*3+a]+=d[a]}lpCarry(S,b,(Q,o)=>{Q[o]+=d[0];Q[o+1]+=d[1];Q[o+2]+=d[2]})}
   headsToWorld(S);resolveOverlaps(S,20,0.02);
   B.frame++;
   if(B.frame>=B.frames){
     // re-center so the self-assembly box is centered on the origin, then continue as self-assembly
-    const [cx,cy,cz]=B.center;for(let c=0;c<N;c++){pos[c*3]-=cx;pos[c*3+1]-=cy;pos[c*3+2]-=cz}for(let b=0;b<M;b++){P[b*3]-=cx;P[b*3+1]-=cy;P[b*3+2]-=cz}
+    const [cx,cy,cz]=B.center;for(let c=0;c<N;c++){pos[c*3]-=cx;pos[c*3+1]-=cy;pos[c*3+2]-=cz}for(let b=0;b<M;b++){P[b*3]-=cx;P[b*3+1]-=cy;P[b*3+2]-=cz}if(S.lp){const Q=S.lp.Q;for(let i=0;i<S.lp.n;i++){Q[i*3]-=cx;Q[i*3+1]-=cy;Q[i*3+2]-=cz}}
     headsToWorld(S);
     S.mode='self';S.Rbox=B.Rnew;S.molBox=0;
     for(let c=0;c<N;c++)S.parent[c]=c;analyze(S);
@@ -1248,6 +1518,15 @@ function blowFrame(){
   }
 }
 $('blowBtn').onclick=blowUp;
+$('xlBtn').onclick=()=>{
+  if(!sim||blow)return;
+  const n=Math.max(1,Math.min(500,Math.round(+$('xlN').value||10)));$('xlN').value=n;
+  const r=addCrosslinks(sim,n,18);buildXl(sim);
+  if(!r.added){setMsg('simMsg','No crosslinks added: no two copies have surface residues within 1.8 nm of each other. Let the copies come together first, then try again.','err');return}
+  for(let c=0;c<sim.N;c++)sim.parent[c]=c;analyze(sim);refreshUI();applyColors();
+  setMsg('simMsg',`Added ${r.added} crosslink${r.added>1?'s':''} (red, two residues each) between ${r.pairs} pair${r.pairs>1?'s':''} of neighbouring copies, joining residues ${(r.dMin/10).toFixed(1)}–${(r.dMax/10).toFixed(1)} nm apart.${r.added<n?` Only ${r.added} of ${n} found close-enough residues.`:''} Linked copies now move together and count as one assembly.${running?'':' Press Resume or Keep going to see them move.'}`,'ok');
+};
+$('xlClear').onclick=()=>{if(!sim)return;clearCrosslinks(sim);buildXl(sim);for(let c=0;c<sim.N;c++)sim.parent[c]=c;analyze(sim);refreshUI();applyColors();setMsg('simMsg','Removed all crosslinks.','ok')};
 $('restartBtn').onclick=()=>{$('restartBtn').hidden=true;$('runBtn').click()};
 
 /* ---------- calculate without 3D (background workers) ---------- */
@@ -1255,7 +1534,7 @@ const WORKER_SRC=`
 self.onmessage=function(e){var d=e.data;var S=createSim(d.model,d.N,d.mode,d.phi,d.eps,d.mols);for(var c=0;c<d.N;c++)S.parent[c]=c;analyze(S);
   function loop(){var t0=performance.now();while(S.steps<d.limit&&performance.now()-t0<150){step(S,(S.steps+1)%100===0||S.steps+1===d.limit)}
     if(S.steps<d.limit){self.postMessage({type:'progress',steps:S.steps});setTimeout(loop,0)}
-    else self.postMessage({type:'done',steps:S.steps,molFree:S.molFree,clusters:S.clusters,state:{P:S.P,pos:S.pos,q:S.q,clusterOf:S.clusterOf}},[S.P.buffer,S.pos.buffer,S.q.buffer,S.clusterOf.buffer])}
+    else self.postMessage({type:'done',steps:S.steps,molFree:S.molFree,clusters:S.clusters,state:{P:S.P,pos:S.pos,q:S.q,clusterOf:S.clusterOf,lpQ:S.lp?S.lp.Q:null}},[S.P.buffer,S.pos.buffer,S.q.buffer,S.clusterOf.buffer])}
   loop()};`;
 let workerURL=null,workerOK=true;
 function makeWorker(){
@@ -1268,7 +1547,7 @@ function runLocal(job,onProgress,onDone){
   const S=createSim(job.model,job.N,job.mode,job.phi,job.eps,job.mols);for(let c=0;c<job.N;c++)S.parent[c]=c;analyze(S);
   const h={stop:false};
   (function loop(){if(h.stop)return;const t0=performance.now();while(S.steps<job.limit&&performance.now()-t0<30)step(S,(S.steps+1)%100===0||S.steps+1===job.limit);
-    if(S.steps<job.limit){onProgress(S.steps);setTimeout(loop,0)}else onDone({steps:S.steps,molFree:S.molFree,clusters:S.clusters,state:{P:S.P,pos:S.pos,q:S.q,clusterOf:S.clusterOf}})})();
+    if(S.steps<job.limit){onProgress(S.steps);setTimeout(loop,0)}else onDone({steps:S.steps,molFree:S.molFree,clusters:S.clusters,state:{P:S.P,pos:S.pos,q:S.q,clusterOf:S.clusterOf,lpQ:S.lp?S.lp.Q:null}})})();
   return {terminate(){h.stop=true}};
 }
 function startJob(job){
@@ -1308,7 +1587,7 @@ function drawCalcRow(job){
 }
 function viewJob(job){
   const r=job.result,S=createSim(job.model,job.N,job.mode,job.phi,job.eps,job.mols);
-  S.P.set(r.state.P);S.pos.set(r.state.pos);S.q.set(r.state.q);S.clusterOf.set(r.state.clusterOf);S.clusters=r.clusters;S.molFree=r.molFree;S.steps=r.steps;S.limit=r.steps;
+  S.P.set(r.state.P);if(S.lp&&r.state.lpQ)S.lp.Q.set(r.state.lpQ);S.pos.set(r.state.pos);S.q.set(r.state.q);S.clusterOf.set(r.state.clusterOf);S.clusters=r.clusters;S.molFree=r.molFree;S.steps=r.steps;S.limit=r.steps;
   for(let c=0;c<S.N;c++)S.parent[c]=c;
   headsToWorld(S);resolveOverlaps(S,100,0.02);blow=null;sim=S;running=false;
   buildMeshes(sim);fitView();enableViewButtons();refreshUI();
@@ -1395,6 +1674,8 @@ $('pdbBtn').onclick=()=>{
       L.push('HETATM'+String(serial++%100000).padStart(5)+'  X   '+rn.padStart(3)+' '+'Z'+String((k+1)%10000).padStart(4)+'    '+f(S.P[b*3])+f(S.P[b*3+1])+f(S.P[b*3+2])+'  1.00'+S.rad[b].toFixed(2).padStart(6)+'      MOL   X')}
     L.push('TER');
   }
+  if(S.lp){L.push('REMARK   3 PHOSPHOLIPID ACYL CHAIN BEADS (ABOUT 3.5 CARBONS EACH), RESIDUE LIP');const f=v=>v.toFixed(3).padStart(8);
+    S.lp.chains.forEach((c,ci)=>{for(let k=0;k<c.n;k++){const o=(c.o+k)*3;L.push('HETATM'+String(serial++%100000).padStart(5)+'  C   LIP Y'+String((ci+1)%10000).padStart(4)+'    '+f(S.lp.Q[o])+f(S.lp.Q[o+1])+f(S.lp.Q[o+2])+'  1.00  2.80      LIP   C')}});L.push('TER')}
   L.push('END');
   download(new Blob([L.join('\n')+'\n'],{type:'chemical/x-pdb'}),'protein-assembly.pdb');
 };
