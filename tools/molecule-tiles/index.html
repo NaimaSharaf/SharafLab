@@ -151,7 +151,7 @@
             </div>
             <p class="mt-note">Press + (or Enter) to look it up on PubChem and add it. You can also <label class="file mini" style="display:inline-block">load a MOL/SDF file<input type="file" id="addFile" accept=".mol,.sdf,.mdl,chemical/x-mdl-molfile" /></label>.</p>
             <div class="mt-list" id="list"></div>
-            <p class="mt-note" id="reloadRow"><button type="button" class="mini" id="reloadEx" title="Replace the list with the five example dyes">Reload examples</button></p>
+            <p class="mt-note" id="reloadRow"><button type="button" class="mini" id="reloadEx" title="Put back the five example dyes and the original settings (the blank page and library are kept)">Reset examples and settings</button></p>
 
             <h3>Canvas</h3>
             <div id="pageCanvas" class="hidden">
@@ -1320,8 +1320,10 @@ const EXAMPLES = [{"name": "Rose Bengal (RB)", "cas": "632-69-9", "mol": "\n    
     if (!Object.keys(set).length) MODE_SET.forEach((id) => (set[id] = valOf($(id)))); // first visit: start from the current values
     MODE_SET.forEach((id) => { if (set[id] != null) setVal($(id), set[id]); });
   }
+  const FIRST = {}; // the settings as the page first loads, before anything saved is applied
   SETTINGS.forEach((id) => {
     const el = $(id);
+    FIRST[id] = valOf(el);
     if (!MODE_SET.includes(id)) try { const v = localStorage.getItem("mt-" + id); if (v != null) { if (el.type === "checkbox") el.checked = v === "1"; else el.value = v; } } catch (e) {}
     el.addEventListener("input", () => { recordSetting(id); draw(); });
   });
@@ -1349,13 +1351,16 @@ const EXAMPLES = [{"name": "Rose Bengal (RB)", "cas": "632-69-9", "mol": "\n    
   $("reloadEx").addEventListener("click", () => {
     const b = $("reloadEx");
     if (items.length && !armed) {
-      b.textContent = "Click again to replace your list";
-      armed = setTimeout(() => { armed = null; b.textContent = "Reload examples"; }, 3000);
+      b.textContent = "Click again to reset list and settings";
+      armed = setTimeout(() => { armed = null; b.textContent = "Reset examples and settings"; }, 3000);
       return;
     }
-    clearTimeout(armed); armed = null; b.textContent = "Reload examples";
+    clearTimeout(armed); armed = null; b.textContent = "Reset examples and settings";
     items = []; arrows = []; syncArrows(); arrowSel = null; $("delArrow").classList.add("hidden"); $("branchArrow").classList.add("hidden"); closeScale();
-    loadExamples(); update(); status("Examples reloaded.");
+    // settings back to how they were the first time the page loaded
+    SETTINGS.forEach((id) => { setVal($(id), FIRST[id]); try { localStorage.removeItem("mt-" + id); } catch (e) {} $(id).dispatchEvent(new Event("change")); });
+    modeSettings = { tiles: {}, page: {} }; try { localStorage.removeItem("mt-modeset"); } catch (e) {}
+    loadExamples(); update(); status("Examples and settings reset.");
   });
   let startMode = "tiles"; try { startMode = localStorage.getItem("mt-mode") || "tiles"; } catch (e) {}
   setMode(startMode === "page" ? "page" : "tiles");

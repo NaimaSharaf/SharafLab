@@ -1,0 +1,386 @@
+<!doctype html>
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Sharaf Lab tool: a library of figure arrows (straight, curved, circular, elbow, reaction and inhibition arrows). Set the color, line width in pt and size, then copy any arrow as SVG."
+    />
+    <title>Arrow Library | Sharaf Lab Tools</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600&family=Montserrat:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../../styles.css" />
+    <style>
+.tool-caution{max-width:1132px;margin:-60px auto 70px;padding:16px 20px;background:#fff7ec;border:1px solid #f0d2a8;border-left:4px solid #d9822b;border-radius:8px;color:#5c3b12;font-size:15px;line-height:1.6}
+.tool-caution strong{color:#8a4b0f}
+.tool-back{display:inline-block;margin:0 0 22px;color:#0b6870;font-weight:600;text-decoration:none}.tool-back:hover{text-decoration:underline;text-underline-offset:4px}
+@media(max-width:1180px){.tool-caution{margin-left:24px;margin-right:24px}}
+@media(max-width:800px){.tool-caution{margin-top:-40px;margin-bottom:50px}}
+.arw{max-width:1180px;margin:0 auto 90px;padding:0 24px;display:grid;grid-template-columns:300px 1fr;gap:20px;align-items:start;font-family:"Manrope",Arial,sans-serif;color:#102a33}
+.arw-panel{background:#fff;border:1px solid #d8e0e0;padding:6px 20px 18px;position:sticky;top:90px}
+.arw-panel h3{font:700 12px "Montserrat",Arial,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#0b6870;margin:20px 0 4px}
+.arw-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #e4ebeb;font-size:14px}
+.arw-row label{font-weight:600}
+.arw-row .val{display:inline-flex;align-items:center;gap:8px}
+.arw input[type=range]{width:105px;accent-color:#0b6870}
+.arw input[type=number]{width:58px;height:28px;box-sizing:border-box;padding:2px 6px;border:1px solid #b8c8d5;border-radius:5px;font:inherit;font-size:13px;text-align:right;color:#102a33;background:#fff}
+.arw select{font:inherit;font-size:14px;padding:5px 8px;border:1px solid #b8c8d5;border-radius:6px;background:#fff;color:#102a33}
+.arw input[type=color]{width:36px;height:30px;border:1px solid #b8c8d5;border-radius:5px;padding:2px;background:#fff;cursor:pointer}
+.arw input[type=checkbox]{width:17px;height:17px;accent-color:#0b6870}
+.arw .swatches{display:flex;gap:6px;flex-wrap:wrap;padding:8px 0 4px}
+.arw .swatches button{width:22px;height:22px;padding:0;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px #b8c8d5;cursor:pointer}
+.arw .swatches button[aria-pressed=true]{box-shadow:0 0 0 2px #0b6870}
+.arw-note{font-size:13px;color:#6b7f83;line-height:1.55;margin:10px 0 0}
+.arw button.btn{border:1px solid #b8c8d5;background:#fff;border-radius:7px;padding:7px 11px;font:600 13px "Manrope",Arial,sans-serif;cursor:pointer;color:#173650}
+.arw button.btn:hover{border-color:#0b6870}
+.arw button.primary{background:#0b6870;color:#fff;border-color:#0b6870}
+.arw button:focus-visible,.arw input:focus-visible,.arw select:focus-visible{outline:2px solid #0b6870;outline-offset:2px}
+.arw-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px}
+.arw-card{background:#fff;border:1px solid #d8e0e0;display:flex;flex-direction:column}
+.arw-card h4{margin:0;padding:10px 12px 0;font:600 13px "Montserrat",Arial,sans-serif;color:#102a33}
+.arw-card small{display:block;padding:0 12px;color:#6b7f83;font-size:12px}
+.arw-stage{height:150px;margin:8px 12px;display:grid;place-items:center;background-image:linear-gradient(45deg,#f4f6f6 25%,transparent 25%),linear-gradient(-45deg,#f4f6f6 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#f4f6f6 75%),linear-gradient(-45deg,transparent 75%,#f4f6f6 75%);background-size:16px 16px;background-position:0 0,0 8px,8px -8px,-8px 0;overflow:hidden}
+.arw-stage svg{max-width:100%;max-height:100%}
+.arw-actions{display:flex;gap:8px;padding:0 12px 12px}
+.arw-actions .btn{white-space:nowrap;padding:7px 9px}
+.arw-actions .primary{flex:1}
+.arw-filter{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 14px}
+.arw-filter button{border:1px solid #b8c8d5;background:#fff;border-radius:999px;padding:6px 12px;font:600 13px "Manrope",Arial,sans-serif;color:#173650;cursor:pointer}
+.arw-filter button[aria-pressed=true]{background:#0b6870;border-color:#0b6870;color:#fff}
+#arwToast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:#102a33;color:#fff;padding:10px 16px;border-radius:8px;font:600 14px Manrope,Arial,sans-serif;z-index:9999;box-shadow:0 6px 20px rgba(0,0,0,.2);opacity:0;transition:opacity .3s;pointer-events:none}
+@media(max-width:860px){.arw{grid-template-columns:1fr}.arw-panel{position:static}}
+    </style>
+  </head>
+  <body class="outreach-body">
+    <header>
+      <div class="nav">
+        <a class="brand" href="../../index.html" aria-label="Sharaf Lab home"
+          ><img src="../../00%20Github%20assets/sharaf-lab-logo.png" alt="Sharaf Lab"
+        /></a>
+        <nav aria-label="Primary navigation">
+          <a href="../../index.html">Home</a>
+          <a href="../../philosophy.html">Philosophy</a>
+          <a href="../../research.html">Research</a>
+          <a href="../../members.html">Lab Members</a>
+          <a href="../../photos.html">Photos</a>
+          <a href="../../links.html">Links of Interest</a>
+          <a class="active" href="../../tools.html" aria-current="page">Tools</a>
+          <a href="../../join.html">Join the Lab</a>
+        </nav>
+      </div>
+    </header>
+    <main>
+      <section class="outreach-hero">
+        <a class="tool-back" href="../../tools.html">← All lab tools</a>
+        <p class="eyebrow eyebrow-dark">Lab tools · Figures · Arrows</p>
+        <h1>Arrow library.</h1>
+        <p>
+          Straight, curved, circular, elbow, reaction and inhibition arrows for
+          figures. Set the color, line width and size once, then copy any arrow
+          as SVG and paste it into Affinity, Illustrator or PowerPoint.
+        </p>
+      </section>
+
+      <div class="tool-caution" role="note">
+        <strong>Check every result.</strong> These tools were vibe coded: built
+        quickly with AI assistance and not independently validated. Compare
+        their output with your own data and standard software before using it
+        in figures, analyses or publications.
+      </div>
+
+      <div class="arw">
+        <aside class="arw-panel" aria-label="Arrow settings">
+          <h3>Color</h3>
+          <div class="arw-row"><label for="color">Arrow color</label><span class="val"><input id="color" type="color" value="#000000" /></span></div>
+          <div class="swatches" id="swatches" aria-label="Color presets"></div>
+
+          <h3>Line</h3>
+          <div class="arw-row"><label for="lw">Line width (pt)</label><span class="val"><input id="lw" type="range" min="0.25" max="6" step="0.25" value="1.5" /><input id="lwNum" type="number" step="any" min="0.05" value="1.5" aria-label="Line width in pt" /></span></div>
+          <div class="arw-row"><label for="cap">Line ends</label><span class="val"><select id="cap"><option value="round">Round</option><option value="butt">Flat</option><option value="square">Square</option></select></span></div>
+          <div class="arw-row"><label for="dashed">Dashed</label><span class="val"><input id="dashed" type="checkbox" /></span></div>
+
+          <h3>Arrowhead</h3>
+          <div class="arw-row"><label for="head">Style</label><span class="val"><select id="head"><option value="triangle">Filled triangle</option><option value="stealth">Notched</option><option value="open">Open V</option><option value="none">None</option></select></span></div>
+          <div class="arw-row"><label for="hl">Head length (× line)</label><span class="val"><input id="hl" type="range" min="1.5" max="10" step="0.1" value="4.2" /><input id="hlNum" type="number" step="any" min="0.5" value="4.2" aria-label="Head length" /></span></div>
+          <div class="arw-row"><label for="hw">Head width (× line)</label><span class="val"><input id="hw" type="range" min="1.5" max="10" step="0.1" value="4.2" /><input id="hwNum" type="number" step="any" min="0.5" value="4.2" aria-label="Head width" /></span></div>
+          <div class="arw-row"><label for="double">Head on both ends</label><span class="val"><input id="double" type="checkbox" /></span></div>
+
+          <h3>Size and direction</h3>
+          <div class="arw-row"><label for="size">Size (in)</label><span class="val"><input id="size" type="range" min="0.1" max="3" step="0.05" value="0.6" /><input id="sizeNum" type="number" step="any" min="0.05" value="0.6" aria-label="Size in inches" /></span></div>
+          <div class="arw-row"><label for="rot">Rotate</label><span class="val"><input id="rot" type="range" min="-180" max="180" step="15" value="0" /><input id="rotNum" type="number" step="any" value="0" aria-label="Rotation in degrees" /></span></div>
+          <div class="arw-row"><label>Flip</label><span class="val"><label style="font-weight:400;display:inline-flex;gap:5px;align-items:center"><input id="flipH" type="checkbox" />↔</label><label style="font-weight:400;display:inline-flex;gap:5px;align-items:center"><input id="flipV" type="checkbox" />↕</label></span></div>
+          <div class="arw-row"><label for="dpi">Document DPI</label><span class="val"><input id="dpi" type="number" min="1" max="2400" step="1" value="360" style="width:70px" /></span></div>
+          <p class="arw-note"><em>Size</em> is the length of the arrow's main span. Line widths and arrowheads stay in pt whatever the size. Set <em>Document DPI</em> to your Affinity document's DPI so pastes land at the right size; use 72 for Illustrator. Settings are remembered in this browser.</p>
+          <p class="arw-note"><button class="btn" id="resetBtn" type="button">Reset settings</button></p>
+        </aside>
+
+        <section aria-label="Arrows">
+          <div class="arw-filter" id="filter" role="group" aria-label="Show arrows"></div>
+          <div class="arw-grid" id="grid"></div>
+        </section>
+      </div>
+      <div id="arwToast" role="status"></div>
+    </main>
+    <footer>© 2026 Sharaf Lab. Hosted on GitHub Pages. Created with the assistance of AI.</footer>
+
+    <script>
+(function () {
+  "use strict";
+  const $ = (id) => document.getElementById(id);
+  const NS = "http://www.w3.org/2000/svg";
+  const f = (x) => (Math.round(x * 100) / 100).toString();
+  const SWATCHES = ["#000000", "#b3b3b3", "#e0569a", "#d94040", "#f08c2e", "#e8c32a", "#4caf6a", "#2a9d8f", "#3a7bd5", "#7b4fc9", "#555555"];
+  const DEFAULTS = { color: "#000000", lw: 1.5, cap: "round", dashed: false, head: "triangle", hl: 4.2, hw: 4.2, double: false, size: 0.6, rot: 0, flipH: false, flipV: false, dpi: 360 };
+  const KEY = "arw-settings";
+
+  // ---------- geometry helpers (unit coordinates: main span = 1, y points down) ----------
+  const rad = (d) => (d * Math.PI) / 180;
+  const line = (...pts) => pts;
+  function arc(cx, cy, r, a0, a1, ry) {
+    const n = Math.max(8, Math.ceil(Math.abs(a1 - a0) / 3)), out = [];
+    for (let i = 0; i <= n; i++) { const a = rad(a0 + ((a1 - a0) * i) / n); out.push([cx + r * Math.cos(a), cy + (ry || r) * Math.sin(a)]); }
+    return out;
+  }
+  function wave(len, amp, waves, x0 = 0, y0 = 0) {
+    const n = Math.ceil(waves * 40), out = [];
+    for (let i = 0; i <= n; i++) { const t = i / n; out.push([x0 + t * len, y0 - amp * Math.sin(t * waves * 2 * Math.PI)]); }
+    return out;
+  }
+  function bez(p0, p1, p2, p3, n = 48) {
+    const out = [];
+    for (let i = 0; i <= n; i++) {
+      const t = i / n, u = 1 - t;
+      out.push([u * u * u * p0[0] + 3 * u * u * t * p1[0] + 3 * u * t * t * p2[0] + t * t * t * p3[0], u * u * u * p0[1] + 3 * u * u * t * p1[1] + 3 * u * t * t * p2[1] + t * t * t * p3[1]]);
+    }
+    return out;
+  }
+  // rounded corners for elbow arrows
+  function elbow(pts, r) {
+    const out = [pts[0]];
+    for (let i = 1; i < pts.length - 1; i++) {
+      const [a, b, c] = [pts[i - 1], pts[i], pts[i + 1]];
+      const d1 = Math.hypot(b[0] - a[0], b[1] - a[1]), d2 = Math.hypot(c[0] - b[0], c[1] - b[1]), rr = Math.min(r, d1 / 2, d2 / 2);
+      const p = [b[0] + ((a[0] - b[0]) * rr) / d1, b[1] + ((a[1] - b[1]) * rr) / d1], q = [b[0] + ((c[0] - b[0]) * rr) / d2, b[1] + ((c[1] - b[1]) * rr) / d2];
+      for (let k = 0; k <= 10; k++) { const t = k / 10, u = 1 - t; out.push([u * u * p[0] + 2 * u * t * b[0] + t * t * q[0], u * u * p[1] + 2 * u * t * b[1] + t * t * q[1]]); }
+    }
+    out.push(pts[pts.length - 1]);
+    return out;
+  }
+
+  // ---------- the library ----------
+  // Each arrow returns strokes: { pts, end, start, dash } where end/start is "head" | "half" | "bar" | "none",
+  // or a filled shape { fill: pts }. k = line width and H = head width, both in unit coordinates.
+  const LIB = [
+    { g: "Straight", name: "Straight", s: () => [{ pts: line([0, 0], [1, 0]), end: "head" }] },
+    { g: "Straight", name: "Double-headed", s: () => [{ pts: line([0, 0], [1, 0]), end: "head", start: "head" }] },
+    { g: "Straight", name: "Diagonal", s: () => [{ pts: line([0, 0.5], [0.8, -0.1]), end: "head" }] },
+    { g: "Straight", name: "Short", s: () => [{ pts: line([0, 0], [0.5, 0]), end: "head" }] },
+    { g: "Straight", name: "Dashed", s: () => [{ pts: line([0, 0], [1, 0]), end: "head", dash: true }] },
+    { g: "Straight", name: "Block arrow", s: () => [{ fill: [[0, -0.09], [0.62, -0.09], [0.62, -0.22], [1, 0], [0.62, 0.22], [0.62, 0.09], [0, 0.09]] }] },
+    { g: "Straight", name: "Block double", s: () => [{ fill: [[0, 0], [0.3, -0.22], [0.3, -0.09], [0.7, -0.09], [0.7, -0.22], [1, 0], [0.7, 0.22], [0.7, 0.09], [0.3, 0.09], [0.3, 0.22]] }] },
+
+    { g: "Curved", name: "Half circle", s: () => [{ pts: arc(0.5, 0, 0.5, 0, -180), end: "head" }] },
+    { g: "Curved", name: "Half circle, clockwise", s: () => [{ pts: arc(0.5, 0, 0.5, 180, 360), end: "head" }] },
+    { g: "Curved", name: "Quarter turn", s: () => [{ pts: arc(0, 0, 0.75, 0, -90), end: "head" }] },
+    { g: "Curved", name: "Three-quarter turn", s: () => [{ pts: arc(0.5, 0, 0.5, 90, -180), end: "head" }] },
+    { g: "Curved", name: "Gentle arc", s: () => [{ pts: arc(0.5, 0.75, 0.9, -146, -34), end: "head" }] },
+    { g: "Curved", name: "Swoop", s: () => [{ pts: bez([0, 0.35], [0.1, -0.35], [0.7, -0.35], [1, 0.1]), end: "head" }] },
+    { g: "Curved", name: "S-curve", s: () => [{ pts: bez([0, 0.25], [0.5, 0.25], [0.5, -0.25], [1, -0.25]), end: "head" }] },
+    { g: "Curved", name: "Wavy", s: () => [{ pts: wave(1, 0.07, 3), end: "head" }] },
+    { g: "Curved", name: "Zigzag", s: () => [{ pts: line([0, 0], [0.2, -0.1], [0.4, 0.1], [0.6, -0.1], [0.8, 0.1], [1, 0]), end: "head" }] },
+    { g: "Curved", name: "Loop", s: () => [{ pts: [...bez([0, 0.15], [0.35, 0.15], [0.55, 0.1], [0.55, -0.12], 30), ...bez([0.55, -0.12], [0.55, -0.35], [0.3, -0.35], [0.3, -0.15], 24).slice(1), ...bez([0.3, -0.15], [0.3, 0.12], [0.7, 0.15], [1, 0.15], 30).slice(1)], end: "head" }] },
+
+    { g: "Circular", name: "Cycle", s: () => [{ pts: arc(0.5, 0, 0.5, 240, -70), end: "head" }] },
+    { g: "Circular", name: "Cycle, clockwise", s: () => [{ pts: arc(0.5, 0, 0.5, -60, 250), end: "head" }] },
+    { g: "Circular", name: "Two-arrow cycle", s: () => [{ pts: arc(0.5, 0, 0.5, -160, -20), end: "head" }, { pts: arc(0.5, 0, 0.5, 20, 160), end: "head" }] },
+    { g: "Circular", name: "Three-arrow cycle", s: () => [0, 120, 240].map((a) => ({ pts: arc(0.5, 0, 0.5, a - 100, a - 25), end: "head" })) },
+    { g: "Circular", name: "Refresh", s: () => [{ pts: arc(0.5, 0, 0.5, -150, 20), end: "head" }, { pts: arc(0.5, 0, 0.5, 30, 200), end: "head" }] },
+
+    { g: "Elbow", name: "Elbow", s: () => [{ pts: elbow([[0, -0.3], [0.7, -0.3], [0.7, 0.4]], 0.12), end: "head" }] },
+    { g: "Elbow", name: "Sharp elbow", s: () => [{ pts: line([0, -0.3], [0.7, -0.3], [0.7, 0.4]), end: "head" }] },
+    { g: "Elbow", name: "U-turn", s: () => [{ pts: [[0.9, -0.25], ...arc(0.25, 0, 0.25, -90, -270), [0.9, 0.25]], end: "head" }] },
+    { g: "Elbow", name: "Step", s: () => [{ pts: elbow([[0, -0.25], [0.45, -0.25], [0.45, 0.25], [1, 0.25]], 0.1), end: "head" }] },
+    { g: "Elbow", name: "Bracket", s: () => [{ pts: elbow([[0, -0.4], [0.35, -0.4], [0.35, 0.4], [0, 0.4]], 0.1), end: "head" }] },
+    { g: "Elbow", name: "Fork", s: () => [{ pts: line([0, 0], [0.4, 0]), end: "none" }, { pts: elbow([[0.4, 0], [0.4, -0.35], [1, -0.35]], 0.12), end: "head" }, { pts: elbow([[0.4, 0], [0.4, 0.35], [1, 0.35]], 0.12), end: "head" }] },
+    { g: "Elbow", name: "Split", s: () => [{ pts: line([0, 0], [0.35, 0]), end: "none" }, { pts: bez([0.35, 0], [0.6, 0], [0.7, -0.35], [1, -0.35], 30), end: "head" }, { pts: bez([0.35, 0], [0.6, 0], [0.7, 0.35], [1, 0.35], 30), end: "head" }] },
+    { g: "Elbow", name: "Merge", s: () => [{ pts: bez([0, -0.35], [0.3, -0.35], [0.4, 0], [0.65, 0], 30), end: "none" }, { pts: bez([0, 0.35], [0.3, 0.35], [0.4, 0], [0.65, 0], 30), end: "none" }, { pts: line([0.65, 0], [1, 0]), end: "head" }] },
+    { g: "Elbow", name: "Three-way split", s: () => [{ pts: line([0, 0], [0.35, 0]), end: "none" }, { pts: line([0.35, 0], [1, 0]), end: "head" }, { pts: bez([0.35, 0], [0.6, 0], [0.7, -0.4], [1, -0.4], 30), end: "head" }, { pts: bez([0.35, 0], [0.6, 0], [0.7, 0.4], [1, 0.4], 30), end: "head" }] },
+
+    { g: "Reaction", name: "Equilibrium", s: (k, H) => { const g = Math.max(0.05, H * 0.5); return [{ pts: line([0, -g], [1, -g]), end: "half" }, { pts: line([1, g], [0, g]), end: "half" }]; } },
+    { g: "Reaction", name: "Two-way arrows", s: (k, H) => { const g = Math.max(0.07, H * 0.65); return [{ pts: line([0, -g], [1, -g]), end: "head" }, { pts: line([1, g], [0, g]), end: "head" }]; } },
+    { g: "Reaction", name: "Favored forward", s: (k, H) => { const g = Math.max(0.05, H * 0.5); return [{ pts: line([0, -g], [1, -g]), end: "half" }, { pts: line([0.75, g], [0.25, g]), end: "half" }]; } },
+    { g: "Reaction", name: "Retrosynthesis", s: (k) => { const g = k * 2.2; return [{ pts: line([0, -g], [0.9, -g]), end: "none" }, { pts: line([0, g], [0.9, g]), end: "none" }, { pts: line([0.84, -g * 3.2], [1, 0], [0.84, g * 3.2]), end: "none", join: true }]; } },
+    { g: "Reaction", name: "With side arc", s: () => [{ pts: line([0, 0.12], [1, 0.12]), end: "head" }, { pts: bez([0.2, -0.3], [0.38, 0.12], [0.62, 0.12], [0.8, -0.3], 40), end: "head" }] },
+    { g: "Reaction", name: "Side arc below", s: () => [{ pts: line([0, -0.12], [1, -0.12]), end: "head" }, { pts: bez([0.2, 0.3], [0.38, -0.12], [0.62, -0.12], [0.8, 0.3], 40), end: "head" }] },
+    { g: "Reaction", name: "Inhibition", s: () => [{ pts: line([0, 0], [1, 0]), end: "bar" }] },
+    { g: "Reaction", name: "Curved inhibition", s: () => [{ pts: arc(0.5, 0.75, 0.9, -146, -34), end: "bar" }] },
+    { g: "Reaction", name: "Resonance", s: () => [{ pts: line([0, 0], [1, 0]), end: "head", start: "head" }] },
+    { g: "Reaction", name: "Electron push", s: () => [{ pts: bez([0, 0.15], [0.15, -0.45], [0.85, -0.45], [1, 0.15]), end: "half" }] },
+  ];
+
+  // ---------- drawing ----------
+  function read() {
+    return {
+      color: $("color").value, lw: Math.max(0.01, +$("lw").value || DEFAULTS.lw), cap: $("cap").value, dashed: $("dashed").checked,
+      head: $("head").value, hl: +$("hl").value || DEFAULTS.hl, hw: +$("hw").value || DEFAULTS.hw, double: $("double").checked,
+      size: Math.max(0.01, +$("size").value || DEFAULTS.size), rot: +$("rot").value || 0, flipH: $("flipH").checked, flipV: $("flipV").checked,
+      dpi: Math.max(1, +$("dpi").value || 360),
+    };
+  }
+  const len = (a, b) => Math.hypot(b[0] - a[0], b[1] - a[1]);
+  // point a distance d back from the end of the polyline
+  function backAt(pts, d) {
+    for (let i = pts.length - 1; i > 0; i--) {
+      const L = len(pts[i - 1], pts[i]);
+      if (L >= d) { const t = d / L; return [pts[i][0] + (pts[i - 1][0] - pts[i][0]) * t, pts[i][1] + (pts[i - 1][1] - pts[i][1]) * t]; }
+      d -= L;
+    }
+    return pts[0];
+  }
+  function trimEnd(pts, d) {
+    const out = pts.slice();
+    while (d > 0 && out.length > 1) {
+      const a = out[out.length - 2], b = out[out.length - 1], L = len(a, b);
+      if (L <= d) { out.pop(); d -= L; continue; }
+      out[out.length - 1] = [b[0] + ((a[0] - b[0]) * d) / L, b[1] + ((a[1] - b[1]) * d) / L];
+      d = 0;
+    }
+    return out;
+  }
+  const pathD = (pts) => "M" + pts.map((p) => f(p[0]) + " " + f(p[1])).join(" L");
+
+  // returns { parts: [svg strings], trim, pts (outline points for the bounds) }
+  function headAt(pts, type, p, lw, HL, HW) {
+    const T = pts[pts.length - 1], P = backAt(pts, Math.min(HL * 0.8, totalLen(pts) * 0.5));
+    let ux = T[0] - P[0], uy = T[1] - P[1]; const ul = Math.hypot(ux, uy) || 1; ux /= ul; uy /= ul;
+    const nx = uy, ny = -ux; // left of travel
+    const B = [T[0] - ux * HL, T[1] - uy * HL];
+    const L = [B[0] + (nx * HW) / 2, B[1] + (ny * HW) / 2], R = [B[0] - (nx * HW) / 2, B[1] - (ny * HW) / 2];
+    const fill = (q) => `<path d="${pathD(q)} Z" fill="${p.color}"/>`;
+    if (type === "bar") return { parts: [`<path d="${pathD([L.map((v, i) => v + (T[i] - B[i])), R.map((v, i) => v + (T[i] - B[i]))])}" fill="none" stroke="${p.color}" stroke-width="${f(lw)}" stroke-linecap="${p.cap}"/>`], trim: 0, pts: [[L[0] + ux * HL, L[1] + uy * HL], [R[0] + ux * HL, R[1] + uy * HL]] };
+    if (type === "half") { const Lh = [B[0] + nx * HW * 0.62, B[1] + ny * HW * 0.62]; return { parts: [fill([T, Lh, [B[0] + ux * HL * 0.2, B[1] + uy * HL * 0.2]])], trim: lw * 0.5, pts: [T, Lh, B] }; }
+    if (p.head === "none") return { parts: [], trim: 0, pts: [T] };
+    if (p.head === "open") return { parts: [`<path d="${pathD([L, T, R])}" fill="none" stroke="${p.color}" stroke-width="${f(lw)}" stroke-linecap="${p.cap}" stroke-linejoin="miter" stroke-miterlimit="10"/>`], trim: lw * 0.6, pts: [L, T, R], tipOut: lw };
+    if (p.head === "stealth") return { parts: [fill([T, L, [T[0] - ux * HL * 0.68, T[1] - uy * HL * 0.68], R])], trim: HL * 0.6, pts: [T, L, R] };
+    return { parts: [fill([T, L, R])], trim: HL * 0.75, pts: [T, L, R] };
+  }
+  function totalLen(pts) { let s = 0; for (let i = 1; i < pts.length; i++) s += len(pts[i - 1], pts[i]); return s; }
+
+  function arrowSVG(def, p, opts) {
+    const U = p.size * p.dpi, lw = (p.lw * p.dpi) / 72, HL = p.hl * lw, HW = p.hw * lw;
+    const strokes = def.s(lw / U, HW / U);
+    const c = Math.cos(rad(p.rot)), s = Math.sin(rad(p.rot));
+    const tf = (q) => { let x = q[0] * U, y = q[1] * U; if (p.flipH) x = U - x; if (p.flipV) y = -y; return [x * c - y * s, x * s + y * c]; };
+    const parts = [], bound = [];
+    const addB = (q, r) => bound.push([q[0] - r, q[1] - r], [q[0] + r, q[1] + r]);
+    strokes.forEach((st) => {
+      if (st.fill) { const q = st.fill.map(tf); parts.push(`<path d="${pathD(q)} Z" fill="${p.color}"/>`); q.forEach((v) => addB(v, 0)); return; }
+      let pts = st.pts.map(tf);
+      let end = st.end || "none", start = st.start || "none";
+      if (p.double && end === "head" && start === "none" && def.g !== "Reaction" && !/^(Fork|Split|Merge|Three-way)/.test(def.name)) start = "head";
+      const heads = [];
+      if (end !== "none") { const h = headAt(pts, end, p, lw, HL, HW); heads.push(h); pts = trimEnd(pts, h.trim); }
+      if (start !== "none") { let r = pts.slice().reverse(); const h = headAt(r, start, p, lw, HL, HW); heads.push(h); r = trimEnd(r, h.trim); pts = r.reverse(); }
+      const dash = (st.dash || p.dashed) ? ` stroke-dasharray="${f(lw * (p.cap === "butt" ? 3 : 1.5))} ${f(lw * (p.cap === "butt" ? 2 : 2.6))}"` : "";
+      parts.push(`<path d="${pathD(pts)}" fill="none" stroke="${p.color}" stroke-width="${f(lw)}" stroke-linecap="${p.cap}" stroke-linejoin="${st.join ? "miter" : "round"}"${dash}/>`);
+      pts.forEach((v) => addB(v, lw / 2 + (st.join ? lw : 0)));
+      heads.forEach((h) => { parts.push(...h.parts); h.pts.forEach((v) => addB(v, h.tipOut || lw / 2)); });
+    });
+    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+    bound.forEach(([x, y]) => { x0 = Math.min(x0, x); y0 = Math.min(y0, y); x1 = Math.max(x1, x); y1 = Math.max(y1, y); });
+    const pad = lw * 0.5; x0 -= pad; y0 -= pad; x1 += pad; y1 += pad;
+    const w = x1 - x0, h = y1 - y0;
+    const wh = opts && opts.preview ? ` style="width:${f(w * opts.preview)}px;height:${f(h * opts.preview)}px"` : ` width="${f(w)}" height="${f(h)}"`;
+    return `<svg xmlns="${NS}" viewBox="${f(x0)} ${f(y0)} ${f(w)} ${f(h)}"${wh} role="img" aria-label="${def.name} arrow">${parts.join("")}</svg>`;
+  }
+
+  // ---------- page ----------
+  let group = "All";
+  const groups = ["All", ...new Set(LIB.map((d) => d.g))];
+  groups.forEach((g) => {
+    const b = document.createElement("button");
+    b.type = "button"; b.textContent = g; b.setAttribute("aria-pressed", String(g === group));
+    b.addEventListener("click", () => { group = g; document.querySelectorAll("#filter button").forEach((x) => x.setAttribute("aria-pressed", String(x.textContent === g))); render(); });
+    $("filter").appendChild(b);
+  });
+  SWATCHES.forEach((c) => {
+    const b = document.createElement("button");
+    b.type = "button"; b.dataset.c = c; b.style.background = c; b.title = c; b.setAttribute("aria-label", "Color " + c);
+    b.addEventListener("click", () => { $("color").value = c; changed(); });
+    $("swatches").appendChild(b);
+  });
+
+  function toast(msg) { const t = $("arwToast"); t.textContent = msg; t.style.opacity = "1"; clearTimeout(toast.h); toast.h = setTimeout(() => (t.style.opacity = "0"), 2400); }
+  async function copySVG(svg, name) {
+    const text = '<?xml version="1.0" encoding="UTF-8"?>\n' + svg;
+    try {
+      await navigator.clipboard.write([new ClipboardItem({ "image/svg+xml": new Blob([text], { type: "image/svg+xml" }), "text/plain": new Blob([text], { type: "text/plain" }) })]);
+      toast(name + " copied as SVG.");
+    } catch (e) {
+      try { await navigator.clipboard.writeText(text); toast(name + " copied as SVG."); }
+      catch (e2) { toast("Couldn't copy here. Use Download instead."); }
+    }
+  }
+  function download(svg, name) {
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob(['<?xml version="1.0" encoding="UTF-8"?>\n' + svg], { type: "image/svg+xml" }));
+    a.download = "arrow-" + name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/-$/, "") + ".svg";
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  }
+
+  function render() {
+    const p = read();
+    document.querySelectorAll("#swatches button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.c === p.color.toLowerCase())));
+    // every card is drawn at the same scale, so line widths look the same across the library
+    const scale = 120 / (p.size * p.dpi);
+    const grid = $("grid"); grid.innerHTML = "";
+    LIB.filter((d) => group === "All" || d.g === group).forEach((d) => {
+      const card = document.createElement("div"); card.className = "arw-card";
+      card.innerHTML = `<h4>${d.name}</h4><small>${d.g}</small><div class="arw-stage">${arrowSVG(d, p, { preview: scale })}</div>`;
+      const act = document.createElement("div"); act.className = "arw-actions";
+      const cp = document.createElement("button"); cp.type = "button"; cp.className = "btn primary"; cp.textContent = "Copy SVG";
+      cp.addEventListener("click", () => copySVG(arrowSVG(d, read()), d.name));
+      const dl = document.createElement("button"); dl.type = "button"; dl.className = "btn"; dl.textContent = "↓ SVG"; dl.title = "Download this arrow as an SVG file";
+      dl.addEventListener("click", () => download(arrowSVG(d, read()), d.name));
+      act.append(cp, dl); card.appendChild(act); grid.appendChild(card);
+    });
+  }
+
+  // sliders with typed values (typed values may go past the slider's range)
+  const pairs = [["lw", "lwNum"], ["hl", "hlNum"], ["hw", "hwNum"], ["size", "sizeNum"], ["rot", "rotNum"]];
+  pairs.forEach(([r, n]) => {
+    $(r).addEventListener("input", () => { $(n).value = $(r).value; changed(); });
+    $(n).addEventListener("input", () => {
+      const v = $(n).value; if (v === "" || !isFinite(+v)) return;
+      const rg = $(r); if (+v < +rg.min) rg.min = v; if (+v > +rg.max) rg.max = v; rg.step = "any"; rg.value = v; changed();
+    });
+    $(n).addEventListener("keydown", (e) => { if (e.key === "Enter") $(n).blur(); });
+  });
+  ["color", "cap", "dashed", "head", "double", "flipH", "flipV", "dpi"].forEach((id) => $(id).addEventListener("input", changed));
+
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(read())); } catch (e) {} }
+  function apply(v) {
+    Object.keys(DEFAULTS).forEach((k) => {
+      const el = $(k); if (!el || v[k] === undefined) return;
+      if (el.type === "checkbox") el.checked = !!v[k];
+      else { if (el.type === "range") { if (+v[k] < +el.min) el.min = v[k]; if (+v[k] > +el.max) el.max = v[k]; } el.value = v[k]; }
+    });
+    pairs.forEach(([r, n]) => ($(n).value = $(r).value));
+  }
+  function changed() { render(); save(); }
+  $("resetBtn").addEventListener("click", () => { apply(DEFAULTS); changed(); });
+
+  let saved = null; try { saved = JSON.parse(localStorage.getItem(KEY) || "null"); } catch (e) {}
+  apply(Object.assign({}, DEFAULTS, saved || {}));
+  render();
+})();
+    </script>
+  </body>
+</html>
