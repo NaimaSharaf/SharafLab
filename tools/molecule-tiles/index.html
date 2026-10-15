@@ -74,6 +74,7 @@
 .mt-libcol .mt-lib{padding:5px 6px;gap:6px;flex-wrap:wrap}
 .mt-libcol .mt-lib .nm{flex:1 1 80px;white-space:normal;overflow:visible}
 .mt-lib .btns{display:flex;gap:4px;flex-wrap:wrap}
+.mt-lib .lc{width:28px;height:26px;padding:1px;border:1px solid #b8c8d5;border-radius:5px;background:#fff;cursor:pointer;flex:none}
 .mt-libcol .mt-lib .btns{flex-basis:100%}
 .mt-libcol .mt-lib .btns .mini{padding:4px 7px}
 .mt-libcol .mt-lib .thumb{width:52px;height:38px}
@@ -92,6 +93,13 @@
 .mt-lib .nm{flex:1;min-width:0;font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #mt-status{font-size:13px;color:#0b6870;min-height:18px}
 .hidden{display:none!important}
+.mt-editor{position:fixed;inset:0;z-index:3000;background:rgba(16,42,51,.45);display:grid;place-items:center;padding:16px}
+.mt-edbox{background:#fff;border-radius:12px;width:min(900px,100%);max-height:calc(100vh - 32px);display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.mt-edhead{display:flex;flex-direction:column;gap:4px;padding:14px 18px;border-bottom:1px solid #e4ebeb;font:600 16px "Montserrat",Arial,sans-serif}
+.mt-edstage{flex:1;min-height:300px;overflow:auto;padding:12px;display:grid;place-items:center;background:#fbfcfc}
+.mt-edstage svg{max-width:100%;max-height:60vh;height:auto}
+.mt-edtools{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:12px 18px;border-top:1px solid #e4ebeb}
+.mt-edtools label{display:inline-flex;gap:6px;align-items:center;font-size:13px}
 @media(max-width:1000px){.mt{grid-template-columns:1fr}}
     </style>
   </head>
@@ -122,7 +130,7 @@
         <p>
           Type a CAS number, name or SMILES and press + to add each molecule.
           Structures come from PubChem and are drawn with the same bond length,
-          font and 1 pt bonds, tiled across a 7 inch canvas. Drag any molecule to move it, click an empty spot to scale them all, add arrows on top, then copy the result as SVG. The blank page below the tiled figure is a 7 × 7 inch canvas: click a molecule and press Ctrl/⌘ C, click the page and press Ctrl/⌘ V to reuse it there.
+          font and 1 pt bonds, tiled across a 7 inch canvas. Drag any molecule to move it, click an empty spot to scale them all, add arrows from the library, then copy the result as SVG. The blank page below the tiled figure is a 7 × 7 inch canvas: click a molecule and press Ctrl/⌘ C, click the page and press Ctrl/⌘ V to reuse it there.
         </p>
       </section>
 
@@ -174,14 +182,32 @@
             <div class="mt-row"><label for="nameBold">Bold</label><span class="val"><input id="nameBold" type="checkbox" checked /></span></div>
             <div class="mt-row"><label for="nameGap">Space below name (pt)</label><span class="val"><input id="nameGap" type="number" min="0" max="60" step="1" value="8" /></span></div>
             <h3>Arrows</h3>
-            <div class="mt-row"><label for="arStyle">New arrow style</label><span class="val"><select id="arStyle"><option value="straight" selected>Straight</option><option value="branch">With side input (curved)</option></select></span></div>
+            <input id="arStyle" class="hidden" aria-hidden="true" tabindex="-1" value="straight" />
             <div class="mt-row"><label for="arW">Line width (pt)</label><span class="val"><input id="arW" type="number" min="0.1" max="10" step="0.05" value="1" /></span></div>
-            <div class="mt-row"><label for="arLen">Head length (pt)</label><span class="val"><input id="arLen" type="number" min="1" max="60" step="0.5" value="8" /></span></div>
-            <div class="mt-row"><label for="arHw">Head width (pt)</label><span class="val"><input id="arHw" type="number" min="1" max="60" step="0.5" value="4.5" /></span></div>
+            <div class="mt-row"><label for="arLen">Head length (pt)</label><span class="val"><input id="arLen" type="number" min="1" max="60" step="0.5" value="4" /></span></div>
+            <div class="mt-row"><label for="arHw">Head width (pt)</label><span class="val"><input id="arHw" type="number" min="1" max="60" step="0.5" value="4" /></span></div>
             <div class="mt-row"><label for="arColor">Color</label><span class="val"><input id="arColor" type="color" value="#8c8c8c" /></span></div>
             <p class="mt-note">Fonts and sizes are the same for every molecule, so labels stay consistent. They are kept as live text in the SVG.</p>
           </div>
 
+          <div class="mt-editor hidden" id="molEditor" role="dialog" aria-modal="true" aria-labelledby="edTitle">
+            <div class="mt-edbox">
+              <div class="mt-edhead"><strong id="edTitle">Edit molecule</strong><span class="small" style="color:#6b7f83">Click atoms or bonds to select them; Shift-click to select several. Changes show up everywhere this molecule is used.</span></div>
+              <div class="mt-edstage" id="edStage"></div>
+              <div class="mt-edtools">
+                <button type="button" class="mini" id="edAll">Select all</button>
+                <button type="button" class="mini" id="edNone">Select none</button>
+                <label class="mini">Color <input type="color" id="edColor" value="#d6338a" /></label>
+                <button type="button" class="mini primary" id="edApply">Color selected</button>
+                <button type="button" class="mini" id="edUncolor">Remove color</button>
+                <button type="button" class="mini" id="edHide">Hide selected</button>
+                <button type="button" class="mini" id="edShow">Show all</button>
+                <button type="button" class="mini" id="edReset">Reset molecule</button>
+                <span id="edCount" class="small" style="color:#0b6870"></span>
+                <button type="button" class="primary" id="edDone" style="margin-left:auto">Done</button>
+              </div>
+            </div>
+          </div>
           <div class="mt-view">
             <header>Figures <small>Click a canvas to work on it; the buttons below act on the highlighted one.</small></header>
             <div class="mt-figgrid">
@@ -198,6 +224,8 @@
                 </details>
                 <input type="text" id="libSearch" placeholder="Filter the library" aria-label="Filter the library" style="width:100%;margin-top:8px" />
                   <div class="mt-list" id="libList"></div>
+                  <p class="mt-note" style="margin:14px 0 0;font-weight:700;color:#0b6870;letter-spacing:.08em;text-transform:uppercase;font-size:11px">Arrows</p>
+                  <div class="mt-list" id="arrowLib"></div>
                 </div>
               <div class="mt-canvases">
             <div class="mt-sub" id="subTiles">
@@ -215,7 +243,7 @@
               <button id="dlSvg" type="button">Download SVG</button>
               <button id="resetPos" type="button" title="Put every molecule back in its tile">Reset positions</button>
               <button id="clearPage" type="button" class="hidden" title="Remove everything from the blank page">Clear page</button>
-              <button id="addArrow" type="button" title="Add an arrow; drag its ends to place it">+ Arrow</button>
+              <button id="addArrow" type="button" class="hidden" tabindex="-1">+ Arrow</button>
               <button id="branchArrow" type="button" class="hidden" title="Add or remove the curved side input on the selected arrow">Side input</button>
               <button id="delArrow" type="button" class="hidden">Delete arrow</button>
               <label for="dpi">Document DPI <input id="dpi" type="number" min="1" max="2400" step="1" value="360" style="width:76px" /></label>
@@ -227,7 +255,8 @@
               </span>
               <span id="pageSel" class="mt-sel hidden">
                 <strong id="pageSelName"></strong>
-                <label>Size <input type="number" id="psSize" min="20" max="400" step="5" style="width:58px" />%</label>
+                <label for="psScale">Scale <input type="range" id="psScale" min="20" max="400" step="5" value="100" style="width:130px;accent-color:#0b6870" /></label><label><input type="number" id="psSize" min="20" max="400" step="5" style="width:58px" aria-label="Scale in percent" />%</label>
+                <button type="button" class="mini" id="psAll" title="Give every molecule on this canvas the same scale">Apply to all</button>
                 <button type="button" class="mini" id="psRl" title="Rotate left 15°">⟲</button>
                 <button type="button" class="mini" id="psRr" title="Rotate right 15°">⟳</button>
                 <button type="button" class="mini" id="psFp" title="Flip left–right">⇋</button>
@@ -369,14 +398,25 @@ const EXAMPLES = [{"name": "Rose Bengal (RB)", "cas": "632-69-9", "mol": "\n    
     const color = item.color || "#000000";
     const fs = S.atomSize, fam = S.atomFont, lw = S.lineW;
     const parts = [];
+    // changes made to parts of the molecule in the library editor: { ac: {atom: color}, bc: {bond: color}, ha: [atoms], hb: [bonds] }
+    const PE = item.parts || {}, AC = PE.ac || {}, BC = PE.bc || {}, HA = new Set(PE.ha || []), HB = new Set(PE.hb || []);
+    const ED = item.edit; // { selA: Set, selB: Set } when drawn inside the editor
+    const hits = [], marks = [];
+    let curC = "";
     let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
     const grow = (x, y, r = 0) => { x0 = Math.min(x0, x - r); x1 = Math.max(x1, x + r); y0 = Math.min(y0, y - r); y1 = Math.max(y1, y + r); };
     const labelR = fs * 0.62; // how far bonds stop short of a label
     const cut = (i) => (showLabel(m.atoms[i]) ? labelR : 0);
-    const line = (ax, ay, bx, by) => parts.push(`<line x1="${f(ax)}" y1="${f(ay)}" x2="${f(bx)}" y2="${f(by)}"/>`);
+    const line = (ax, ay, bx, by) => parts.push(`<line x1="${f(ax)}" y1="${f(ay)}" x2="${f(bx)}" y2="${f(by)}"${curC ? ` stroke="${curC}"` : ""}/>`);
 
     m.bonds.forEach((bd, bi) => {
+      if (HB.has(bi) || HA.has(bd.a) || HA.has(bd.b)) return;
       const [ax, ay] = P[bd.a], [bx, by] = P[bd.b];
+      curC = BC[bi] || "";
+      if (ED) {
+        if (ED.selB.has(bi)) marks.push(`<line x1="${f(ax)}" y1="${f(ay)}" x2="${f(bx)}" y2="${f(by)}" stroke="#2bb3a3" stroke-opacity=".45" stroke-width="${f(S.bond * 0.32)}" stroke-linecap="round"/>`);
+        hits.push(`<line data-bond="${bi}" x1="${f(ax)}" y1="${f(ay)}" x2="${f(bx)}" y2="${f(by)}" stroke="transparent" stroke-width="${f(S.bond * 0.28)}" style="cursor:pointer"/>`);
+      }
       const L = Math.hypot(bx - ax, by - ay) || 1, ux = (bx - ax) / L, uy = (by - ay) / L, nx = -uy, ny = ux;
       const ca = cut(bd.a), cb = cut(bd.b);
       const sx = ax + ux * ca, sy = ay + uy * ca, ex = bx - ux * cb, ey = by - uy * cb;
@@ -412,7 +452,7 @@ const EXAMPLES = [{"name": "Rose Bengal (RB)", "cas": "632-69-9", "mol": "\n    
         line(sx - nx * off, sy - ny * off, ex - nx * off, ey - ny * off);
       } else if (bd.stereo === 1) { // wedge
         const w = S.bond * 0.13;
-        parts.push(`<path d="M${f(sx)},${f(sy)}L${f(ex + nx * w)},${f(ey + ny * w)}L${f(ex - nx * w)},${f(ey - ny * w)}Z" fill="${color}" stroke="none"/>`);
+        parts.push(`<path d="M${f(sx)},${f(sy)}L${f(ex + nx * w)},${f(ey + ny * w)}L${f(ex - nx * w)},${f(ey - ny * w)}Z" fill="${curC || color}" stroke="none"/>`);
       } else if (bd.stereo === 6) { // hash
         const w = S.bond * 0.13, n = 6;
         for (let k = 1; k <= n; k++) { const t = k / n, cx = sx + (ex - sx) * t, cy = sy + (ey - sy) * t, ww = w * t; line(cx + nx * ww, cy + ny * ww, cx - nx * ww, cy - ny * ww); }
@@ -422,6 +462,11 @@ const EXAMPLES = [{"name": "Rose Bengal (RB)", "cas": "632-69-9", "mol": "\n    
     // atom labels as live text: symbol centred on the atom, H count on the open side, charge as superscript
     const labels = [];
     m.atoms.forEach((a, i) => {
+      if (HA.has(i)) return;
+      if (ED) {
+        if (ED.selA.has(i)) marks.push(`<circle cx="${f(P[i][0])}" cy="${f(P[i][1])}" r="${f(Math.max(fs * 0.8, S.bond * 0.22))}" fill="#2bb3a3" fill-opacity=".45"/>`);
+        hits.push(`<circle data-atom="${i}" cx="${f(P[i][0])}" cy="${f(P[i][1])}" r="${f(Math.max(fs * 0.7, S.bond * 0.2))}" fill="transparent" style="cursor:pointer"/>`);
+      }
       if (!showLabel(a)) return;
       const [x, y] = P[i];
       let dx = 0; a.nb.forEach((k) => (dx += P[k][0] - x));
@@ -438,13 +483,13 @@ const EXAMPLES = [{"name": "Rose Bengal (RB)", "cas": "632-69-9", "mol": "\n    
       else inner = esc(a.el) + hTxt + (hSub ? sub(hSub) : "") + (chg ? sup(chg) : "");
       const total = wSym + wH + wSub + wChg;
       grow(start, y - fs * 0.75); grow(start + total, y + fs * 0.55);
-      labels.push(`<text x="${f(start)}" y="${f(base)}">${inner}</text>`);
+      labels.push(`<text x="${f(start)}" y="${f(base)}"${AC[i] ? ` fill="${AC[i]}"` : ""}>${inner}</text>`);
     });
     if (!isFinite(x0)) { x0 = y0 = 0; x1 = y1 = 1; }
     const pad = lw;
     x0 -= pad; y0 -= pad; x1 += pad; y1 += pad;
-    const svg = `<g stroke="${color}" stroke-width="${f(lw)}" stroke-linecap="round" fill="none">${parts.join("")}</g>` +
-      (labels.length ? `<g fill="${color}" font-family="${esc(fam)}" font-size="${f(fs)}">${labels.join("")}</g>` : "");
+    const svg = (marks.length ? marks.join("") : "") + `<g stroke="${color}" stroke-width="${f(lw)}" stroke-linecap="round" fill="none">${parts.join("")}</g>` +
+      (labels.length ? `<g fill="${color}" font-family="${esc(fam)}" font-size="${f(fs)}">${labels.join("")}</g>` : "") + (hits.length ? hits.join("") : "");
     return { svg, x0, y0, w: x1 - x0, h: y1 - y0 };
   }
 
@@ -466,6 +511,7 @@ const EXAMPLES = [{"name": "Rose Bengal (RB)", "cas": "632-69-9", "mol": "\n    
     library.push(e); return e;
   }
   const libPrep = (l) => l.prep || (l.prep = prepare(parseMol(l.mol)));
+  const partsFor = (it) => { const l = library.find((x) => x.key === libKey(it)); return l && l.parts; };
   let nextId = 1;
   function save() {
     syncArrows();
@@ -488,7 +534,7 @@ const EXAMPLES = [{"name": "Rose Bengal (RB)", "cas": "632-69-9", "mol": "\n    
       showNames: $("showNames").checked, nameFont: $("nameFont").value, nameSize: (+$("nameSize").value || 12) * m, nameBold: $("nameBold").checked, nameGap: (+$("nameGap").value || 0) * m,
       vAlign: $("vAlign").value, fit: $("fitW").checked,
       pageW: (+$("pageW").value || 7) * dpi, pageH: (+$("pageH").value || 7) * dpi,
-      arW: (+$("arW").value || 1) * m, arLen: (+$("arLen").value || 8) * m, arHw: (+$("arHw").value || 4.5) * m, arColor: $("arColor").value
+      arW: (+$("arW").value || 1) * m, arLen: (+$("arLen").value || 4) * m, arHw: (+$("arHw").value || 4) * m, arColor: $("arColor").value
     };
   }
 
@@ -496,7 +542,7 @@ const EXAMPLES = [{"name": "Rose Bengal (RB)", "cas": "632-69-9", "mol": "\n    
   function buildSVG(S, sized, preview) {
     if (mode === "page") return buildPage(S, sized, preview);
     const tiles = items.filter((it) => it.prep).map((it) => {
-      const d = drawMolecule(it, S);
+      const d = drawMolecule(Object.assign({}, it, { parts: partsFor(it) }), S);
       const nameW = S.showNames && it.name ? tw(it.name, S.nameSize, S.nameFont, S.nameBold) : 0;
       return { it, d, w: Math.max(d.w, nameW), nameW };
     });
@@ -548,7 +594,7 @@ const EXAMPLES = [{"name": "Rose Bengal (RB)", "cas": "632-69-9", "mol": "\n    
     let out = "";
     page.forEach((pi) => {
       const lib = library.find((l) => l.key === pi.lib); if (!lib) return;
-      let d; try { d = drawMolecule({ prep: libPrep(lib), rot: pi.rot, flip: pi.flip, color: pi.color, size: pi.size }, S); } catch (e) { return; }
+      let d; try { d = drawMolecule({ prep: libPrep(lib), rot: pi.rot, flip: pi.flip, color: pi.color, size: pi.size, parts: lib.parts }, S); } catch (e) { return; }
       const showName = pi.showName && S.showNames && lib.name;
       const nameH = showName ? S.nameSize * 1.2 + S.nameGap : 0;
       const nameW = showName ? tw(lib.name, S.nameSize, S.nameFont, S.nameBold) : 0;
@@ -566,29 +612,75 @@ const EXAMPLES = [{"name": "Rose Bengal (RB)", "cas": "632-69-9", "mol": "\n    
   }
 
   // arrows sit on top: a line that stops where the tall triangular head begins
+  // ---------- arrows: one drawing routine for every reaction-arrow style ----------
+  // Styles: straight, side input (branch), side output, equilibrium, resonance (double-headed),
+  // retrosynthetic, dashed, no reaction (crossed), curved (electron pair) and fishhook (single electron).
+  const ARROW_STYLES = [
+    ["straight", "Reaction arrow"], ["branch", "With side input (reagent in)"], ["sideout", "With side output (by-product out)"],
+    ["equilibrium", "Equilibrium"], ["resonance", "Resonance (double-headed)"], ["retro", "Retrosynthetic"],
+    ["dashed", "Dashed (proposed step)"], ["noreaction", "No reaction (crossed)"], ["curved", "Curved (electron pair)"], ["fishhook", "Fishhook (single electron)"]
+  ];
+  function arrowMarkup(a, S) {
+    const x1 = a.x1 * S.m, y1 = a.y1 * S.m, x2 = a.x2 * S.m, y2 = a.y2 * S.m;
+    const L = Math.hypot(x2 - x1, y2 - y1) || 1, ux = (x2 - x1) / L, uy = (y2 - y1) / L, nx = -uy, ny = ux;
+    const hl = S.arLen, hw = S.arHw / 2, lw = S.arW, col = S.arColor, tuck = Math.min(lw, hl / 2);
+    const P = (t, h) => [x1 + ux * t + nx * h, y1 + uy * t + ny * h];
+    const ln = (p, q, extra) => `<line x1="${f(p[0])}" y1="${f(p[1])}" x2="${f(q[0])}" y2="${f(q[1])}" stroke="${col}" stroke-width="${f(lw)}" stroke-linecap="butt"${extra || ""}/>`;
+    // a filled head with its tip at `tip`, pointing along (dx, dy); side 0 = full, otherwise only the barb on that normal side (sx, sy)
+    const head = (tip, dx, dy, side) => {
+      const b = [tip[0] - dx * hl, tip[1] - dy * hl], px = -dy * hw, py = dx * hw;
+      if (!side) return `<path d="M${f(tip[0])},${f(tip[1])}L${f(b[0] + px)},${f(b[1] + py)}L${f(b[0] - px)},${f(b[1] - py)}Z" fill="${col}"/>`;
+      const s = side[0] * px + side[1] * py > 0 ? 1 : -1;
+      return `<path d="M${f(tip[0])},${f(tip[1])}L${f(b[0] + s * px)},${f(b[1] + s * py)}L${f(b[0])},${f(b[1])}Z" fill="${col}"/>`;
+    };
+    const kind = a.kind || (a.branch ? "branch" : "straight");
+    let g = "", handle = null;
+    const shaft = (extra) => (L > hl ? ln(P(0, 0), P(L - hl + tuck, 0), extra) : "");
+    if (kind === "resonance") {
+      if (L > 2 * hl) g += ln(P(hl - tuck, 0), P(L - hl + tuck, 0));
+      g += head(P(L, 0), ux, uy, 0) + head(P(0, 0), -ux, -uy, 0);
+    } else if (kind === "equilibrium") {
+      const gap = Math.max(hw * 0.9, 1.6 * lw), up = [-nx, -ny], dn = [nx, ny];
+      if (L > hl) g += ln(P(0, -gap / 2), P(L - hl + tuck, -gap / 2)) + ln(P(L, gap / 2), P(hl - tuck, gap / 2));
+      g += head(P(L, -gap / 2), ux, uy, up) + head(P(0, gap / 2), -ux, -uy, dn);
+    } else if (kind === "retro") {
+      const gap = Math.max(hw * 0.9, 2 * lw), arm = hw * 1.15, tEnd = L - hl * (gap / 2) / arm;
+      g += ln(P(0, -gap / 2), P(tEnd, -gap / 2)) + ln(P(0, gap / 2), P(tEnd, gap / 2));
+      const a1 = P(L - hl, -arm), tp = P(L, 0), a2 = P(L - hl, arm);
+      g += `<path d="M${f(a1[0])},${f(a1[1])}L${f(tp[0])},${f(tp[1])}L${f(a2[0])},${f(a2[1])}" fill="none" stroke="${col}" stroke-width="${f(lw)}" stroke-linejoin="miter" stroke-linecap="butt"/>`;
+    } else if (kind === "curved" || kind === "fishhook") {
+      // quadratic curve from tail to tip that bows to one side; the head follows the curve's direction at the tip
+      const bow = (a.bow != null ? a.bow : -0.45) * L, P0 = P(0, 0), P2 = P(L, 0), C = P(L / 2, bow);
+      let dx = P2[0] - C[0], dy = P2[1] - C[1]; const dl = Math.hypot(dx, dy) || 1; dx /= dl; dy /= dl;
+      const q = (t) => [(1 - t) * (1 - t) * P0[0] + 2 * (1 - t) * t * C[0] + t * t * P2[0], (1 - t) * (1 - t) * P0[1] + 2 * (1 - t) * t * C[1] + t * t * P2[1]];
+      let len = 0, prev = P0; for (let i = 1; i <= 40; i++) { const p = q(i / 40); len += Math.hypot(p[0] - prev[0], p[1] - prev[1]); prev = p; }
+      const ts = Math.max(0.05, 1 - (hl - tuck) / len), C1 = [P0[0] + (C[0] - P0[0]) * ts, P0[1] + (C[1] - P0[1]) * ts], E = q(ts);
+      g += `<path d="M${f(P0[0])},${f(P0[1])}Q${f(C1[0])},${f(C1[1])} ${f(E[0])},${f(E[1])}" fill="none" stroke="${col}" stroke-width="${f(lw)}" stroke-linecap="butt"/>`;
+      g += head(P2, dx, dy, kind === "fishhook" ? [C[0] - (P0[0] + P2[0]) / 2, C[1] - (P0[1] + P2[1]) / 2] : 0);
+      handle = { pt: C, kind: "bow" };
+    } else {
+      g += shaft(kind === "dashed" ? ` stroke-dasharray="${f(3 * lw)} ${f(2 * lw)}"` : "") + head(P(L, 0), ux, uy, 0);
+      if (kind === "noreaction") { const m = (L - hl) / 2, s = Math.max(hw * 1.4, 3 * lw); g += ln(P(m - s, -s), P(m + s, s)) + ln(P(m - s, s), P(m + s, -s)); }
+      if (kind === "branch" || kind === "sideout") {
+        if (a.bf == null) a.bf = a.bt != null ? a.bt / (L / S.m) : 0.22;
+        const room = Math.max(0, L - hl - 2 * S.m);
+        const r = Math.min(Math.abs((a.bh != null ? a.bh : -13) * S.m), room), bt = Math.min(a.bf * L, Math.max(0, room - r)), bh = Math.sign(a.bh || -1) * r;
+        // side input: from off the shaft, bending in to run along it; side output: leaves the shaft and bends away
+        const s0 = kind === "branch" ? P(bt, bh) : P(bt, 0), e0 = kind === "branch" ? P(bt + r, 0) : P(bt + r, bh), c0 = kind === "branch" ? P(bt + r, bh) : P(bt, bh);
+        const cz = (s0[0] - c0[0]) * (e0[1] - c0[1]) - (s0[1] - c0[1]) * (e0[0] - c0[0]);
+        g = `<path d="M${f(s0[0])},${f(s0[1])}A${f(r)},${f(r)} 0 0 ${cz > 0 ? 1 : 0} ${f(e0[0])},${f(e0[1])}" fill="none" stroke="${col}" stroke-width="${f(lw)}" stroke-linecap="butt"/>` + g;
+        handle = { pt: kind === "branch" ? s0 : e0, kind };
+      }
+    }
+    return { g, handle };
+  }
+
   function arrowsSVG(S, preview) {
     let out = "";
     arrows.forEach((a) => {
       const x1 = a.x1 * S.m, y1 = a.y1 * S.m, x2 = a.x2 * S.m, y2 = a.y2 * S.m;
-      const L = Math.hypot(x2 - x1, y2 - y1) || 1, ux = (x2 - x1) / L, uy = (y2 - y1) / L, hl = S.arLen, hw = S.arHw / 2;
-      const bx = x2 - ux * hl, by = y2 - uy * hl;
-      const tuck = Math.min(S.arW, hl / 2); // the line runs a little under the head so there is no gap
-      let g = (L > hl ? `<line x1="${f(x1)}" y1="${f(y1)}" x2="${f(bx + ux * tuck)}" y2="${f(by + uy * tuck)}" stroke="${S.arColor}" stroke-width="${f(S.arW)}" stroke-linecap="butt"/>` : "") +
-        `<path d="M${f(x2)},${f(y2)}L${f(bx - uy * hw)},${f(by + ux * hw)}L${f(bx + uy * hw)},${f(by - ux * hw)}Z" fill="${S.arColor}"/>`;
-      // curved side input: starts off the shaft and bends in a quarter circle until it runs along the shaft
-      const nx = -uy, ny = ux, P = (t, h) => [x1 + ux * t + nx * h, y1 + uy * t + ny * h];
-      let bs = null;
-      if (a.branch) {
-        if (a.bf == null) a.bf = a.bt != null ? a.bt / (L / S.m) : 0.22; // older arrows stored a distance
-        const room = Math.max(0, L - hl - 2 * S.m);
-        let r = Math.min(Math.abs(a.bh * S.m), room);
-        let bt = Math.min(a.bf * L, Math.max(0, room - r));
-        const bh = Math.sign(a.bh || -1) * r;
-        const s0 = P(bt, bh), e0 = P(bt + r, 0), c0 = P(bt + r, bh);
-        const cz = (s0[0] - c0[0]) * (e0[1] - c0[1]) - (s0[1] - c0[1]) * (e0[0] - c0[0]);
-        g = `<path d="M${f(s0[0])},${f(s0[1])}A${f(r)},${f(r)} 0 0 ${cz > 0 ? 1 : 0} ${f(e0[0])},${f(e0[1])}" fill="none" stroke="${S.arColor}" stroke-width="${f(S.arW)}" stroke-linecap="butt"/>` + g;
-        bs = s0;
-      }
+      const am = arrowMarkup(a, S);
+      let g = am.g, bs = am.handle ? am.handle.pt : null;
       if (preview) {
         g = `<line x1="${f(x1)}" y1="${f(y1)}" x2="${f(x2)}" y2="${f(y2)}" stroke="transparent" stroke-width="${f(Math.max(S.arHw, 12 * S.m))}"/>` + g;
         if (arrowSel === a.id) {
@@ -660,13 +752,16 @@ const EXAMPLES = [{"name": "Rose Bengal (RB)", "cas": "632-69-9", "mol": "\n    
     $("stage2").innerHTML = rp.svg;
     $("countTiles").textContent = `${rt.n} molecule${rt.n === 1 ? "" : "s"} · ${$("canvasIn").value} × ${(rt.H / S.dpi).toFixed(2)} in` + (rt.warn ? (S.fit ? " · a row was shrunk to fit" : " · a row is wider than the canvas") : "");
     $("countPage").textContent = `${rp.n} molecule${rp.n === 1 ? "" : "s"} · ${$("pageW").value} × ${$("pageH").value} in`;
-    const ps = mode === "page" && page.find((x) => x.id === pageSel);
+    const ps = selObj();
     $("pageSel").classList.toggle("hidden", !ps);
     if (ps) {
-      const lib = library.find((l) => l.key === ps.lib);
-      $("pageSelName").textContent = lib ? lib.name : "Molecule";
-      if (document.activeElement !== $("psSize")) $("psSize").value = ps.size;
-      $("psColor").value = ps.color; $("psName").checked = ps.showName;
+      const onPage = mode === "page", lib = onPage && library.find((l) => l.key === ps.lib);
+      $("pageSelName").textContent = onPage ? (lib ? lib.name : "Molecule") : (ps.name || "Molecule");
+      const sz = ps.size || 100;
+      if (document.activeElement !== $("psSize")) $("psSize").value = sz;
+      if (document.activeElement !== $("psScale")) $("psScale").value = sz;
+      $("psColor").value = ps.color || "#000000"; $("psName").checked = !!ps.showName;
+      $("psName").parentElement.classList.toggle("hidden", !onPage);
     }
     save();
   }
@@ -681,10 +776,19 @@ const EXAMPLES = [{"name": "Rose Bengal (RB)", "cas": "632-69-9", "mol": "\n    
     library.filter((l) => !q || (l.name + " " + l.q).toLowerCase().includes(q)).forEach((l) => {
       const row = document.createElement("div"); row.className = "mt-lib";
       let thumb = "";
-      try { const d = drawMolecule({ prep: libPrep(l), color: l.color }, thumbS()); thumb = `<svg xmlns="${NS}" viewBox="${f(d.x0)} ${f(d.y0)} ${f(d.w)} ${f(d.h)}">${d.svg}</svg>`; } catch (e) {}
-      row.innerHTML = `<span class="thumb">${thumb}</span><span class="nm" title="${esc(l.name)}${l.q ? " · " + esc(l.q) : ""}">${esc(l.name)}</span><span class="btns"><button type="button" class="mini primary pl" title="Place on the blank page">+ Page</button><button type="button" class="mini primary tl" title="Add to the tiled figure">+ Tiles</button><button type="button" class="mini cs" title="Copy this molecule as SVG (current settings, real size)">Copy</button><button type="button" class="mini rm" title="Remove from library">✕</button></span>`;
+      try { const d = drawMolecule({ prep: libPrep(l), color: l.color, parts: l.parts }, thumbS()); thumb = `<svg xmlns="${NS}" viewBox="${f(d.x0)} ${f(d.y0)} ${f(d.w)} ${f(d.h)}">${d.svg}</svg>`; } catch (e) {}
+      row.innerHTML = `<span class="thumb">${thumb}</span><span class="nm" title="${esc(l.name)}${l.q ? " · " + esc(l.q) : ""}">${esc(l.name)}</span><input type="color" class="lc" value="${esc(l.color || "#000000")}" title="Molecule color" aria-label="Color of ${esc(l.name)}" /><span class="btns"><button type="button" class="mini primary pl" title="Place on the blank page">+ Page</button><button type="button" class="mini primary tl" title="Add to the tiled figure">+ Tiles</button><button type="button" class="mini cs" title="Copy this molecule as SVG (current settings, real size)">Copy</button><button type="button" class="mini ed" title="Color or hide parts of this molecule">Edit</button><button type="button" class="mini rm" title="Remove from library">✕</button></span>`;
       row.querySelector(".pl").addEventListener("click", () => placeOnPage(l));
       row.querySelector(".cs").addEventListener("click", () => copyOne(l));
+      row.querySelector(".ed").addEventListener("click", () => openEditor(l));
+      // library color: used for new placements and Copy, and applied to every copy of this molecule already on the canvases
+      row.querySelector(".lc").addEventListener("input", (e) => {
+        const c = e.target.value; l.color = c;
+        page.forEach((pi) => { if (pi.lib === l.key) pi.color = c; });
+        items.forEach((it) => { if (it.mol && libKey(it) === l.key) it.color = c; });
+        draw(); renderList();
+      });
+      row.querySelector(".lc").addEventListener("change", () => renderLibrary());
       row.querySelector(".tl").addEventListener("click", () => {
         const it = addItem({ q: l.q, name: l.name, mol: l.mol, color: l.color || "#000000", msg: "From library" });
         tileSel = it.id; update(); status(`${l.name} added to the tiled figure.`);
@@ -695,6 +799,42 @@ const EXAMPLES = [{"name": "Rose Bengal (RB)", "cas": "632-69-9", "mol": "\n    
     if (!library.length) box.innerHTML = `<p class="mt-note">No molecules yet. Add one above with a CAS number, name or SMILES.</p>`;
   }
   $("libSearch").addEventListener("input", renderLibrary);
+  // ---------- edit parts of a library molecule (color or hide atoms and bonds) ----------
+  let edLib = null, edSelA = new Set(), edSelB = new Set();
+  const edS = () => Object.assign(settings(), { dpi: 72, m: 1, lineW: 2, bond: 34, atomSize: 15, dbl: (+$("dblGap").value || 18) / 100 });
+  function renderEditor() {
+    if (!edLib) return;
+    const d = drawMolecule({ prep: libPrep(edLib), color: edLib.color || "#000000", parts: edLib.parts, edit: { selA: edSelA, selB: edSelB } }, edS());
+    const pad = 12;
+    $("edStage").innerHTML = `<svg xmlns="${NS}" viewBox="${f(d.x0 - pad)} ${f(d.y0 - pad)} ${f(d.w + 2 * pad)} ${f(d.h + 2 * pad)}" width="${f(d.w + 2 * pad)}" height="${f(d.h + 2 * pad)}">${d.svg}</svg>`;
+    const n = edSelA.size + edSelB.size;
+    $("edCount").textContent = n ? `${edSelA.size} atom${edSelA.size === 1 ? "" : "s"}, ${edSelB.size} bond${edSelB.size === 1 ? "" : "s"} selected` : "";
+  }
+  function openEditor(l) { edLib = l; edSelA = new Set(); edSelB = new Set(); $("edTitle").textContent = "Edit " + l.name; $("molEditor").classList.remove("hidden"); renderEditor(); }
+  function edChanged() { draw(); renderList(); renderLibrary(); renderEditor(); }
+  const edParts = () => (edLib.parts = edLib.parts || { ac: {}, bc: {}, ha: [], hb: [] });
+  $("edStage").addEventListener("click", (e) => {
+    const at = e.target.closest("[data-atom]"), bd = e.target.closest("[data-bond]");
+    if (!at && !bd) { if (!e.shiftKey) { edSelA.clear(); edSelB.clear(); renderEditor(); } return; }
+    if (!e.shiftKey) { edSelA.clear(); edSelB.clear(); }
+    if (at) { const i = +at.dataset.atom; edSelA.has(i) && e.shiftKey ? edSelA.delete(i) : edSelA.add(i); }
+    else { const i = +bd.dataset.bond; edSelB.has(i) && e.shiftKey ? edSelB.delete(i) : edSelB.add(i); }
+    renderEditor();
+  });
+  $("edAll").addEventListener("click", () => { const m = libPrep(edLib); m.atoms.forEach((a, i) => edSelA.add(i)); m.bonds.forEach((b, i) => edSelB.add(i)); renderEditor(); });
+  $("edNone").addEventListener("click", () => { edSelA.clear(); edSelB.clear(); renderEditor(); });
+  // coloring selected atoms also colors the bonds between them, so a whole group can be colored in one go
+  const withInner = () => { const m = libPrep(edLib), bonds = new Set(edSelB); m.bonds.forEach((b, i) => { if (edSelA.has(b.a) && edSelA.has(b.b)) bonds.add(i); }); return bonds; };
+  $("edApply").addEventListener("click", () => { const P2 = edParts(), c = $("edColor").value; edSelA.forEach((i) => (P2.ac[i] = c)); withInner().forEach((i) => (P2.bc[i] = c)); edChanged(); });
+  $("edUncolor").addEventListener("click", () => { const P2 = edParts(); edSelA.forEach((i) => delete P2.ac[i]); withInner().forEach((i) => delete P2.bc[i]); edChanged(); });
+  $("edHide").addEventListener("click", () => { const P2 = edParts(); P2.ha = [...new Set([...P2.ha, ...edSelA])]; P2.hb = [...new Set([...P2.hb, ...edSelB])]; edSelA.clear(); edSelB.clear(); edChanged(); });
+  $("edShow").addEventListener("click", () => { const P2 = edParts(); P2.ha = []; P2.hb = []; edChanged(); });
+  $("edReset").addEventListener("click", () => { delete edLib.parts; edSelA.clear(); edSelB.clear(); edChanged(); });
+  const closeEditor = () => { $("molEditor").classList.add("hidden"); edLib = null; };
+  $("edDone").addEventListener("click", closeEditor);
+  $("molEditor").addEventListener("click", (e) => { if (e.target === $("molEditor")) closeEditor(); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && edLib) closeEditor(); });
+
   // ---------- library as a CAS list: save, copy, import ----------
   const isCAS = (x) => /^\d{2,7}-\d{2}-\d$/.test(x);
   function libraryList() { return library.map((l) => (l.q && l.q !== l.name && !/\.(mol|sdf|mdl)$/i.test(l.q) ? l.q : l.name)).join("\n") + "\n"; }
@@ -733,7 +873,7 @@ const EXAMPLES = [{"name": "Rose Bengal (RB)", "cas": "632-69-9", "mol": "\n    
   // one library molecule as its own SVG, drawn with the current settings at real size (name included if names are on)
   function moleculeSVG(l) {
     const S = settings();
-    const d = drawMolecule({ prep: libPrep(l), color: l.color || "#000000" }, S);
+    const d = drawMolecule({ prep: libPrep(l), color: l.color || "#000000", parts: l.parts }, S);
     const showName = S.showNames && l.name;
     const nameH = showName ? S.nameSize * 1.2 + S.nameGap : 0, nameW = showName ? tw(l.name, S.nameSize, S.nameFont, S.nameBold) : 0;
     const pad = S.lineW, w = Math.max(d.w, nameW) + 2 * pad, h = d.h + nameH + 2 * pad, cx = w / 2;
@@ -771,15 +911,32 @@ const EXAMPLES = [{"name": "Rose Bengal (RB)", "cas": "632-69-9", "mol": "\n    
     if (!quiet) update();
   }
   ["pageCanvas", "clearPage"].forEach((id) => $(id).classList.remove("hidden"));
-  const selPage = () => page.find((x) => x.id === pageSel);
-  $("psSize").addEventListener("input", (e) => { const p = selPage(); if (p) { p.size = Math.max(20, Math.min(400, +e.target.value || 100)); draw(); } });
+  // the selection bar works on whichever molecule is selected: a page instance or a tile
+  function selObj() { return mode === "page" ? page.find((x) => x.id === pageSel) : (tileSel != null ? items.find((x) => x.id === tileSel) : null) || null; }
+  const selPage = selObj;
+  function setSelSize(v) { const p = selObj(); if (!p) return; p.size = Math.max(20, Math.min(400, Math.round(+v || 100))); if (mode === "tiles") renderList(); draw(); }
+  $("psSize").addEventListener("input", (e) => setSelSize(e.target.value));
+  $("psScale").addEventListener("input", (e) => setSelSize(e.target.value));
+  $("psAll").addEventListener("click", () => {
+    const p = selObj(); if (!p) return; const sz = p.size || 100;
+    const list = mode === "page" ? page : items; list.forEach((x) => { x.size = sz; });
+    if (mode === "tiles") renderList(); draw();
+    status(`All ${list.length} molecule${list.length === 1 ? "" : "s"} on the ${mode === "page" ? "blank page" : "tiled figure"} set to ${sz}%.`);
+  });
   $("psRl").addEventListener("click", () => { const p = selPage(); if (p) { p.rot = (p.rot - 15) % 360; draw(); } });
   $("psRr").addEventListener("click", () => { const p = selPage(); if (p) { p.rot = (p.rot + 15) % 360; draw(); } });
   $("psFp").addEventListener("click", () => { const p = selPage(); if (p) { p.flip = !p.flip; draw(); } });
   $("psColor").addEventListener("input", (e) => { const p = selPage(); if (p) { p.color = e.target.value; draw(); } });
   $("psName").addEventListener("change", (e) => { const p = selPage(); if (p) { p.showName = e.target.checked; draw(); } });
-  $("psDup").addEventListener("click", () => { const p = selPage(); if (!p) return; const c = { ...p, id: nextPage++, x: p.x + 18, y: p.y + 18 }; page.push(c); pageSel = c.id; draw(); });
-  function removeSelected() { page = page.filter((x) => x.id !== pageSel); pageSel = null; draw(); }
+  $("psDup").addEventListener("click", () => {
+    const p = selPage(); if (!p) return;
+    if (mode === "tiles") { const c = addItem({ q: p.q, name: p.name, mol: p.mol, color: p.color, size: p.size, rot: p.rot, flip: p.flip }); tileSel = c.id; update(); return; }
+    const c = { ...p, id: nextPage++, x: p.x + 18, y: p.y + 18 }; page.push(c); pageSel = c.id; draw();
+  });
+  function removeSelected() {
+    if (mode === "tiles") { items = items.filter((x) => x.id !== tileSel); tileSel = null; update(); return; }
+    page = page.filter((x) => x.id !== pageSel); pageSel = null; draw();
+  }
   $("psDel").addEventListener("click", removeSelected);
   let clearArmed = null;
   $("clearPage").addEventListener("click", () => {
@@ -867,7 +1024,13 @@ const EXAMPLES = [{"name": "Rose Bengal (RB)", "cas": "632-69-9", "mol": "\n    
       const end = evt.target.closest("[data-end]"), pt = svgPt(evt), m = settings().m;
       arrowSel = a.id; $("delArrow").classList.remove("hidden"); $("branchArrow").classList.remove("hidden");
       drag = { arrow: a, end: end ? +end.dataset.end : 0, x: pt.x, y: pt.y, a0: { ...a }, m };
-      if (drag.end === 3) { const L = Math.hypot(a.x2 - a.x1, a.y2 - a.y1) || 1, ux = (a.x2 - a.x1) / L, uy = (a.y2 - a.y1) / L, bt = (a.bf != null ? a.bf : 0.22) * L; drag.a0.bx0 = a.x1 + ux * bt - uy * a.bh; drag.a0.by0 = a.y1 + uy * bt + ux * a.bh; }
+      if (drag.end === 3) {
+        const L = Math.hypot(a.x2 - a.x1, a.y2 - a.y1) || 1, ux = (a.x2 - a.x1) / L, uy = (a.y2 - a.y1) / L, kind = a.kind || (a.branch ? "branch" : "straight");
+        let t, h;
+        if (kind === "curved" || kind === "fishhook") { t = L / 2; h = (a.bow != null ? a.bow : -0.45) * L; }
+        else { const bh = a.bh != null ? a.bh : -13; t = (a.bf != null ? a.bf : 0.22) * L + (kind === "sideout" ? Math.abs(bh) : 0); h = bh; }
+        drag.a0.bx0 = a.x1 + ux * t - uy * h; drag.a0.by0 = a.y1 + uy * t + ux * h;
+      }
       $("branchArrow").classList.remove("hidden");
       stage.setPointerCapture(evt.pointerId); evt.preventDefault(); draw(); return;
     }
@@ -887,7 +1050,7 @@ const EXAMPLES = [{"name": "Rose Bengal (RB)", "cas": "632-69-9", "mol": "\n    
     }
     const g = evt.target.closest("[data-i]"); if (!g) return;
     const it = items.find((x) => x.id === +g.dataset.i); if (!it) return;
-    tileSel = it.id;
+    tileSel = it.id; draw();
     const pt = svgPt(evt), m = settings().m;
     drag = { it, x: pt.x, y: pt.y, dx: it.dx || 0, dy: it.dy || 0, m };
     stage.setPointerCapture(evt.pointerId); evt.preventDefault();
@@ -902,6 +1065,9 @@ const EXAMPLES = [{"name": "Rose Bengal (RB)", "cas": "632-69-9", "mol": "\n    
         const L = Math.hypot(a.x2 - a.x1, a.y2 - a.y1) || 1, ux = (a.x2 - a.x1) / L, uy = (a.y2 - a.y1) / L;
         const px = a0.bx0 + ddx - a.x1, py = a0.by0 + ddy - a.y1;
         let t = px * ux + py * uy, h = px * -uy + py * ux;
+        const kind = a.kind || (a.branch ? "branch" : "straight");
+        if (kind === "curved" || kind === "fishhook") { a.bow = Math.max(-1.5, Math.min(1.5, h / L)); if (Math.abs(a.bow) < 0.05) a.bow = 0.05 * Math.sign(a.bow || -1); draw(); return; }
+        if (kind === "sideout") t -= Math.abs(h); // the handle sits at the free end of the side output
         const room = L - (+$("arLen").value || 8) - 2;
         t = Math.max(0, Math.min(t, room - 2));
         if (t + Math.abs(h) > room) h = Math.sign(h || -1) * Math.max(2, room - t);
@@ -932,18 +1098,67 @@ const EXAMPLES = [{"name": "Rose Bengal (RB)", "cas": "632-69-9", "mol": "\n    
     el.addEventListener("pointerup", endDrag);
     el.addEventListener("pointercancel", endDrag);
   });
+  // one arrow style as its own SVG at real size, with the current line width, head size and color
+  function arrowSVG(style) {
+    const S = settings();
+    const a = { x1: 0, y1: 0, x2: 36, y2: 0, kind: style };
+    if (style === "branch" || style === "sideout") { a.x2 = 54; a.branch = style === "branch"; a.bf = style === "branch" ? 0.22 : 0.35; a.bh = style === "branch" ? -13 : 13; }
+    if (style === "curved" || style === "fishhook") { a.x2 = 44; a.bow = -0.45; }
+    const g = arrowMarkup(a, S).g;
+    // measure the drawing so the SVG hugs the arrow
+    const tmp = document.createElementNS(NS, "svg"); tmp.setAttribute("style", "position:absolute;left:-9999px;top:0");
+    tmp.innerHTML = `<g>${g}</g>`; document.body.appendChild(tmp);
+    const bb = tmp.firstChild.getBBox(); tmp.remove();
+    const pad = S.arW, x = bb.x - pad, y = bb.y - pad, w = bb.width + 2 * pad, h = bb.height + 2 * pad;
+    return `<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="${NS}" viewBox="${f(x)} ${f(y)} ${f(w)} ${f(h)}" width="${f(w)}" height="${f(h)}">${g}</svg>`;
+  }
+  async function copyArrow(style, label) {
+    const svg = arrowSVG(style);
+    try {
+      await navigator.clipboard.write([new ClipboardItem({ "image/svg+xml": new Blob([svg], { type: "image/svg+xml" }), "text/plain": new Blob([svg], { type: "text/plain" }) })]);
+    } catch (e) {
+      try { await navigator.clipboard.writeText(svg); } catch (e2) { status("Copy failed."); return; }
+    }
+    status(`${label} copied as SVG.`);
+  }
+  // add an arrow of a given style to a given canvas (from the library's Arrows list)
+  function addArrowTo(m, style) {
+    if (mode !== m) setMode(m, true);
+    $("arStyle").value = style;
+    $("addArrow").click();
+  }
+  (function arrowLibrary() {
+    const TS = { m: 1, arW: 1.6, arLen: 7, arHw: 5.5, arColor: "#455a64" };
+    const thumb = (style) => {
+      const a = { x1: 6, y1: 17, x2: 58, y2: 17, kind: style, branch: style === "branch", bf: style === "sideout" ? 0.3 : 0.18, bh: style === "branch" ? -11 : 11, bow: -0.45 };
+      if (style === "curved" || style === "fishhook") { a.y1 = a.y2 = 24; a.x1 = 12; a.x2 = 52; }
+      if (style === "branch") { a.y1 = a.y2 = 23; }
+      return `<svg xmlns="${NS}" viewBox="0 0 64 34" width="56" height="30">${arrowMarkup(a, TS).g}</svg>`;
+    };
+    ARROW_STYLES.forEach(([style, label]) => {
+      const row = document.createElement("div"); row.className = "mt-lib";
+      row.innerHTML = `<span class="thumb">${thumb(style)}</span><span class="nm">${label}</span><span class="btns"><button type="button" class="mini primary" data-to="page" title="Add to the blank page">+ Page</button><button type="button" class="mini primary" data-to="tiles" title="Add to the tiled figure">+ Tiles</button><button type="button" class="mini cp" title="Copy this arrow as SVG, drawn with the current arrow settings">Copy SVG</button></span>`;
+      row.querySelector(".cp").addEventListener("click", () => copyArrow(style, label));
+      row.querySelectorAll("[data-to]").forEach((b) => b.addEventListener("click", () => addArrowTo(b.dataset.to, style)));
+      $("arrowLib").appendChild(row);
+    });
+  })();
   $("addArrow").addEventListener("click", () => {
     const S = settings(), r = buildSVG(S, false, false), w = (mode === "page" ? S.pageW : S.W) / S.m, h = r.H / S.m;
     const a = { id: nextArrow++, x1: w / 2 - 18, y1: h / 2, x2: w / 2 + 18, y2: h / 2 };
-    if ($("arStyle").value === "branch") { a.x1 = w / 2 - 27; a.x2 = w / 2 + 27; a.branch = true; a.bf = 0.22; a.bh = -13; }
+    const st = $("arStyle").value;
+    a.kind = st;
+    if (st === "branch" || st === "sideout") { a.x1 = w / 2 - 27; a.x2 = w / 2 + 27; a.branch = st === "branch"; a.bf = st === "branch" ? 0.22 : 0.35; a.bh = st === "branch" ? -13 : 13; }
+    if (st === "curved" || st === "fishhook") { a.x1 = w / 2 - 22; a.x2 = w / 2 + 22; a.bow = -0.45; }
     arrows.push(a); arrowSel = a.id; $("delArrow").classList.remove("hidden"); $("branchArrow").classList.remove("hidden"); $("branchArrow").classList.remove("hidden"); draw();
   });
   function deleteArrow() { if (arrowSel == null) return; arrows = arrows.filter((a) => a.id !== arrowSel); syncArrows(); arrowSel = null; $("delArrow").classList.add("hidden"); $("branchArrow").classList.add("hidden"); draw(); }
   $("delArrow").addEventListener("click", deleteArrow);
   $("branchArrow").addEventListener("click", () => {
     const a = arrows.find((x) => x.id === arrowSel); if (!a) return;
-    if (a.branch) a.branch = false;
-    else { const L = Math.hypot(a.x2 - a.x1, a.y2 - a.y1); a.branch = true; if (a.bh == null) { a.bf = 0.22; a.bh = -Math.min(L * 0.25, Math.max(4, L - (+$("arLen").value || 8) - L * 0.22 - 4)); } }
+    if (a.branch) { a.branch = false; if (a.kind === "branch") a.kind = "straight"; }
+    else if (a.kind && a.kind !== "straight" && a.kind !== "branch") { status("Side input works on a plain reaction arrow."); return; }
+    else { a.kind = "branch"; const L = Math.hypot(a.x2 - a.x1, a.y2 - a.y1); a.branch = true; if (a.bh == null) { a.bf = 0.22; a.bh = -Math.min(L * 0.25, Math.max(4, L - (+$("arLen").value || 8) - L * 0.22 - 4)); } }
     draw();
   });
   // Ctrl/⌘ C copies the selected molecule or arrow; Ctrl/⌘ V pastes it on whichever page is showing
@@ -986,7 +1201,7 @@ const EXAMPLES = [{"name": "Rose Bengal (RB)", "cas": "632-69-9", "mol": "\n    
   document.addEventListener("keydown", (e) => {
     if (!(e.key === "Delete" || e.key === "Backspace") || /input|select|textarea/i.test(e.target.tagName)) return;
     if (arrowSel != null) { e.preventDefault(); deleteArrow(); }
-    else if (mode === "page" && pageSel != null) { e.preventDefault(); removeSelected(); }
+    else if (selObj()) { e.preventDefault(); removeSelected(); }
   });
   $("resetPos").addEventListener("click", () => { items.forEach((it) => { it.dx = 0; it.dy = 0; }); update(); });
 
@@ -1089,7 +1304,7 @@ const EXAMPLES = [{"name": "Rose Bengal (RB)", "cas": "632-69-9", "mol": "\n    
   });
 
   // settings: redraw and remember in this browser
-  const SETTINGS = ["arStyle", "pageW", "pageH", "arW", "arLen", "arHw", "arColor", "canvasIn", "perRow", "gapPt", "vAlign", "fitW", "lineW", "bondLen", "dblGap", "atomFont", "atomSize", "showNames", "nameFont", "nameSize", "nameBold", "nameGap", "dpi"];
+  const SETTINGS = ["pageW", "pageH", "arW", "arLen", "arHw", "arColor", "canvasIn", "perRow", "gapPt", "vAlign", "fitW", "lineW", "bondLen", "dblGap", "atomFont", "atomSize", "showNames", "nameFont", "nameSize", "nameBold", "nameGap", "dpi"];
   // all settings are shared by the tiled figure and the blank page
   const MODE_SET = [];
   let modeSettings = { tiles: {}, page: {} };
