@@ -1,0 +1,347 @@
+<!doctype html>
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Sharaf Lab tool: put several PNG images into a PowerPoint file, one per slide. Files are processed on your own device."
+    />
+    <title>PNGs to PowerPoint | Sharaf Lab Tools</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600&family=Montserrat:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../../styles.css" />
+    <style>
+.tool-back{display:inline-block;margin:0 0 22px;color:#0b6870;font-weight:600;text-decoration:none}
+.tool-back:hover{text-decoration:underline;text-underline-offset:4px}
+.tool-caution{max-width:1132px;margin:-60px auto 70px;padding:16px 20px;background:#fff7ec;border:1px solid #f0d2a8;border-left:4px solid #d9822b;border-radius:8px;color:#5c3b12;font-size:15px;line-height:1.6}
+.tool-caution strong{color:#8a4b0f}
+@media(max-width:1180px){.tool-caution{margin-left:24px;margin-right:24px}}
+@media(max-width:800px){.tool-caution{margin-top:-40px;margin-bottom:50px}}
+.tool-section{padding:0 max(24px,calc((100vw - 1132px)/2)) 100px;scroll-margin-top:90px}
+.tool-section-soft{background:#f2f3f4}
+.p2p{color:#102a33;font-family:"Manrope",Arial,sans-serif}
+.p2p-work{display:grid;grid-template-columns:1.5fr 1fr;gap:16px;align-items:start}
+.p2p-drop{min-height:220px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:30px;background:#fff;border:2px dashed #b8c8cc;cursor:pointer;text-align:center;transition:border-color .2s,background .2s}
+.p2p-drop:hover,.p2p-drop:focus-visible,.p2p-drop.is-dragging{border-color:#0b6870;background:#f3faf9;outline:none}
+.p2p-drop strong{font-family:"Montserrat",Arial,sans-serif;font-size:22px;font-weight:500}
+.p2p-drop p{margin:0;color:#586e73}
+.p2p-icon{width:52px;height:52px;display:grid;place-items:center;margin-bottom:10px;border-radius:50%;background:#0b6870;color:#fff;font-size:22px}
+.p2p-browse{color:#0b6870;font-weight:700;text-decoration:underline;text-underline-offset:4px}
+.p2p-limit{margin-top:14px;color:#84979a;font-size:12px}
+.p2p-settings{padding:22px 26px;background:#fff;border:1px solid #d8e0e0}
+.p2p-row{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:12px 0;border-bottom:1px solid #e4ebeb}
+.p2p-row label{display:block;font-weight:600}
+.p2p-row small{display:block;color:#6b7f83;font-size:13px;font-weight:400}
+.p2p-field{display:inline-flex;align-items:center;gap:6px;color:#586e73;white-space:nowrap}
+.p2p input[type=number],.p2p input[type=text],.p2p select{font:inherit;padding:7px 8px;border:1px solid #b8c8d5;border-radius:5px;background:#fff;color:#102a33}
+.p2p input[type=number]{width:72px}
+.p2p input[type=text]{width:180px}
+.p2p input[type=checkbox]{flex:none;width:18px;height:18px;accent-color:#0b6870}
+.p2p :focus-visible{outline:3px solid #0b6870;outline-offset:2px}
+.p2p [hidden]{display:none!important}
+.p2p-privacy{margin:16px 0 0;color:#586e73;font-size:14px}
+.p2p button{font:inherit;cursor:pointer;padding:9px 14px;border-radius:7px;border:1px solid #b8c8d5;background:#fff;color:#173650}
+.p2p button:hover{background:#e7f7f5}
+.p2p button:disabled{opacity:.55;cursor:default;background:#fff}
+.p2p .primary{border-color:#0b6870;background:#0b6870;color:#fff;font-weight:600}
+.p2p .primary:hover{background:#095a61}
+.p2p .mini{padding:4px 9px;font-size:13px}
+.p2p-bar{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;margin:22px 0 12px}
+.p2p-bar h2{font-size:20px;margin:0 auto 0 0}
+.p2p-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px;list-style:none;margin:0;padding:0}
+.p2p-card{background:#fff;border:1px solid #d8e0e0;border-radius:10px;overflow:hidden;display:flex;flex-direction:column;cursor:grab}
+.p2p-card.dragging{opacity:.4}
+.p2p-card.over{border-color:#0b6870;box-shadow:0 0 0 2px #0b6870}
+.p2p-slide{position:relative;margin:10px;background:#fff;border:1px solid #e1e8ee;box-shadow:0 1px 3px rgba(16,42,51,.12);overflow:hidden}
+.p2p-slide img{position:absolute;display:block}
+.p2p-slide .ttl{position:absolute;left:0;right:0;text-align:center;font-family:Arial,sans-serif;color:#102a33;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.p2p-meta{display:flex;align-items:center;gap:6px;padding:0 10px 10px}
+.p2p-num{font:700 12px "Montserrat",Arial,sans-serif;color:#0b6870;min-width:20px}
+.p2p-name{flex:1;min-width:0;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.p2p-meta button{padding:2px 7px;font-size:13px;line-height:1.3}
+.p2p-notes{padding:0 10px 10px;display:flex;flex-direction:column;gap:6px}
+.p2p .p2p-nbtn{align-self:flex-start;padding:3px 8px;font-size:12px;font-weight:600;color:#0b6870;border-color:#cfe7e4;background:#f3faf9}
+.p2p-notes textarea{width:100%;box-sizing:border-box;font:13px/1.45 "Manrope",Arial,sans-serif;padding:7px 8px;border:1px solid #b8c8d5;border-radius:5px;resize:vertical;color:#102a33;cursor:text}
+.p2p-empty{padding:26px;text-align:center;color:#6b7f83;background:#fff;border:1px dashed #d8e0e0;border-radius:10px}
+.p2p-message{margin-top:16px;padding:14px 18px;background:#fbeeee;color:#9a2f2f;border:1px solid #efcfcf}
+.p2p-message.success{background:#edf7f6;color:#0b5a60;border-color:#cfe7e4}
+@media(max-width:800px){.p2p-work{grid-template-columns:1fr}.tool-section{padding-bottom:76px}}
+    </style>
+  </head>
+
+  <body class="outreach-body">
+    <header>
+      <div class="nav">
+        <a class="brand" href="../../index.html" aria-label="Sharaf Lab home"
+          ><img src="../../00%20Github%20assets/sharaf-lab-logo.png" alt="Sharaf Lab"
+        /></a>
+        <nav aria-label="Primary navigation">
+          <a href="../../index.html">Home</a>
+          <a href="../../philosophy.html">Philosophy</a>
+          <a href="../../research.html">Research</a>
+          <a href="../../members.html">Lab Members</a>
+          <a href="../../photos.html">Photos</a>
+          <a href="../../links.html">Links of Interest</a>
+          <a class="active" href="../../tools.html" aria-current="page">Tools</a>
+          <a href="../../join.html">Join the Lab</a>
+        </nav>
+      </div>
+    </header>
+    <main>
+      <section class="outreach-hero">
+        <a class="tool-back" href="../../tools.html">← All lab tools</a>
+        <p class="eyebrow eyebrow-dark">Lab tools · Slides · Images</p>
+        <h1>Turn a stack of PNGs into a PowerPoint.</h1>
+        <p>
+          Drop in your images or choose a folder, put them in order, add presentation notes, and download a .pptx with one image per slide, scaled to fit without cropping.
+        </p>
+      </section>
+
+      <div class="tool-caution" role="note">
+        <strong>Check every result.</strong> These tools were vibe coded: built
+        quickly with AI assistance and not independently validated. Compare
+        their output with your own data and standard software before using it
+        in figures, analyses or publications.
+      </div>
+
+      <section class="tool-section tool-section-soft" id="png-to-pptx" aria-label="PNGs to PowerPoint">
+        <div class="p2p">
+          <div class="p2p-work">
+            <div class="p2p-drop" id="drop" tabindex="0" role="button" aria-label="Choose PNG images" aria-describedby="drop-help">
+              <input id="fileIn" type="file" accept="image/png,image/jpeg,image/gif,.png,.jpg,.jpeg,.gif" multiple hidden />
+              <input id="dirIn" type="file" webkitdirectory directory multiple hidden />
+              <div class="p2p-icon" aria-hidden="true">↑</div>
+              <strong>Drop PNGs here</strong>
+              <p id="drop-help">or <span class="p2p-browse">browse your files</span> · pick as many as you like</p>
+              <button type="button" id="pickDir" class="primary" style="margin-top:12px">Choose a folder…</button>
+              <span class="p2p-limit">Pick the folder and every PNG, JPG or GIF in it (and its subfolders) is added for you · processed locally</span>
+            </div>
+            <aside class="p2p-settings" aria-label="Slide settings">
+              <div class="p2p-row"><label for="size">Slide size</label>
+                <select id="size">
+                  <option value="7x4" selected>7 × 4 in</option>
+                  <option value="16x9">Widescreen 16:9 (13.33 × 7.5 in)</option>
+                  <option value="4x3">Standard 4:3 (10 × 7.5 in)</option>
+                  <option value="custom">Custom…</option>
+                </select>
+              </div>
+              <div class="p2p-row" id="customRow" hidden><label>Custom size</label>
+                <span class="p2p-field"><input id="cw" type="number" min="1" max="56" step="0.1" value="7" aria-label="Slide width in inches" /> × <input id="ch" type="number" min="1" max="56" step="0.1" value="4" aria-label="Slide height in inches" /> in</span>
+              </div>
+              <div class="p2p-row"><div><label for="margin">Margin</label><small>Space kept around each image</small></div>
+                <span class="p2p-field"><input id="margin" type="number" min="0" max="3" step="0.05" value="0.25" /> in</span>
+              </div>
+              <div class="p2p-row"><div><label for="upscale">Enlarge small images</label><small>Off keeps small images at their own size</small></div>
+                <input id="upscale" type="checkbox" checked />
+              </div>
+              <div class="p2p-row"><div><label for="titles">Title from file name</label><small>Adds the file name above each image</small></div>
+                <input id="titles" type="checkbox" />
+              </div>
+              <div class="p2p-row" id="titleRow" hidden><label for="tsize">Title size</label>
+                <span class="p2p-field"><input id="tsize" type="number" min="8" max="72" step="1" value="24" /> pt</span>
+              </div>
+              <div class="p2p-row"><div><label for="notes">Add file name to notes</label><small>Goes under your presentation notes so you know which file each slide came from</small></div>
+                <input id="notes" type="checkbox" />
+              </div>
+              <div class="p2p-row"><label for="outName">File name</label>
+                <span class="p2p-field"><input id="outName" type="text" value="images" />.pptx</span>
+              </div>
+              <p class="p2p-privacy">Your images never leave this device.</p>
+            </aside>
+          </div>
+
+          <div class="p2p-bar">
+            <h2 id="count">Slides</h2>
+            <button type="button" id="sortAZ" class="mini">Sort by name</button>
+            <button type="button" id="reverse" class="mini">Reverse order</button>
+            <button type="button" id="allNotes" class="mini">Show all notes</button>
+            <button type="button" id="clearAll" class="mini">Remove all</button>
+            <button type="button" id="make" class="primary" disabled>Download PowerPoint →</button>
+          </div>
+          <p style="margin:0 0 12px;color:#586e73;font-size:14px">Drag cards to reorder them. Each preview shows the slide as it will look. Notes go into each slide's PowerPoint presenter notes.</p>
+          <ol class="p2p-list" id="list"></ol>
+          <div class="p2p-empty" id="empty">No images yet.</div>
+          <div class="p2p-message" id="msg" role="status" hidden></div>
+        </div>
+      </section>
+    </main>
+
+    <footer>© 2026 Sharaf Lab. Hosted on GitHub Pages. Created with the assistance of AI.</footer>
+
+    <!-- PptxGenJS 3.12.0 (MIT licence, see lib/LICENSE-pptxgenjs.txt) -->
+    <script src="lib/pptxgen.bundle.js"></script>
+    <script>
+    (() => {
+      const $ = (id) => document.getElementById(id);
+      let imgs = [], nextId = 1, dragId = null; // {id, name, data, w, h, notes}
+      const openNotes = new Set();
+
+      // ---------- settings ----------
+      const SIZES = { "7x4": [7, 4], "16x9": [13.333, 7.5], "4x3": [10, 7.5] };
+      function opts() {
+        let [W, H] = SIZES[$("size").value] || [Math.max(1, Math.min(56, +$("cw").value || 7)), Math.max(1, Math.min(56, +$("ch").value || 4))];
+        const margin = Math.max(0, Math.min(Math.min(W, H) / 3, +$("margin").value || 0));
+        const titles = $("titles").checked, tsize = Math.max(8, Math.min(72, +$("tsize").value || 24));
+        return { W, H, margin, titles, tsize, titleH: titles ? (tsize / 72) * 1.5 : 0, upscale: $("upscale").checked, notes: $("notes").checked };
+      }
+      // where the image sits on the slide, in inches
+      function place(im, o) {
+        const top = o.margin + o.titleH, bw = o.W - 2 * o.margin, bh = o.H - top - o.margin;
+        const nw = im.w / 96, nh = im.h / 96; // pixel size at 96 dpi, PowerPoint's own default
+        let k = Math.min(bw / nw, bh / nh);
+        if (!o.upscale) k = Math.min(k, 1);
+        const w = nw * k, h = nh * k;
+        return { x: o.margin + (bw - w) / 2, y: top + (bh - h) / 2, w, h };
+      }
+      const title = (name) => name.replace(/\.[^.]+$/, "");
+
+      // ---------- files ----------
+      function readImage(file) {
+        return new Promise((res) => {
+          const r = new FileReader();
+          r.onload = () => { const im = new Image(); im.onload = () => res({ id: nextId++, name: file.name, data: r.result, w: im.naturalWidth, h: im.naturalHeight, notes: "" }); im.onerror = () => res(null); im.src = r.result; };
+          r.onerror = () => res(null);
+          r.readAsDataURL(file);
+        });
+      }
+      async function addFiles(list, keepOrder) {
+        const all = [...list].filter((f) => !/^\./.test(f.name)); // skip hidden files such as macOS ._ copies
+        const files = all.filter((f) => /^image\/(png|jpeg|gif)$/.test(f.type) || /\.(png|jpe?g|gif)$/i.test(f.name));
+        const skipped = all.length - files.length;
+        const key = (f) => f.webkitRelativePath || f.name;
+        if (!keepOrder) files.sort((a, b) => key(a).localeCompare(key(b), undefined, { numeric: true, sensitivity: "base" }));
+        const got = (await Promise.all(files.map(readImage))).filter(Boolean);
+        imgs.push(...got); render();
+        if (!files.length) msg("No PNG, JPG or GIF images were found there.");
+        else if (skipped || got.length < files.length) msg(`Added ${got.length} image${got.length === 1 ? "" : "s"}; ${skipped + files.length - got.length} other file(s) skipped (only PNG, JPG and GIF images can be added).`, true);
+        else hideMsg();
+      }
+      $("drop").addEventListener("click", (e) => { if (e.target.closest("#pickDir")) return; $("fileIn").click(); });
+      // Folder: in Chrome/Edge pick the folder itself and every image in it is added at once (no file selecting);
+      // other browsers fall back to the folder upload picker.
+      async function walk(dir, path, out) {
+        for await (const [name, h] of dir.entries()) {
+          if (name.startsWith(".")) continue;
+          if (h.kind === "directory") await walk(h, path + name + "/", out);
+          else if (/\.(png|jpe?g|gif)$/i.test(name)) { const f = await h.getFile(); out.push({ f, key: path + name }); }
+        }
+        return out;
+      }
+      $("pickDir").addEventListener("click", async (e) => {
+        e.stopPropagation();
+        if (window.showDirectoryPicker) {
+          let dir;
+          try { dir = await window.showDirectoryPicker({ id: "png-to-pptx", mode: "read" }); }
+          catch (err) { if (err && err.name === "AbortError") return; $("dirIn").click(); return; }
+          try {
+            const found = await walk(dir, "", []);
+            found.sort((a, b) => a.key.localeCompare(b.key, undefined, { numeric: true, sensitivity: "base" }));
+            if (!found.length) { msg(`No PNG, JPG or GIF images were found in “${dir.name}”.`); return; }
+            await addFiles(found.map((x) => x.f), true);
+            msg(`Added ${found.length} image${found.length === 1 ? "" : "s"} from “${dir.name}”.`, true);
+          } catch (err) { console.error(err); msg("That folder could not be read."); }
+          return;
+        }
+        $("dirIn").click();
+      });
+      $("dirIn").addEventListener("change", () => { addFiles($("dirIn").files); $("dirIn").value = ""; });
+      $("drop").addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); $("fileIn").click(); } });
+      $("fileIn").addEventListener("change", () => { addFiles($("fileIn").files); $("fileIn").value = ""; });
+      ["dragenter", "dragover"].forEach((n) => $("drop").addEventListener(n, (e) => { e.preventDefault(); $("drop").classList.add("is-dragging"); }));
+      ["dragleave", "drop"].forEach((n) => $("drop").addEventListener(n, (e) => { e.preventDefault(); $("drop").classList.remove("is-dragging"); }));
+      $("drop").addEventListener("drop", (e) => addFiles(e.dataTransfer.files));
+
+      // ---------- list ----------
+      function render() {
+        const o = opts(), list = $("list"), PW = 170, s = PW / o.W, PH = o.H * s;
+        list.innerHTML = "";
+        imgs.forEach((im, i) => {
+          const p = place(im, o), li = document.createElement("li");
+          li.className = "p2p-card"; li.draggable = true; li.dataset.id = im.id;
+          const ttl = o.titles ? `<div class="ttl" style="top:${o.margin * s}px;height:${o.titleH * s}px;line-height:${o.titleH * s}px;font-size:${Math.max(5, (o.tsize / 72) * s)}px"></div>` : "";
+          li.innerHTML = `<div class="p2p-slide" style="width:${PW}px;height:${PH}px">${ttl}<img alt="" style="left:${p.x * s}px;top:${p.y * s}px;width:${p.w * s}px;height:${p.h * s}px" /></div>
+            <div class="p2p-meta"><span class="p2p-num">${i + 1}</span><span class="p2p-name"></span>
+            <button type="button" data-a="up" title="Move earlier" aria-label="Move earlier"${i === 0 ? " disabled" : ""}>↑</button>
+            <button type="button" data-a="down" title="Move later" aria-label="Move later"${i === imgs.length - 1 ? " disabled" : ""}>↓</button>
+            <button type="button" data-a="del" title="Remove" aria-label="Remove">×</button></div>
+            <div class="p2p-notes"><button type="button" class="p2p-nbtn" data-a="notes" aria-expanded="false">+ Presentation notes</button><textarea rows="4" placeholder="What you'll say on this slide" aria-label="Presentation notes for slide ${i + 1}" hidden></textarea></div>`;
+          li.querySelector("img").src = im.data;
+          li.querySelector(".p2p-name").textContent = im.name; li.querySelector(".p2p-name").title = `${im.name} · ${im.w} × ${im.h} px`;
+          if (o.titles) li.querySelector(".ttl").textContent = title(im.name);
+          li.querySelectorAll("[data-a]:not([data-a=notes])").forEach((b) => b.addEventListener("click", () => act(im.id, b.dataset.a)));
+          const nb = li.querySelector(".p2p-nbtn"), ta = li.querySelector("textarea");
+          ta.value = im.notes || "";
+          const showNotes = (on) => { ta.hidden = !on; nb.setAttribute("aria-expanded", on); nb.textContent = on ? "Presentation notes" : (im.notes ? "✎ Presentation notes" : "+ Presentation notes"); };
+          showNotes(!!im.notes || openNotes.has(im.id));
+          nb.addEventListener("click", () => { const on = ta.hidden; on ? openNotes.add(im.id) : openNotes.delete(im.id); showNotes(on); if (on) ta.focus(); });
+          ta.addEventListener("input", () => { im.notes = ta.value; });
+          ta.addEventListener("mousedown", (e) => e.stopPropagation());
+          ta.addEventListener("focus", () => (li.draggable = false));
+          ta.addEventListener("blur", () => (li.draggable = true));
+          li.addEventListener("dragstart", (e) => { dragId = im.id; li.classList.add("dragging"); e.dataTransfer.effectAllowed = "move"; e.dataTransfer.setData("text/plain", String(im.id)); });
+          li.addEventListener("dragend", () => { dragId = null; render(); });
+          li.addEventListener("dragover", (e) => { if (dragId == null) return; e.preventDefault(); li.classList.add("over"); });
+          li.addEventListener("dragleave", () => li.classList.remove("over"));
+          li.addEventListener("drop", (e) => { if (dragId == null) return; e.preventDefault(); moveTo(dragId, im.id); });
+          list.appendChild(li);
+        });
+        $("empty").hidden = imgs.length > 0;
+        $("count").textContent = imgs.length ? `${imgs.length} slide${imgs.length === 1 ? "" : "s"}` : "Slides";
+        ["make", "sortAZ", "reverse", "clearAll", "allNotes"].forEach((id) => ($(id).disabled = !imgs.length));
+      }
+      function act(id, a) {
+        const i = imgs.findIndex((x) => x.id === id); if (i < 0) return;
+        if (a === "del") imgs.splice(i, 1);
+        else { const j = a === "up" ? i - 1 : i + 1; if (j < 0 || j >= imgs.length) return; [imgs[i], imgs[j]] = [imgs[j], imgs[i]]; }
+        render();
+      }
+      function moveTo(fromId, toId) {
+        if (fromId === toId) return;
+        const i = imgs.findIndex((x) => x.id === fromId), j = imgs.findIndex((x) => x.id === toId);
+        const [m] = imgs.splice(i, 1); imgs.splice(j, 0, m); dragId = null; render();
+      }
+      $("sortAZ").addEventListener("click", () => { imgs.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: "base" })); render(); });
+      $("reverse").addEventListener("click", () => { imgs.reverse(); render(); });
+      $("clearAll").addEventListener("click", () => { imgs = []; openNotes.clear(); render(); hideMsg(); });
+      $("allNotes").addEventListener("click", () => { const open = imgs.some((im) => !openNotes.has(im.id) && !im.notes); imgs.forEach((im) => (open ? openNotes.add(im.id) : openNotes.delete(im.id))); render(); $("allNotes").textContent = open ? "Hide empty notes" : "Show all notes"; });
+      $("size").addEventListener("change", () => { $("customRow").hidden = $("size").value !== "custom"; render(); });
+      $("titles").addEventListener("change", () => { $("titleRow").hidden = !$("titles").checked; render(); });
+      ["cw", "ch", "margin", "tsize", "upscale"].forEach((id) => $(id).addEventListener("input", render));
+
+      // ---------- build ----------
+      function msg(t, ok) { const m = $("msg"); m.textContent = t; m.className = "p2p-message" + (ok ? " success" : ""); m.hidden = false; }
+      function hideMsg() { $("msg").hidden = true; }
+      $("make").addEventListener("click", async () => {
+        if (!imgs.length) return;
+        if (!window.PptxGenJS) { msg("The PowerPoint engine did not load. Reload the page and try again."); return; }
+        const o = opts(), b = $("make");
+        b.disabled = true; b.textContent = "Building…";
+        try {
+          const pptx = new PptxGenJS();
+          pptx.defineLayout({ name: "P2P", width: o.W, height: o.H }); pptx.layout = "P2P";
+          pptx.title = ($("outName").value || "images").trim();
+          imgs.forEach((im) => {
+            const s = pptx.addSlide(), p = place(im, o);
+            if (o.titles) s.addText(title(im.name), { x: o.margin, y: o.margin, w: o.W - 2 * o.margin, h: o.titleH, fontFace: "Arial", fontSize: o.tsize, color: "102A33", align: "center", valign: "middle", margin: 0, fit: "shrink" });
+            s.addImage({ data: im.data, x: p.x, y: p.y, w: p.w, h: p.h, altText: im.name });
+            const nt = [(im.notes || "").trim(), o.notes ? im.name : ""].filter(Boolean).join("\n\n");
+            if (nt) s.addNotes(nt);
+          });
+          const name = (($("outName").value || "images").trim().replace(/\.pptx$/i, "").replace(/[\\/:*?"<>|]+/g, "-") || "images") + ".pptx";
+          await pptx.writeFile({ fileName: name });
+          msg(`${name} is ready and has been downloaded (${imgs.length} slide${imgs.length === 1 ? "" : "s"}).`, true);
+        } catch (e) {
+          console.error(e); msg("The PowerPoint file could not be made. " + (e && e.message ? e.message : ""));
+        } finally { b.disabled = false; b.textContent = "Download PowerPoint →"; }
+      });
+      render();
+    })();
+    </script>
+  </body>
+</html>
