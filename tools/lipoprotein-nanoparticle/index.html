@@ -35,6 +35,13 @@
 .lnp-row label{font-weight:600}
 .lnp-row .val{display:inline-flex;align-items:center;gap:8px}
 .lnp-row output{min-width:30px;text-align:right;font-variant-numeric:tabular-nums;color:#586e73}
+.lnp-row output.lnp-hide{display:none}
+.lnp .lnp-row input.lnp-num{width:50px;height:26px;min-height:0;box-sizing:border-box;margin:0;-moz-appearance:textfield;padding:2px 5px;border:1px solid #b8c8d5;border-radius:5px;font:inherit;font-size:13px;text-align:right;font-variant-numeric:tabular-nums;color:#102a33;background:#fff}
+.lnp .lnp-row input.lnp-num::-webkit-inner-spin-button,.lnp .lnp-row input.lnp-num::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.lnp .lnp-row input.lnp-num:focus{outline:2px solid #0b6870;outline-offset:0;border-color:#0b6870}
+.lnp .lnp-unit{font-size:13px;color:#586e73;margin-left:-6px;width:6px}
+.lnp-row .val:has(.lnp-num) input[type=range]{width:110px}
+.lnp-defaults{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .lnp input[type=range]{width:130px;accent-color:#0b6870}
 .lnp input[type=number]{width:64px;font:inherit;padding:6px 7px;border:1px solid #b8c8d5;border-radius:5px}
 .lnp input[type=color]{width:36px;height:30px;border:1px solid #b8c8d5;border-radius:5px;padding:2px;background:#fff;cursor:pointer}
@@ -50,7 +57,7 @@
 .swatches button{width:24px;height:24px;padding:0;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px #b8c8d5}
 .swatches button[aria-pressed=true]{box-shadow:0 0 0 2px #0b6870}
 .lnp-note{font-size:13px;color:#6b7f83;line-height:1.55;margin:6px 0 0}
-.lnp-views{display:grid;grid-template-columns:220px 1fr;gap:20px}
+.lnp-views{display:grid;grid-template-columns:220px 1fr;gap:20px;position:relative}
 .lnp-view{background:#fff;border:1px solid #d8e0e0;border-radius:10px;display:flex;flex-direction:column}
 .lnp-view header{all:unset;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid #e4ebeb;font-family:"Montserrat",Arial,sans-serif;font-weight:600;font-size:15px}
 .lnp-view header small{font-family:"Manrope",Arial,sans-serif;font-weight:500;color:#6b7f83;font-size:13px}
@@ -71,6 +78,14 @@
 .lnp .lnp-ctx button{border:0;border-radius:5px;background:none;text-align:left;padding:8px 10px;font-size:13px;display:flex;gap:8px;align-items:center}
 .lnp .lnp-ctx button:hover,.lnp .lnp-ctx button:focus-visible{background:#e7f7f5}
 .lnp-ctx .sw{width:14px;height:14px;border-radius:3px;border:1px solid rgba(0,0,0,.25);flex:none}
+.lnp-ctx{width:300px;max-width:calc(100% - 8px)}
+.lnp-ctx .ctx-item{padding:4px 8px 6px}
+.lnp-ctx .ctx-label{display:flex;gap:8px;align-items:center;font-size:13px;margin-bottom:5px}
+.lnp-ctx .ctx-sws{display:flex;flex-wrap:wrap;gap:5px}
+.lnp .lnp-ctx button.ctx-dot{width:20px;height:20px;padding:0;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px #b8c8d5;display:inline-flex;justify-content:center;align-items:center;font-size:12px;line-height:1;color:#173650}
+.lnp .lnp-ctx button.ctx-dot:hover{box-shadow:0 0 0 2px #0b6870}
+.lnp .lnp-ctx button.ctx-dot[aria-pressed=true]{box-shadow:0 0 0 2px #0b6870}
+.lnp .lnp-ctx button.ctx-custom{background:conic-gradient(#d94040,#e8c32a,#4caf6a,#3a7bd5,#7b4fc9,#d94040)}
 .lnp-ctx hr{border:0;border-top:1px solid #e4ebeb;margin:4px 0}
 .lnp-ctx-color{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;left:0;top:0}
 #lnp-np-stage [data-mol]{cursor:grab}
@@ -217,6 +232,7 @@
               <label for="headColor">Head color</label>
               <span class="val"><input id="headColor" type="color" value="#a6a6a6" /><input id="headOutline" type="color" value="#333333" aria-label="Head outline color" /></span>
             </div>
+            <div class="swatches" id="headSwatches" aria-label="Protein head color presets"></div>
             <div class="lnp-row">
               <label for="headStroke">Head outline width (pt)</label>
               <span class="val"><input id="headStroke" type="range" min="0" max="3" step="0.05" value="0.45" /><output id="headStrokeOut">0.45</output></span>
@@ -261,6 +277,67 @@
             <div class="lnp-row">
               <label for="headAngle">Linker to protein angle</label>
               <span class="val"><input id="headAngle" type="range" min="-90" max="90" step="1" value="0" /><output id="headAngleOut">0°</output></span>
+            </div>
+            <h3>Protein two</h3>
+            <div class="lnp-row">
+              <label for="p2On">Add protein two</label>
+              <span class="val"><input id="p2On" type="checkbox" /></span>
+            </div>
+            <div id="p2Rows" class="hidden">
+            <p class="lnp-note" style="margin-top:0">A second protein (for example SpyTag-MBP) that binds each protein head: a <em>tag</em> that docks into the head and a <em>domain</em> behind it. Right-click a lipoprotein to add or remove it on just that one.</p>
+            <div class="lnp-row">
+              <label for="p2Shape">Domain shape</label>
+              <span class="val"><select id="p2Shape"></select></span>
+            </div>
+            <div class="lnp-row">
+              <label for="p2Color">Domain color</label>
+              <span class="val"><input id="p2Color" type="color" value="#f2ae3d" /><input id="p2Outline" type="color" value="#231f20" aria-label="Protein two outline color" /></span>
+            </div>
+            <div class="lnp-row">
+              <label for="p2Size">Domain size</label>
+              <span class="val"><input id="p2Size" type="range" min="3" max="40" step="0.5" value="12" /><output id="p2SizeOut">12</output></span>
+            </div>
+            <div class="lnp-row">
+              <label for="p2Turn">Domain turn</label>
+              <span class="val"><input id="p2Turn" type="range" min="-180" max="180" step="1" value="0" /><output id="p2TurnOut">0°</output></span>
+            </div>
+            <div class="lnp-row">
+              <label for="tagShape">Tag shape</label>
+              <span class="val"><select id="tagShape"><option value="none">No tag</option></select></span>
+            </div>
+            <div class="lnp-row">
+              <label for="tagColor">Tag color</label>
+              <span class="val"><input id="tagColor" type="color" value="#a6a6a6" /></span>
+            </div>
+            <div class="lnp-row">
+              <label for="tagSize">Tag size</label>
+              <span class="val"><input id="tagSize" type="range" min="1" max="25" step="0.5" value="7" /><output id="tagSizeOut">7</output></span>
+            </div>
+            <div class="lnp-row">
+              <label for="p2Stroke">Outline width (pt)</label>
+              <span class="val"><input id="p2Stroke" type="range" min="0" max="3" step="0.05" value="0.75" /><output id="p2StrokeOut">0.75</output></span>
+            </div>
+            <div class="lnp-row">
+              <label for="p2Angle">Where it binds on the head</label>
+              <span class="val"><input id="p2Angle" type="range" min="-180" max="180" step="1" value="0" /><output id="p2AngleOut">0°</output></span>
+            </div>
+            <div class="lnp-row">
+              <label for="p2Depth">How deep the tag sits</label>
+              <span class="val"><input id="p2Depth" type="range" min="-0.5" max="2" step="0.05" value="0.15" /><output id="p2DepthOut">0.15</output></span>
+            </div>
+            <div class="lnp-row">
+              <label for="p2Overlap">Tag–domain overlap</label>
+              <span class="val"><input id="p2Overlap" type="range" min="-0.5" max="0.8" step="0.05" value="0.15" /><output id="p2OverlapOut">0.15</output></span>
+            </div>
+            <div class="lnp-row">
+              <label for="p2N">Lipoproteins with protein two</label>
+              <span class="val"><input id="p2N" type="range" min="0" max="30" step="1" value="30" /><output id="p2NOut">30</output></span>
+            </div>
+            <div class="lnp-row">
+              <label for="p2Single">Show on the one lipoprotein</label>
+              <span class="val"><input id="p2Single" type="checkbox" /></span>
+            </div>
+            <p class="lnp-note"><em>Where it binds</em> is measured on the protein head (0° is the opening of the <em>Cut-out circle</em>), so protein two turns with the head. <em>How deep</em> is the tag tip's distance from the head center, in head radii.</p>
             </div>
             <h3>Phospholipids</h3>
             <div class="lnp-row">
@@ -349,19 +426,30 @@
               <span class="val"><input id="smArea" type="range" min="10" max="150" step="5" value="85" /><output id="smAreaOut">85</output></span>
             </div>
             <div class="lnp-row">
+              <label for="smShade">3D shading</label>
+              <span class="val"><input id="smShade" type="checkbox" checked /></span>
+            </div>
+            <div class="lnp-row">
               <label for="smTop">Draw on top</label>
               <span class="val"><input id="smTop" type="checkbox" checked /><button id="smShuffle" class="mini" type="button" title="Scatter them again">↻ Rescatter</button></span>
             </div>
-            <p class="lnp-note">Small molecules are drawn as spheres scattered through the core without overlapping each other. Click one in the figure to move or remove it.</p>
+            <p class="lnp-note">Small molecules are drawn as spheres (3D-shaded, lit from the upper left, unless you turn shading off) scattered through the core without overlapping each other. Click one in the figure to move or remove it.</p>
             </div>
-            <p class="lnp-note"><button id="resetBtn" type="button">Reset to defaults</button></p>
+            <p class="lnp-note lnp-defaults"><button id="resetBtn" type="button">Reset to defaults</button><button id="saveDefaults" type="button" title="Use the current settings every time this tool opens and when you press Reset">Save as my defaults</button><button id="clearDefaults" type="button" class="hidden" title="Go back to the built-in defaults">Clear my defaults</button></p>
+            <p class="lnp-note" id="defaultsNote"></p>
           </div>
 
           <div class="lnp-views">
+            <div class="lnp-ctx hidden" id="ctxMenu" role="menu"></div>
+            <input type="color" id="ctxColor" class="lnp-ctx-color" aria-label="Pick a color" tabindex="-1" />
             <div class="lnp-singles">
             <div class="lnp-view">
               <header>One lipoprotein <button class="mini" id="copyLp" type="button">Copy SVG</button></header>
               <div class="lnp-stage" id="lnp-single-stage"></div>
+            </div>
+            <div class="lnp-view hidden" id="p2View">
+              <header>Protein two alone <button class="mini" id="copyP2" type="button">Copy SVG</button></header>
+              <div class="lnp-stage" id="lnp-p2-stage"></div>
             </div>
             <div class="lnp-view" id="plView">
               <header>One phospholipid <button class="mini" id="copyPl" type="button">Copy SVG</button></header>
@@ -442,10 +530,8 @@
                 <p class="lnp-note">Drag <em>Core spacing</em> below 0 to let the tails overlap in the core. Lower <em>Phospholipid core packing</em> pushes the phospholipids deeper into the core.</p>
               </div>
               <div class="lnp-stage" id="lnp-np-stage"></div>
-              <div class="lnp-ctx hidden" id="ctxMenu" role="menu"></div>
-              <input type="color" id="ctxColor" class="lnp-ctx-color" aria-label="Pick a color" tabindex="-1" />
               <div class="lnp-selbar" id="selBar">
-                <span id="selHint">Click a molecule to select it. Drag it to move it, drag the round handle to rotate it, drag the green diamond to swing the linker, or drag the orange square to turn just the protein domain (hold Shift on a handle to snap to 15°). Shift-drag a molecule to drag out a copy. Right-click to change colors.</span>
+                <span id="selHint">Click a molecule to select it. Drag it to move it, drag the round handle to rotate it, drag the green diamond to swing the linker, or drag the orange square to turn just the protein domain (hold Shift on a handle to snap to 15°). Shift-drag a molecule to drag out a copy. Right-click any molecule, or the single lipoprotein and phospholipid, to change colors.</span>
                 <span id="selTools" class="hidden">
                   <strong id="selName"></strong>
                   <label for="selRot" id="selRotLabel">Rotate <input id="selRot" type="range" min="-180" max="180" step="1" value="0" /><output id="selRotOut">0°</output></label>
@@ -462,7 +548,10 @@
                 <label for="exportIn">Size <input id="exportIn" type="number" min="0.2" max="20" step="0.05" value="0.8" style="width:70px" /> in</label>
                 <label for="dpi">Document DPI <input id="dpi" type="number" min="1" max="2400" step="1" value="360" style="width:76px" /></label>
                 <label><input id="pngWhite" type="checkbox" /> White PNG background</label>
-                <p class="lnp-note" style="flex-basis:100%;margin:0">The SVG canvas is this size. Molecule sizes and line widths (in pt) stay fixed when you change the canvas or add molecules, so things may overlap or run past the edge. Set <em>Document DPI</em> to your Affinity document's DPI (File &rsaquo; Document Setup) so pastes land at the right size; use 72 for Illustrator.</p>
+                <label title="Scale the whole figure so it is exactly this wide. Line widths stay at the pt you set."><input id="fitWidth" type="checkbox" checked /> Fit figure to width</label>
+                <label for="picScale" title="Export the whole picture at this percent of Size: shapes and line widths scale together">Export at <input id="picScale" type="number" min="1" max="1000" step="5" value="100" style="width:70px" /> %</label>
+                <button type="button" class="mini" id="picScaleReset" title="Back to 100%">100%</button>
+                <p class="lnp-note" style="flex-basis:100%;margin:0">With <em>Fit figure to width</em> on, the preview and the export are scaled to exactly this width (height follows; the dashed frame is the export area) while every line width stays at the pt you set. The single lipoprotein and phospholipid are drawn and copied at the same scale, so they match the nanoparticle exactly. With it off, the SVG canvas is this size and molecules keep a fixed scale, so they may run past the edge. <em>Export at</em> scales the whole picture, line widths included: with Size 1 in and Export at 50%, you get a 0.5 in figure with every line half as thick. Set <em>Document DPI</em> to your Affinity document's DPI (File &rsaquo; Document Setup) so pastes land at the right size; use 72 for Illustrator.</p>
                 <span id="lnp-status" role="status"></span>
               </div>
             </div>
@@ -489,7 +578,7 @@
     plOn: true, plN: 8, plHeadColor: "#452a75", plHeadOutline: "#231f20", plHeadStroke: 0, plHeadSize: 12,
     plTailColor: "#452a75", plTails: 2, plTailW: 1, plTailLen: 34, plTailGap: 5, plWaves: 3.5, plWaveAmp: 1.5,
     plRadial: 0, plAngle: 0, plTop: true,
-    smOn: false, smN: 24, smColor: "#f2a93b", smOutline: "#231f20", smStroke: 0, smSize: 5, smVary: 20, smArea: 85, smTop: true,
+    smOn: false, smN: 24, smColor: "#f2a93b", smOutline: "#231f20", smStroke: 0, smShade: true, smSize: 5, p2On: false, p2Shape: "circle", p2Color: "#f2ae3d", p2Outline: "#231f20", p2Size: 12, p2Turn: 0, tagShape: "triangle", tagColor: "#a6a6a6", tagSize: 7, p2Stroke: 0.75, p2Angle: 0, p2Depth: 0.15, p2Overlap: 0.15, p2N: 30, p2Single: false, smVary: 20, smArea: 85, smTop: true,
     headMix: false, colorMix: false,
     memLpN: 4, lpRadial: 0, memLpLift: 0, memLpSide: "top", memLen: 320, memSpacing: 25, memGap: 1, memShape: "flat", memCurve: 40, memWaves: 2
   };
@@ -510,6 +599,26 @@
     r = Math.round(r * (1 - k)); g = Math.round(g * (1 - k * 1.1)); b = Math.round(Math.min(255, b * (1 - k * 0.6) + 20));
     g = Math.max(0, g);
     return "#" + [r, g, b].map((x) => x.toString(16).padStart(2, "0")).join("");
+  }
+  // mix a color toward white (k = 0..1)
+  function lighten(hex, k) {
+    const n = parseInt(hex.slice(1), 16);
+    return "#" + [(n >> 16) & 255, (n >> 8) & 255, n & 255].map((x) => Math.round(x + (255 - x) * k).toString(16).padStart(2, "0")).join("");
+  }
+  function shadeDown(hex, k) {
+    const n = parseInt(hex.slice(1), 16);
+    return "#" + [(n >> 16) & 255, (n >> 8) & 255, n & 255].map((x) => Math.round(x * (1 - k)).toString(16).padStart(2, "0")).join("");
+  }
+  // small molecule: a flat circle, or a shaded 3D ball lit from the upper left whatever way the molecule is turned
+  function smBall(p, key, r0, sw, ang) {
+    const e = edits[key] || {}, c = e.color || p.smColor;
+    const st = `stroke="${sw > 0 ? p.smOutline : "none"}" stroke-width="${f(sw)}"`;
+    if (!p.smShade || !/^#[0-9a-f]{6}$/i.test(c)) return `<circle r="${f(r0)}" fill="${c}" ${st}/>`;
+    const id = "lnpSm-" + key.replace(/[^a-z0-9]/gi, "_"), turn = -((ang || 0) + (e.rot || 0));
+    return `<defs><radialGradient id="${id}" cx="0.5" cy="0.5" r="0.5" fx="0.34" fy="0.3" gradientTransform="rotate(${f(turn)} 0.5 0.5)">` +
+      `<stop offset="0" stop-color="${lighten(c, 0.85)}"/><stop offset="0.22" stop-color="${lighten(c, 0.4)}"/>` +
+      `<stop offset="0.62" stop-color="${c}"/><stop offset="1" stop-color="${shadeDown(c, 0.3)}"/></radialGradient></defs>` +
+      `<circle r="${f(r0)}" fill="url(#${id})" ${st}/>`;
   }
   function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;"); }
 
@@ -582,12 +691,15 @@
 
   function read() {
     return {
-      n: +$("n").value, spacing: +$("spacing").value, rotation: +$("rotation").value, jitter: +$("jitter").value, exportIn: +$("exportIn").value || 0.8,
+      n: +$("n").value, spacing: +$("spacing").value, rotation: +$("rotation").value, jitter: +$("jitter").value, exportIn: +$("exportIn").value || 0.8, fitWidth: $("fitWidth").checked, picScale: Math.max(0.01, (+$("picScale").value || 100) / 100),
       plOn: $("plOn").checked, plN: +$("plN").value, plHeadColor: $("plHeadColor").value, plHeadOutline: $("plHeadOutline").value,
       plHeadStroke: +$("plHeadStroke").value, plHeadSize: +$("plHeadSize").value, plTailColor: $("plTailColor").value, plTails: +$("plTails").value,
       plTailW: +$("plTailW").value, plTailLen: +$("plTailLen").value, plTailGap: +$("plTailGap").value, plWaves: +$("plWaves").value,
       plWaveAmp: +$("plWaveAmp").value, plRadial: +$("plRadial").value, plAngle: +$("plAngle").value, plTop: $("plTop").checked,
-      smOn: $("smOn").checked, smN: +$("smN").value, smColor: $("smColor").value, smOutline: $("smOutline").value, smStroke: +$("smStroke").value,
+      smOn: $("smOn").checked, smN: +$("smN").value, smColor: $("smColor").value, smShade: $("smShade").checked,
+      p2On: $("p2On").checked, p2Shape: $("p2Shape").value, p2Color: $("p2Color").value, p2Outline: $("p2Outline").value, p2Size: +$("p2Size").value, p2Turn: +$("p2Turn").value,
+      tagShape: $("tagShape").value, tagColor: $("tagColor").value, tagSize: +$("tagSize").value, p2Stroke: +$("p2Stroke").value, p2Angle: +$("p2Angle").value,
+      p2Depth: +$("p2Depth").value, p2Overlap: +$("p2Overlap").value, p2N: +$("p2N").value, p2Single: $("p2Single").checked, smOutline: $("smOutline").value, smStroke: +$("smStroke").value,
       smSize: +$("smSize").value, smVary: +$("smVary").value, smArea: +$("smArea").value, smTop: $("smTop").checked,
       mode, headMix: $("headMix").checked, colorMix: $("colorMix").checked,
       memLpN: +$("memLpN").value, lpRadial: +$("lpRadial").value, memLpLift: +$("memLpLift").value, memLpSide: $("memLpSide").value, memLen: +$("memLen").value, memSpacing: +$("memSpacing").value,
@@ -639,7 +751,13 @@
   // points (x, y, radius) that bound one lipoprotein, for sizing the drawing
   function unitBounds(p, d) {
     const hb = d.bundle / 2 + d.amp + p.u;
-    return [[0, -hb, 0], [0, hb, 0], [d.L, -hb, 0], [d.L, hb, 0], [d.E[0], d.E[1], p.linkerW], [d.C[0], d.C[1], d.big * 1.3 + p.headStroke]];
+    const out = [[0, -hb, 0], [0, hb, 0], [d.L, -hb, 0], [d.L, hb, 0], [d.E[0], d.E[1], p.linkerW], [d.C[0], d.C[1], d.big * 1.3 + p.headStroke]];
+    if (p.p2On && p.p2Single) { // protein two on the one-lipoprotein view
+      const a = rad(p.headTurn + (d.dir * 180) / Math.PI + p.p2Angle), rt = p.tagShape !== "none" ? p.tagSize : 0;
+      const far = p.p2Depth * d.R + (rt ? rt * 1.65 + p.p2Size * (1 - p.p2Overlap) : p.p2Size);
+      out.push([d.C[0] + far * Math.cos(a), d.C[1] + far * Math.sin(a), p.p2Size * 1.45 + p.p2Stroke]);
+    }
+    return out;
   }
 
   function tailPath(p, d, yk, wob) {
@@ -732,7 +850,37 @@
     ["Other", [["crescent", "Crescent"], ["donut", "Ring"], ["heart", "Heart"], ["cloud", "Cloud"], ["flower", "Flower"], ["cross", "Cross"]]]
   ];
 
+  // protein head plus, when it is on, protein two bound to it (drawn in the head's own frame so it turns with the head)
   function headMarkup(p, d) {
+    let out = headCore(p, d);
+    const show = p.p2Show === undefined ? p.p2Single : p.p2Show;
+    if (p.p2On && show) out += `<g transform="translate(${f(d.C[0])},${f(d.C[1])}) rotate(${f(p.headTurn + (d.dir * 180) / Math.PI)}) rotate(${f(p.p2Angle)})">${p2Parts(p, p.p2Depth * d.R)}</g>`;
+    return out;
+  }
+  // one shape from the head library, centered on (0, 0)
+  function shapeOnly(p, shape, r, fill, outline, sw) {
+    return headCore(Object.assign({}, p, { headShape: shape, headColor: fill, headOutline: outline, headStroke: sw, headStretch: 1, headTurn: 0 }), { R: r, C: [0, 0], dir: 0 });
+  }
+  // protein two along +x: tag tip at x = t0 pointing back toward -x, domain beyond it
+  function p2Parts(p, t0) {
+    const r2 = p.p2Size, rt = p.tagSize, hasTag = p.tagShape !== "none";
+    const tc = t0 + rt * 1.1;
+    const dc = hasTag ? tc + rt * 0.55 + r2 * (1 - p.p2Overlap) : t0 + r2;
+    let out = `<g transform="translate(${f(dc)},0) rotate(${f(p.p2Turn)})">${shapeOnly(p, p.p2Shape, r2, p.p2Color, p.p2Outline, p.p2Stroke)}</g>`;
+    if (hasTag) out += `<g transform="translate(${f(tc)},0)">${shapeOnly(p, p.tagShape, rt, p.tagColor, p.p2Outline, p.p2Stroke)}</g>`;
+    return out;
+  }
+  // protein two on its own, tag pointing down
+  function p2SVG(p, opts) {
+    const rt = p.tagShape !== "none" ? p.tagSize : 0, r2 = p.p2Size;
+    const X = (rt ? rt * 1.1 + rt * 0.55 + r2 * (1 - p.p2Overlap) : r2) + r2 * 1.45 + p.p2Stroke, Y = Math.max(r2 * 1.45, rt * 1.4) + p.p2Stroke;
+    const x0 = -rt * 0.4 - p.p2Stroke, pad = 3 * p.u;
+    // local x runs up the page after rotate(-90): page x = local y, page y = -local x
+    const vx = -Y - pad, vy = -X - pad, w = 2 * Y + 2 * pad, h = X - x0 + 2 * pad;
+    const wh = opts && opts.sized ? ` width="${f(w)}" height="${f(h)}"` : "";
+    return `<svg xmlns="${NS}" viewBox="${f(vx)} ${f(vy)} ${f(w)} ${f(h)}"${wh} role="img" aria-label="Protein two"><g transform="rotate(-90)">${p2Parts(p, 0)}</g></svg>`;
+  }
+  function headCore(p, d) {
     const R = d.R, sw = p.headStroke;
     const g = (inner) => `<g transform="translate(${f(d.C[0])},${f(d.C[1])}) rotate(${f(p.headTurn + (d.dir * 180) / Math.PI)})">${inner}</g>`;
     if (p.headShape === "image" && headImg) {
@@ -761,6 +909,11 @@
   function unitMarkup(p, d, r) {
     const out = p.outlineAuto ? darken(p.tailColor, 0.35) : p.tailOutline;
     const parts = [];
+    if (p.linkerOn) {
+      // drawn first so it sits behind the tails and the protein; round ends
+      const tuck = Math.min(d.R * 0.3, Math.hypot(d.C[0] - d.E[0], d.C[1] - d.E[1]));
+      parts.push(`<line x1="${f(d.L)}" y1="0" x2="${f(d.E[0] + tuck * Math.cos(d.dir))}" y2="${f(d.E[1] + tuck * Math.sin(d.dir))}" stroke="${p.linkerColor}" stroke-width="${f(p.linkerW)}" stroke-linecap="round"/>`);
+    }
     if (d.tailFit) {
       const href = imgHref(tailImg, p.tailRecolor, p.tailColor, out);
       const tf = d.tailFit;
@@ -774,11 +927,6 @@
         parts.push(`<path d="${tailPath(p, d, yk, r() * p.jitter * 0.04)}" fill="none" stroke="${p.tailColor}" stroke-width="${f(d.tw)}" stroke-linecap="round" stroke-linejoin="round"/>`);
       }
       if (p.tails > 1 || p.linkerOn) parts.push(`<circle cx="${f(d.L)}" cy="0" r="${f(d.tw / 2)}" fill="${p.tailColor}"/>`);
-    }
-    if (p.linkerOn) {
-      // drawn before the head so the head covers its far end
-      const tuck = Math.min(d.R * 0.3, Math.hypot(d.C[0] - d.E[0], d.C[1] - d.E[1]));
-      parts.push(`<line x1="${f(d.L)}" y1="0" x2="${f(d.E[0] + tuck * Math.cos(d.dir))}" y2="${f(d.E[1] + tuck * Math.sin(d.dir))}" stroke="${p.linkerColor}" stroke-width="${f(p.linkerW)}" stroke-linecap="butt"/>`);
     }
     parts.push(headMarkup(p, d));
     return parts.join("");
@@ -895,6 +1043,10 @@
     if (e.color) o.headColor = e.color;
     if (e.headRot) o.headTurn = p.headTurn + e.headRot;
     if (e.linkerRot) o.linkerAngle = p.linkerAngle + e.linkerRot;
+    if (p.p2On) {
+      const N = key && key.startsWith("mlp:") ? p.memLpN : p.n, c = Math.min(N, p.p2N);
+      o.p2Show = e.p2 !== undefined ? e.p2 : Math.floor(((i + 1) * c) / N) > Math.floor((i * c) / N);
+    }
     return Object.keys(o).length ? Object.assign({}, p, o) : p;
   }
   function plVariant(p, key) { const e = edits[key]; return e && e.color ? Object.assign({}, p, { plHeadColor: e.color }) : p; }
@@ -905,7 +1057,7 @@
   // ---------- copies made with Shift-drag ----------
   // Each copy remembers its kind, the source index (for mixed shapes/colors) and where it was made,
   // in unscaled units; its own moves, turns and colors live in edits["cp:<id>"].
-  let copies = [], copyId = 0, lastQ = null;
+  let copies = [], copyId = 0, lastQ = null, lastFit = null, measureBox = null;
   function molInfo(key) {
     const [t, i] = key.split(":");
     if (t === "cp") { const c = copies.find((x) => x.id === +i); return c ? { kind: c.kind, idx: c.idx } : { kind: "pl", idx: 0 }; }
@@ -922,7 +1074,7 @@
       if (c.kind === "lp") { const lw = lpDraw(p, d, c.idx, key, rng(seed + c.idx)); return placeXY(ctx, key, c.ang, x, y, lpPv, lpReach, Math.max(d.C[0] + d.big, d.L), lw.markup, lw.head); }
       if (c.kind === "pl") return placeXY(ctx, key, c.ang, x, y, plPv, plReach, pd.hr, plMarkup(plVariant(p, key), pd));
       const r0 = c.r * p.u, sw = p.smStroke;
-      return placeXY(ctx, key, c.ang, x, y, [0, 0], r0 * 1.4 + sw, r0, `<circle r="${f(r0)}" fill="${(edits[key] || {}).color || p.smColor}" stroke="${sw > 0 ? p.smOutline : "none"}" stroke-width="${f(sw)}"/>`);
+      return placeXY(ctx, key, c.ang, x, y, [0, 0], r0 * 1.4 + sw, r0, smBall(p, key, r0, sw, c.ang));
     }).join("");
   }
 
@@ -989,7 +1141,7 @@
         }
         placed.push({ x: best.x, y: best.y, r: rad0 });
         const sw = p.smStroke;
-        sms.push(place("sm:" + i, best.a, best.rr, [0, 0], rad0 * 1.4 + sw, rad0, `<circle r="${f(rad0)}" fill="${(edits["sm:" + i] || {}).color || p.smColor}" stroke="${sw > 0 ? p.smOutline : "none"}" stroke-width="${f(sw)}"/>`));
+        sms.push(place("sm:" + i, best.a, best.rr, [0, 0], rad0 * 1.4 + sw, rad0, smBall(p, "sm:" + i, rad0, sw, best.a)));
         if (pivots["sm:" + i]) pivots["sm:" + i].r = rad0;
       }
       ext = Math.max(ext, R + p.smStroke);
@@ -1109,7 +1261,7 @@
   function scaled(p, k, m) {
     return Object.assign({}, p, {
       tailW: p.tailW * m, tailStroke: p.tailStroke * m, headStroke: p.headStroke * m, linkerW: p.linkerW * m,
-      plTailW: p.plTailW * m, plHeadStroke: p.plHeadStroke * m, smStroke: p.smStroke * m, smSize: p.smSize * k,
+      plTailW: p.plTailW * m, plHeadStroke: p.plHeadStroke * m, smStroke: p.smStroke * m, smSize: p.smSize * k, p2Stroke: p.p2Stroke * m, p2Size: p.p2Size * k, tagSize: p.tagSize * k,
       memLen: p.memLen * k, memSpacing: p.memSpacing * k, memGap: p.memGap * k, lpRadial: p.lpRadial * k, memLpLift: p.memLpLift * k,
       plHeadSize: p.plHeadSize * k, plTailLen: p.plTailLen * k, plTailGap: p.plTailGap * k, plWaveAmp: p.plWaveAmp * k, plRadial: p.plRadial * k,
       u: k, headSize: p.headSize * k, tailLen: p.tailLen * k, tailGap: p.tailGap * k, waveAmp: p.waveAmp * k,
@@ -1119,13 +1271,14 @@
   function physical(p) {
     // Work in pixels at the document DPI: Affinity reads SVG units as pixels at the document's DPI,
     // so a figure N inches wide is N x DPI units, and a w pt line is w x DPI / 72 units.
-    const dpi = Math.max(1, p.dpi || 72), m = dpi / 72;
-    const sizePt = Math.max(0.1, p.exportIn || 0.8) * dpi;
+    // "Scale whole picture" multiplies everything: shapes, line widths and the export size
+    const sc = p.picScale || 1, dpi = Math.max(1, p.dpi || 72), m = (dpi / 72) * sc;
+    const sizePt = Math.max(0.1, p.exportIn || 0.8) * dpi * sc;
     // Fixed scale: 1 size unit = PT_PER_UNIT points, whatever else changes. Molecules keep their size and
     // line widths when you add molecules, change spacing or the export size; things may overlap or run past the edge.
     const k = PT_PER_UNIT * m;
     const q = scaled(p, k, m);
-    q.sizePt = sizePt; q.dpi = dpi;
+    q.sizePt = sizePt; q.dpi = dpi; q.lineM = m; q.outIn = Math.max(0.1, p.exportIn || 0.8) * sc;
     return q;
   }
 
@@ -1135,6 +1288,12 @@
     const size = 2 * ext;
     const wh = opts && opts.px ? ` width="${opts.px}" height="${opts.px}"` : opts && opts.inch ? ` width="${f(opts.inch * p.dpi)}" height="${f(opts.inch * p.dpi)}"` : "";
     const bg = opts && opts.bg ? `<rect x="${f(-ext)}" y="${f(-ext)}" width="${f(size)}" height="${f(size)}" fill="${opts.bg}"/>` : "";
+    if (opts && opts.preview && opts.box) {
+      // fitted preview: the dashed frame is exactly what gets exported
+      const B = opts.box, mg = Math.max(B.w, B.h) * 0.12, lw = Math.max(B.w, B.h) * 0.003;
+      const frame = `<rect x="${f(B.x)}" y="${f(B.y)}" width="${f(B.w)}" height="${f(B.h)}" fill="none" stroke="#8aa0a6" stroke-width="${f(lw)}" stroke-dasharray="${f(lw * 4)} ${f(lw * 3)}"/>`;
+      return `<svg xmlns="${NS}" viewBox="${f(B.x - mg)} ${f(B.y - mg)} ${f(B.w + 2 * mg)} ${f(B.h + 2 * mg)}" role="img" aria-label="Lipoprotein nanoparticle with ${p.n} lipoproteins">${defsMarkup(p)}${body}${frame}</svg>`;
+    }
     if (opts && opts.preview) {
       // preview: show a margin around the canvas and mark the export area with a dashed square
       const v = ext * 1.3, lw = size * 0.003;
@@ -1151,7 +1310,7 @@
   let restoring = false, commitTimer = null;
   function snapshot() {
     const inputs = {};
-    document.querySelectorAll(".lnp-panel input, .lnp-panel select, .lnp-np-controls input, .lnp-np-controls select, #exportIn, #dpi").forEach((el) => {
+    document.querySelectorAll(".lnp-panel input, .lnp-panel select, .lnp-np-controls input, .lnp-np-controls select, #exportIn, #dpi, #fitWidth, #picScale").forEach((el) => {
       if (!el.id || el.type === "file") return;
       inputs[el.id] = el.type === "checkbox" ? el.checked : el.value;
     });
@@ -1183,6 +1342,7 @@
 
   function render() {
     if (!restoring) scheduleCommit();
+    syncNums();
     const p = read();
     $("nNum").value = p.n;
     $("spacingOut").textContent = p.spacing;
@@ -1215,8 +1375,12 @@
     ["tailUploadRow", "tailTurnRow", "tailRecolorRow", "tailOutlineOnRow", "tailOutlineRow", "tailStrokeRow", "tailUploadNote"].forEach((id) => $(id).classList.toggle("hidden", !timg));
     if (timg && !tailImg) p.tailStyle = "wavy";
     document.querySelectorAll("#tailSwatches button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.c === p.tailColor)));
+    document.querySelectorAll("#headSwatches button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.c === p.headColor)));
+    $("headSwatches").classList.toggle("hidden", $("headColorRow").classList.contains("hidden"));
     const q = physical(p);
     $("lnp-single-stage").innerHTML = singleSVG(q);
+    $("p2Rows").classList.toggle("hidden", !p.p2On); $("p2View").classList.toggle("hidden", !p.p2On);
+    if (p.p2On) $("lnp-p2-stage").innerHTML = p2SVG(q);
     $("lnp-pl-stage").innerHTML = plSVG(q);
     $("plView").classList.toggle("hidden", !p.plOn);
     $("plRows").classList.toggle("hidden", !p.plOn);
@@ -1233,9 +1397,16 @@
     $("memWavesRow").classList.toggle("hidden", p.memShape !== "wavy");
     ["lpRadial", "memLpLift", "memLpN", "memCurve", "memWaves", "memLen", "memSpacing", "memGap"].forEach((id) => ($(id + "Out").textContent = p[id]));
     ["smN", "smStroke", "smSize", "smVary", "smArea"].forEach((id) => ($(id + "Out").textContent = p[id]));
-    lastK = q.u; lastQ = q;
+    let qn = q, fitBox = null;
+    if (p.fitWidth) {
+      if (drag && lastFit) { qn = scaledAt(p, q, lastFit.s); fitBox = lastFit.box; } // hold the scale while dragging
+      else { lastFit = fitQ(p, q, lastFit ? lastFit.s : 1); qn = lastFit.q; fitBox = lastFit.box; }
+    }
+    // the single molecules are drawn at the nanoparticle's scale, so they match it exactly
+    if (qn !== q) { $("lnp-single-stage").innerHTML = singleSVG(qn); $("lnp-pl-stage").innerHTML = plSVG(qn); if (p.p2On) $("lnp-p2-stage").innerHTML = p2SVG(qn); }
+    lastK = qn.u; lastQ = qn;
     if (sel != null) { const [t, i] = sel.split(":"); if ((t === "pl" && (+i >= p.plN || !p.plOn)) || (t === "lp" && +i >= p.n) || (t === "sm" && (+i >= p.smN || !p.smOn))) sel = null; }
-    $("lnp-np-stage").innerHTML = npSVG(q, { preview: true, sel });
+    $("lnp-np-stage").innerHTML = npSVG(qn, { preview: true, sel, box: fitBox });
     const e = sel != null ? edits[sel] || {} : {};
     $("selHint").classList.toggle("hidden", sel != null);
     $("selTools").classList.toggle("hidden", sel == null);
@@ -1244,12 +1415,14 @@
     if (sel != null && !pivots[sel]) { sel = null; $("selTools").classList.add("hidden"); $("selHint").classList.remove("hidden"); }
     $("lnp-count").textContent = `${p.n} lipoproteins` + (p.plOn && p.plN ? ` · ${p.plN} phospholipids` : "") + (p.smOn && p.smN ? ` · ${p.smN} small molecules` : "");
     if (mode === "membrane") $("lnp-count").textContent = `${p.memLpN} lipoproteins · ${npStageCount("mpt:") + npStageCount("mpb:")} phospholipids`;
+    if (p.fitWidth && lastFit) $("lnp-count").textContent += ` · ${+(p.exportIn * p.picScale).toFixed(3)} in wide, scaled ${Math.round(lastFit.s * 100)}%`;
+    if (p.picScale !== 1) $("lnp-count").textContent += ` · exporting at ${Math.round(p.picScale * 100)}%`;
   }
 
   function setAll(v) {
     for (const k in v) {
       const el = $(k); if (!el) continue;
-      if (el.type === "checkbox") el.checked = v[k]; else el.value = v[k];
+      if (el.type === "checkbox") el.checked = v[k]; else { if (el.type === "range") fitRange(el, v[k]); el.value = v[k]; }
     }
     $("nNum").value = v.n;
   }
@@ -1262,6 +1435,11 @@
       sel.appendChild(og);
     });
     const o = document.createElement("option"); o.value = "image"; o.textContent = "My SVG / image…"; sel.appendChild(o);
+    ["p2Shape", "tagShape"].forEach((id) => SHAPE_GROUPS.forEach(([label, list]) => {
+      const og = document.createElement("optgroup"); og.label = label;
+      list.forEach(([v, t]) => { const o2 = document.createElement("option"); o2.value = v; o2.textContent = t; og.appendChild(o2); });
+      $(id).appendChild(og);
+    }));
   })();
 
   SWATCHES.forEach((c) => {
@@ -1269,6 +1447,9 @@
     b.type = "button"; b.dataset.c = c; b.style.background = c; b.title = c; b.setAttribute("aria-label", "Tail color " + c);
     b.addEventListener("click", () => { $("tailColor").value = c; render(); });
     $("tailSwatches").appendChild(b);
+    const h = b.cloneNode(); h.setAttribute("aria-label", "Protein head color " + c);
+    h.addEventListener("click", () => { $("headColor").value = c; $("colorMix").checked = false; Object.keys(edits).forEach((k) => kindOf(k) === "lp" && delete edits[k].color); render(); });
+    $("headSwatches").appendChild(h);
   });
 
   document.querySelectorAll(".lnp input, .lnp select").forEach((el) => {
@@ -1279,7 +1460,59 @@
     });
   });
   $("reshuffle").addEventListener("click", () => { seed = (Math.random() * 1e9) | 0; if (+$("jitter").value === 0) $("jitter").value = 4; render(); });
-  $("resetBtn").addEventListener("click", () => { setAll(DEFAULTS); seed = 7; edits = {}; sel = null; render(); });
+  $("resetBtn").addEventListener("click", () => { setAll(startDefaults()); seed = 7; edits = {}; sel = null; render(); });
+
+  // ---------- typed values next to every slider ----------
+  // A slider can take any typed value: the slider's range and step stretch to fit it.
+  function fitRange(el, v) {
+    const x = parseFloat(v); if (!isFinite(x)) return;
+    if (x < +el.min) el.min = x;
+    if (x > +el.max) el.max = x;
+    const st = el.step;
+    if (st && st !== "any") { const q = (x - (+el.min || 0)) / +st; if (Math.abs(q - Math.round(q)) > 1e-6) el.step = "any"; }
+  }
+  const numPairs = [];
+  document.querySelectorAll('.lnp input[type=range]').forEach((rg) => {
+    const out = rg.parentElement.querySelector("output");
+    if (!out || !out.id || out.id !== rg.id + "Out") return;
+    const num = document.createElement("input");
+    num.type = "number"; num.className = "lnp-num"; num.step = "any"; num.value = rg.value;
+    num.setAttribute("aria-label", (document.querySelector(`label[for="${rg.id}"]`)?.textContent.trim() || rg.id) + " value");
+    out.classList.add("lnp-hide");
+    out.after(num);
+    if ((out.textContent || "").includes("°")) { const u = document.createElement("span"); u.className = "lnp-unit"; u.textContent = "°"; num.after(u); }
+    const apply = () => {
+      if (num.value === "" || !isFinite(+num.value)) return;
+      fitRange(rg, num.value); rg.value = num.value;
+      rg.dispatchEvent(new Event("input", { bubbles: true }));
+    };
+    num.addEventListener("input", apply);
+    num.addEventListener("change", () => { apply(); num.value = rg.value; });
+    num.addEventListener("keydown", (e) => { if (e.key === "Enter") num.blur(); });
+    numPairs.push([rg, num]);
+  });
+  function syncNums() { numPairs.forEach(([rg, num]) => { if (document.activeElement !== num) num.value = rg.value; }); }
+
+  // ---------- your own defaults (saved in this browser) ----------
+  const DEF_KEY = "lnp-my-defaults";
+  function savedDefaults() { try { const v = localStorage.getItem(DEF_KEY); return v ? JSON.parse(v) : null; } catch (e) { return null; } }
+  function startDefaults() { return Object.assign({}, DEFAULTS, savedDefaults() || {}); }
+  function showDefaults() {
+    const has = !!savedDefaults();
+    $("clearDefaults").classList.toggle("hidden", !has);
+    $("defaultsNote").textContent = has ? "Using your saved defaults (stored in this browser). Reset goes back to them." : "";
+  }
+  $("saveDefaults").addEventListener("click", () => {
+    const v = JSON.parse(snapshot()).inputs;
+    ["headFile", "tailFile", "selRot", "ctxColor"].forEach((k) => delete v[k]);
+    try { localStorage.setItem(DEF_KEY, JSON.stringify(v)); status("Saved. These settings now load every time you open the tool."); }
+    catch (e) { status("Couldn't save defaults in this browser."); }
+    showDefaults();
+  });
+  $("clearDefaults").addEventListener("click", () => {
+    try { localStorage.removeItem(DEF_KEY); } catch (e) {}
+    showDefaults(); status("Cleared. Reset now uses the built-in defaults.");
+  });
 
   $("headFile").addEventListener("change", (e) => {
     const file = e.target.files && e.target.files[0];
@@ -1370,50 +1603,105 @@
   }
   ctxColor.addEventListener("input", () => { if (ctxAction) { ctxAction(ctxColor.value); render(); } });
   ctxColor.addEventListener("change", () => { ctxAction = null; });
+  // shared items for the lipoprotein / phospholipid parts
+  const setIn = (id) => (c) => ($(id).value = c);
+  function lpItems(p, add) {
+    add("All protein heads", p.headColor, (c) => { $("headColor").value = c; $("colorMix").checked = false; Object.keys(edits).forEach((k) => kindOf(k) === "lp" && delete edits[k].color); });
+    add("Protein head outline", p.headOutline, setIn("headOutline"));
+    add("Lipoprotein tails", p.tailColor, setIn("tailColor"));
+    add("Tail outline", p.outlineAuto ? darken(p.tailColor, 0.35) : p.tailOutline, (c) => { $("outlineAuto").checked = false; $("tailOutline").value = c; });
+    if (p.linkerOn) add("Linker", p.linkerColor, setIn("linkerColor"));
+    if (p.p2On) { add("Protein two domain", p.p2Color, setIn("p2Color")); if (p.tagShape !== "none") add("Protein two tag", p.tagColor, setIn("tagColor")); add("Protein two outline", p.p2Outline, setIn("p2Outline")); }
+  }
+  function p2Items(p, add) { add("Protein two domain", p.p2Color, setIn("p2Color")); if (p.tagShape !== "none") add("Protein two tag", p.tagColor, setIn("tagColor")); add("Protein two outline", p.p2Outline, setIn("p2Outline")); }
+  function plItems(p, add) {
+    add("Phospholipid heads", p.plHeadColor, (c) => { $("plHeadColor").value = c; Object.keys(edits).forEach((k) => kindOf(k) === "pl" && delete edits[k].color); });
+    add("Phospholipid head outline", p.plHeadOutline, setIn("plHeadOutline"));
+    add("Phospholipid tails", p.plTailColor, setIn("plTailColor"));
+  }
+  function smItems(p, add) {
+    add("All small molecules", p.smColor, (c) => { $("smColor").value = c; Object.keys(edits).forEach((k) => kindOf(k) === "sm" && delete edits[k].color); });
+    add("Small molecule outline", p.smOutline, setIn("smOutline"));
+  }
+  // each row: current color + name, then the preset swatches and a custom picker
+  function openCtx(evt, items) {
+    ctxMenu.innerHTML = `<div class="ctx-title">Change color</div>`;
+    items.forEach((it, n) => {
+      if (n && it.sep) ctxMenu.appendChild(document.createElement("hr"));
+      const row = document.createElement("div"); row.className = "ctx-item";
+      const lab = document.createElement("div"); lab.className = "ctx-label";
+      lab.innerHTML = (it.color ? `<span class="sw" style="background:${it.color}"></span>` : `<span class="sw" style="background:transparent;border-style:dashed"></span>`) + it.label;
+      row.appendChild(lab);
+      if (it.set) {
+        const sws = document.createElement("div"); sws.className = "ctx-sws";
+        SWATCHES.forEach((c) => {
+          const b = document.createElement("button");
+          b.type = "button"; b.className = "ctx-dot"; b.style.background = c; b.title = c; b.setAttribute("aria-label", it.label + " " + c);
+          if (it.color && it.color.toLowerCase() === c) b.setAttribute("aria-pressed", "true");
+          b.addEventListener("click", () => { it.set(c); closeCtx(); render(); });
+          sws.appendChild(b);
+        });
+        const cu = document.createElement("button");
+        cu.type = "button"; cu.className = "ctx-dot ctx-custom"; cu.title = "Custom color…"; cu.textContent = "…";
+        cu.addEventListener("click", () => pickColor(it.color, it.set));
+        sws.appendChild(cu); row.appendChild(sws);
+      } else {
+        const b = document.createElement("button"); b.type = "button"; b.setAttribute("role", "menuitem");
+        b.textContent = it.label; b.addEventListener("click", it.fn); row.innerHTML = ""; row.appendChild(b);
+      }
+      ctxMenu.appendChild(row);
+    });
+    const host = ctxMenu.parentElement.getBoundingClientRect(), mw = 300;
+    ctxMenu.style.left = Math.max(0, Math.min(evt.clientX - host.left, host.width - mw)) + "px";
+    ctxMenu.style.top = evt.clientY - host.top + "px";
+    ctxMenu.classList.remove("hidden");
+    ctxMenu.querySelector("button")?.focus();
+  }
   npStage.addEventListener("contextmenu", (evt) => {
     evt.preventDefault();
     const p = read(), g = evt.target.closest("[data-mol]"), key = g ? g.dataset.mol : null;
     if (key) { sel = key; render(); }
     const items = [];
-    const add = (label, color, fn) => items.push({ label, color, fn });
+    const add = (label, color, set, sep) => items.push({ label, color, set, sep });
     if (key) {
-      const kind = kindOf(key), e = edits[key] || {}, [t, i] = key.split(":");
+      const kind = kindOf(key), e = edits[key] || {};
       if (kind === "lp") {
         const v = lpVariant(p, molInfo(key).idx, key);
-        add("This protein", v.headColor, () => pickColor(v.headColor, (c) => (editOf(key).color = c)));
-        add("All proteins", p.headColor, () => pickColor(p.headColor, (c) => { $("headColor").value = c; $("colorMix").checked = false; Object.keys(edits).forEach((k) => kindOf(k) === "lp" && delete edits[k].color); }));
-        add("All lipoprotein tails", p.tailColor, () => pickColor(p.tailColor, (c) => ($("tailColor").value = c)));
+        add("This protein head", v.headColor, (c) => (editOf(key).color = c));
+        lpItems(p, (l, c, s) => add(l, c, s, l === "All protein heads"));
+        if (p.p2On) items.push({ label: v.p2Show ? "Remove protein two from this one" : "Add protein two to this one", sep: true, fn: () => { editOf(key).p2 = !v.p2Show; closeCtx(); render(); } });
       } else if (kind === "pl") {
         const c0 = e.color || p.plHeadColor;
-        add("This phospholipid head", c0, () => pickColor(c0, (c) => (editOf(key).color = c)));
-        add("All phospholipid heads", p.plHeadColor, () => pickColor(p.plHeadColor, (c) => { $("plHeadColor").value = c; Object.keys(edits).forEach((k) => kindOf(k) === "pl" && delete edits[k].color); }));
-        add("All phospholipid tails", p.plTailColor, () => pickColor(p.plTailColor, (c) => ($("plTailColor").value = c)));
+        add("This phospholipid head", c0, (c) => (editOf(key).color = c));
+        plItems(p, (l, c, s) => add(l, c, s, l === "Phospholipid heads"));
       } else {
         const c0 = e.color || p.smColor;
-        add("This small molecule", c0, () => pickColor(c0, (c) => (editOf(key).color = c)));
-        add("All small molecules", p.smColor, () => pickColor(p.smColor, (c) => { $("smColor").value = c; Object.keys(edits).forEach((k) => kindOf(k) === "sm" && delete edits[k].color); }));
+        add("This small molecule", c0, (c) => (editOf(key).color = c));
+        smItems(p, (l, c, s) => add(l, c, s, l === "All small molecules"));
       }
-      if (e.color) add("Reset this color", null, () => { delete edits[key].color; closeCtx(); render(); });
+      if (e.color) items.push({ label: "Reset this color", sep: true, fn: () => { delete edits[key].color; closeCtx(); render(); } });
     } else {
-      add("All proteins", p.headColor, () => pickColor(p.headColor, (c) => { $("headColor").value = c; $("colorMix").checked = false; Object.keys(edits).forEach((k) => kindOf(k) === "lp" && delete edits[k].color); }));
-      add("All lipoprotein tails", p.tailColor, () => pickColor(p.tailColor, (c) => ($("tailColor").value = c)));
-      if (p.plOn) add("All phospholipid heads", p.plHeadColor, () => pickColor(p.plHeadColor, (c) => ($("plHeadColor").value = c)));
-      if (p.plOn) add("All phospholipid tails", p.plTailColor, () => pickColor(p.plTailColor, (c) => ($("plTailColor").value = c)));
-      if (p.smOn) add("All small molecules", p.smColor, () => pickColor(p.smColor, (c) => ($("smColor").value = c)));
+      lpItems(p, add);
+      if (p.plOn) plItems(p, (l, c, s) => add(l, c, s, l === "Phospholipid heads"));
+      if (p.smOn) smItems(p, (l, c, s) => add(l, c, s, l === "All small molecules"));
     }
-    ctxMenu.innerHTML = `<div class="ctx-title">Change color</div>`;
-    items.forEach((it) => {
-      const b = document.createElement("button");
-      b.type = "button"; b.setAttribute("role", "menuitem");
-      b.innerHTML = (it.color ? `<span class="sw" style="background:${it.color}"></span>` : `<span class="sw" style="background:transparent;border-style:dashed"></span>`) + it.label;
-      b.addEventListener("click", it.fn);
-      ctxMenu.appendChild(b);
-    });
-    const host = ctxMenu.parentElement.getBoundingClientRect();
-    ctxMenu.style.left = Math.min(evt.clientX - host.left, host.width - 220) + "px";
-    ctxMenu.style.top = evt.clientY - host.top + "px";
-    ctxMenu.classList.remove("hidden");
-    ctxMenu.querySelector("button")?.focus();
+    openCtx(evt, items);
+  });
+  // right-click on the single lipoprotein / phospholipid previews
+  $("lnp-single-stage").addEventListener("contextmenu", (evt) => {
+    evt.preventDefault(); const items = [];
+    lpItems(read(), (label, color, set) => items.push({ label, color, set }));
+    openCtx(evt, items);
+  });
+  $("lnp-p2-stage").addEventListener("contextmenu", (evt) => {
+    evt.preventDefault(); const items = [];
+    p2Items(read(), (label, color, set) => items.push({ label, color, set }));
+    openCtx(evt, items);
+  });
+  $("lnp-pl-stage").addEventListener("contextmenu", (evt) => {
+    evt.preventDefault(); const items = [];
+    plItems(read(), (label, color, set) => items.push({ label, color, set }));
+    openCtx(evt, items);
   });
   document.addEventListener("pointerdown", (evt) => { if (!ctxMenu.contains(evt.target)) closeCtx(); });
   document.addEventListener("keydown", (evt) => { if (evt.key === "Escape") closeCtx(); });
@@ -1444,9 +1732,58 @@
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(a.href), 1000);
   }
+  // ---------- fit to width ----------
+  // Scale only the lengths (not the line widths) until the drawn figure is exactly the export width.
+  function figBox(q) {
+    if (!measureBox) {
+      measureBox = document.createElement("div");
+      measureBox.style.cssText = "position:absolute;left:-99999px;top:0;width:10px;height:10px;overflow:hidden;visibility:hidden";
+      document.body.appendChild(measureBox);
+    }
+    measureBox.innerHTML = npSVG(q, {});
+    const b = measureBox.querySelector("svg").getBBox();
+    measureBox.innerHTML = "";
+    const m = q.lineM || q.dpi / 72, P = read();
+    // getBBox ignores stroke widths: pad by the widest half-stroke (tails also carry their outline)
+    const pad = m * Math.max(
+      P.tailStyle === "image" ? (P.tailOutlineOn ? P.tailStroke : 0) : P.tailW / 2,
+      P.headShape === "image" ? (P.headOutlineOn ? P.headStroke : 0) : P.headStroke / 2,
+      P.linkerOn ? P.linkerW / 2 : 0, P.plOn ? Math.max(P.plTailW / 2, P.plHeadStroke / 2) : 0, P.smOn ? P.smStroke / 2 : 0, P.p2On ? P.p2Stroke / 2 : 0, 0.1);
+    return { x: b.x - pad, y: b.y - pad, w: b.width + 2 * pad, h: b.height + 2 * pad };
+  }
+  function scaledAt(p, base, s) { const m = base.lineM, q = scaled(p, PT_PER_UNIT * m * s, m); q.sizePt = base.sizePt; q.dpi = base.dpi; q.lineM = m; q.outIn = base.outIn; return q; }
+  // find the length scale s that makes the figure exactly the export width (strokes don't scale, so iterate)
+  function fitQ(p, base, s0) {
+    const W = base.sizePt;
+    let s = s0 || 1, q = scaledAt(p, base, s), box = figBox(q);
+    for (let i = 0; i < 25 && box.w > 0; i++) {
+      if (Math.abs(box.w - W) < W * 1e-4) break;
+      s *= W / box.w;
+      q = scaledAt(p, base, s); box = figBox(q);
+    }
+    return { q, box, s };
+  }
+  // returns the SVG, its size in inches, and the length scale used
+  function exportSVG(opts) {
+    const p = read(), base = physical(p);
+    if (!p.fitWidth) return { svg: npSVG(base, opts.png ? { px: opts.png, bg: opts.bg } : { inch: base.outIn }), wIn: +base.outIn.toFixed(3), hIn: base.outIn, scale: 1 };
+    const W = base.sizePt, F = fitQ(p, base, lastFit ? lastFit.s : 1), q = F.q, box = F.box, s = F.s;
+    const { body } = q.mode === "membrane" ? membrane(q, {}) : particle(q, {});
+    render(); // restore the on-screen handles
+    const hIn = (box.h / box.w) * base.outIn;
+    let wh;
+    if (opts.png) { const pw = opts.png, ph = Math.round((pw * box.h) / box.w); wh = ` width="${pw}" height="${ph}"`; }
+    else wh = ` width="${f(W)}" height="${f((W * box.h) / box.w)}"`;
+    const bg = opts.bg ? `<rect x="${f(box.x)}" y="${f(box.y)}" width="${f(box.w)}" height="${f(box.h)}" fill="${opts.bg}"/>` : "";
+    const svg = `<svg xmlns="${NS}" viewBox="${f(box.x)} ${f(box.y)} ${f(box.w)} ${f(box.h)}"${wh} role="img" aria-label="Lipoprotein nanoparticle">${defsMarkup(q)}${bg}${body}</svg>`;
+    return { svg, wIn: +base.outIn.toFixed(3), hIn, scale: s, ph: opts.png ? Math.round((opts.png * box.h) / box.w) : 0 };
+  }
+  $("picScaleReset").addEventListener("click", () => { $("picScale").value = 100; render(); });
+  const sizeMsg = (r) => `${r.wIn} × ${(+r.hIn.toFixed(2))} in` + (r.scale !== 1 ? `, figure scaled ${Math.round(r.scale * 100)}%` : "");
+
   $("dlSvg").addEventListener("click", () => {
-    const p = read(); const svg = '<?xml version="1.0" encoding="UTF-8"?>\n' + npSVG(physical(p), { inch: p.exportIn });
-    download(new Blob([svg], { type: "image/svg+xml" }), fileName("svg")); status("SVG downloaded.");
+    const r = exportSVG({}); const svg = '<?xml version="1.0" encoding="UTF-8"?>\n' + r.svg;
+    download(new Blob([svg], { type: "image/svg+xml" }), fileName("svg")); status(`SVG downloaded (${sizeMsg(r)}).`);
   });
   async function copySVGText(svg, label) {
     try {
@@ -1458,30 +1795,32 @@
     }
   }
   // single molecules are copied at the same scale as the nanoparticle, so they match in a figure
-  $("copyLp").addEventListener("click", () => copySVGText('<?xml version="1.0" encoding="UTF-8"?>\n' + singleSVG(physical(read()), { sized: true }), "Lipoprotein"));
-  $("copyPl").addEventListener("click", () => copySVGText('<?xml version="1.0" encoding="UTF-8"?>\n' + plSVG(physical(read()), { sized: true }), "Phospholipid"));
+  function singleQ() { const p = read(), q = physical(p); return p.fitWidth && lastFit ? scaledAt(p, q, lastFit.s) : q; }
+  $("copyLp").addEventListener("click", () => copySVGText('<?xml version="1.0" encoding="UTF-8"?>\n' + singleSVG(singleQ(), { sized: true }), "Lipoprotein"));
+  $("copyP2").addEventListener("click", () => copySVGText('<?xml version="1.0" encoding="UTF-8"?>\n' + p2SVG(singleQ(), { sized: true }), "Protein two"));
+  $("copyPl").addEventListener("click", () => copySVGText('<?xml version="1.0" encoding="UTF-8"?>\n' + plSVG(singleQ(), { sized: true }), "Phospholipid"));
   $("copySvg").addEventListener("click", async () => {
-    const p = read();
-    const svg = '<?xml version="1.0" encoding="UTF-8"?>\n' + npSVG(physical(p), { inch: p.exportIn });
+    const r = exportSVG({});
+    const svg = '<?xml version="1.0" encoding="UTF-8"?>\n' + r.svg;
     // offer both an SVG image and the SVG code, so apps that paste images and apps that paste code both get it at size
     try {
       await navigator.clipboard.write([new ClipboardItem({ "image/svg+xml": new Blob([svg], { type: "image/svg+xml" }), "text/plain": new Blob([svg], { type: "text/plain" }) })]);
-      status(`SVG copied (${p.exportIn} in).`);
+      status(`SVG copied (${sizeMsg(r)}).`);
     } catch (e) {
-      try { await navigator.clipboard.writeText(svg); status(`SVG copied (${p.exportIn} in).`); }
+      try { await navigator.clipboard.writeText(svg); status(`SVG copied (${sizeMsg(r)}).`); }
       catch (e2) { status("Copy failed; use Download SVG instead."); }
     }
   });
   $("dlPng").addEventListener("click", () => {
     const px = 2400;
-    const svg = npSVG(physical(read()), { px, bg: $("pngWhite").checked ? "#ffffff" : null });
+    const r = exportSVG({ png: px, bg: $("pngWhite").checked ? "#ffffff" : null }), svg = r.svg, ph = r.ph || px;
     const url = URL.createObjectURL(new Blob([svg], { type: "image/svg+xml" }));
     const im = new Image();
     im.onload = () => {
-      const c = document.createElement("canvas"); c.width = px; c.height = px;
-      c.getContext("2d").drawImage(im, 0, 0, px, px);
+      const c = document.createElement("canvas"); c.width = px; c.height = ph;
+      c.getContext("2d").drawImage(im, 0, 0, px, ph);
       URL.revokeObjectURL(url);
-      c.toBlob((b) => { if (b) { download(b, fileName("png")); status("PNG downloaded (2400 × 2400)."); } else status("PNG export failed."); }, "image/png");
+      c.toBlob((b) => { if (b) { download(b, fileName("png")); status(`PNG downloaded (${px} × ${ph}).`); } else status("PNG export failed."); }, "image/png");
     };
     im.onerror = () => { URL.revokeObjectURL(url); status("PNG export failed."); };
     im.src = url;
@@ -1567,7 +1906,8 @@
     else if ((k === "z" && evt.shiftKey) || k === "y") { evt.preventDefault(); redo(); }
   });
 
-  setAll(DEFAULTS);
+  setAll(startDefaults());
+  showDefaults();
   render();
   commit();
 })();
