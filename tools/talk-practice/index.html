@@ -1,0 +1,206 @@
+<!doctype html>
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Sharaf Lab tool: pick the folder with your PNG slides, add notes and record a short practice video for each slide. Notes and videos save into that folder, and you can download a PowerPoint." />
+    <title>Talk Practice | Sharaf Lab Tools</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../../styles.css" />
+    <style>
+.tool-back{display:inline-block;margin:0 0 22px;color:#0b6870;font-weight:600;text-decoration:none}
+.tool-back:hover{text-decoration:underline;text-underline-offset:4px}
+.tool-caution{max-width:1132px;margin:-60px auto 70px;padding:16px 20px;background:#fff7ec;border:1px solid #f0d2a8;border-left:4px solid #d9822b;border-radius:8px;color:#5c3b12;font-size:15px;line-height:1.6}
+.tool-caution strong{color:#8a4b0f}
+@media(max-width:1180px){.tool-caution{margin-left:24px;margin-right:24px}}
+@media(max-width:800px){.tool-caution{margin-top:-40px;margin-bottom:50px}}
+.tool-section{padding:0 max(24px,calc((100vw - 1132px)/2)) 100px;scroll-margin-top:90px}
+.tool-section-soft{background:#f2f3f4}
+
+/* Talk practice, scoped to .tp (layout follows PNGs to PowerPoint) */
+.tp{--accent:#0b6870;--rec:#c0392b;color:#102a33;font-family:"Manrope",Arial,sans-serif}
+.tp *{box-sizing:border-box}
+.tp [hidden]{display:none!important}
+.tp :focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.tp-work{display:grid;grid-template-columns:1.5fr 1fr;gap:16px;align-items:start;padding-top:40px}
+.tp-drop{min-height:220px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:30px;background:#fff;border:2px dashed #b8c8cc;text-align:center}
+.tp-drop strong{font-family:"Montserrat",Arial,sans-serif;font-size:22px;font-weight:500}
+.tp-drop p{margin:0;color:#586e73}
+.tp-icon{width:52px;height:52px;display:grid;place-items:center;margin-bottom:10px;border-radius:50%;background:var(--accent);color:#fff;font-size:22px}
+.tp-limit{margin-top:10px;color:#84979a;font-size:12px}
+.tp-where{margin-top:6px;font-weight:600;color:var(--accent)}
+.tp-settings{padding:22px 26px;background:#fff;border:1px solid #d8e0e0}
+.tp-row{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:12px 0;border-bottom:1px solid #e4ebeb}
+.tp-row label{display:block;font-weight:600}
+.tp-row small{display:block;color:#6b7f83;font-size:13px;font-weight:400}
+.tp-field{display:inline-flex;align-items:center;gap:6px;color:#586e73;white-space:nowrap}
+.tp input[type=text],.tp select{font:inherit;padding:7px 8px;border:1px solid #b8c8d5;border-radius:5px;background:#fff;color:#102a33}
+.tp input[type=text]{width:180px}
+.tp input[type=checkbox]{flex:none;width:18px;height:18px;accent-color:var(--accent)}
+.tp-privacy{margin:16px 0 0;color:#586e73;font-size:14px}
+.tp button{font:inherit;cursor:pointer;padding:9px 14px;border-radius:7px;border:1px solid #b8c8d5;background:#fff;color:#173650}
+.tp button:hover:not(:disabled){background:#e7f7f5}
+.tp button:disabled{opacity:.5;cursor:default}
+.tp .primary{border-color:var(--accent);background:var(--accent);color:#fff;font-weight:600}
+.tp .primary:hover:not(:disabled){background:#095a61}
+.tp .mini{padding:4px 9px;font-size:13px}
+.tp .recb{border-color:var(--rec);color:var(--rec);font-weight:600}
+.tp .recb:hover:not(:disabled){background:#fbeeee}
+.tp-bar{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;margin:22px 0 12px}
+.tp-bar h2{font-size:20px;margin:0 auto 0 0}
+.tp-status{min-height:20px;margin:0 0 12px;color:#586e73;font-size:14px}
+.tp-status.err{color:#9a2f2f}.tp-status.ok{color:#2f855a}
+.tp-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px;list-style:none;margin:0;padding:0}
+.tp-card{background:#fff;border:1px solid #d8e0e0;border-radius:10px;overflow:hidden;display:flex;flex-direction:column;cursor:grab}
+.tp-card.dragging{opacity:.4}.tp-card.over{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent)}
+.tp-card img.pic{display:block;margin:10px;width:calc(100% - 20px);aspect-ratio:16/9;object-fit:contain;background:#f6f8f8;border:1px solid #e1e8ee;cursor:zoom-in}
+.tp-meta{display:flex;align-items:center;gap:6px;padding:0 10px 8px}
+.tp-num{font:700 12px "Montserrat",Arial,sans-serif;color:var(--accent);min-width:20px}
+.tp-name{flex:1;min-width:0;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tp-meta button{padding:2px 7px;font-size:13px;line-height:1.3}
+.tp-card textarea{margin:0 10px 8px;width:calc(100% - 20px);font:13px/1.45 "Manrope",Arial,sans-serif;padding:7px 8px;border:1px solid #b8c8d5;border-radius:5px;resize:vertical;color:#102a33;cursor:text;min-height:70px}
+.tp-vid{display:flex;align-items:center;gap:6px;padding:0 10px 10px;font-size:13px;color:#586e73}
+.tp-vid button{padding:4px 9px;font-size:13px}
+.tp-vid .has{color:var(--rec);font-weight:600}
+.tp-empty{padding:26px;text-align:center;color:#6b7f83;background:#fff;border:1px dashed #d8e0e0;border-radius:10px}
+@media(max-width:800px){.tp-work{grid-template-columns:1fr}}
+
+/* recorder */
+.tp-modal{position:fixed;inset:0;z-index:2000;background:#0d1a20f2;display:flex;align-items:center;justify-content:center;padding:16px}
+.tp-box{width:min(1280px,100%);max-height:100%;overflow:auto;background:#fff;border-radius:12px;padding:16px;display:grid;grid-template-columns:minmax(0,1.4fr) minmax(280px,1fr);gap:16px}
+@media(max-width:860px){.tp-box{grid-template-columns:1fr}}
+.tp-box h3{grid-column:1/-1;margin:0;font:600 18px "Montserrat",Arial,sans-serif;display:flex;align-items:center;gap:10px}
+.tp-box h3 .sp{flex:1}
+.tp-big{width:100%;aspect-ratio:16/9;object-fit:contain;background:#f6f8f8;border:1px solid #e1e8ee;border-radius:6px;display:block}
+.tp-cam{position:relative;aspect-ratio:16/9;background:#0d1a20;border-radius:8px;overflow:hidden}
+.tp-cam video{width:100%;height:100%;object-fit:contain;display:block}
+.tp-cam video.live{transform:scaleX(-1)}
+.tp-cam .off{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#b9c7cc;font-size:14px;text-align:center;padding:12px}
+.tp-cam.recording{outline:3px solid var(--rec);outline-offset:-3px}
+.tp-cam.recording:after{content:"● REC";position:absolute;top:8px;left:10px;color:#fff;background:var(--rec);font:700 12px "Montserrat",Arial,sans-serif;padding:2px 8px;border-radius:4px}
+.tp-ctl{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+.tp #mRec{background:var(--rec);border-color:var(--rec);color:#fff;font-weight:600}
+.tp #mRec.stop{background:#102a33;border-color:#102a33}
+.tp #mTimer{font:600 15px "Montserrat",Arial,sans-serif;color:var(--rec);min-width:70px}
+.tp-box textarea{width:100%;min-height:120px;margin-top:4px;font:14px/1.5 "Manrope",Arial,sans-serif;padding:8px 10px;border:1px solid #b8c8d5;border-radius:6px;resize:vertical}
+.tp-runbox{width:min(1280px,100%);max-height:100%;overflow:auto;background:#0d1a20;color:#fff;border-radius:12px;padding:12px}
+.tp-stage{position:relative;aspect-ratio:16/9;background:#fff;border-radius:6px;overflow:hidden}
+.tp-stage img{width:100%;height:100%;object-fit:contain;display:block}
+.tp-stage video{position:absolute;right:2%;bottom:3%;width:26%;aspect-ratio:16/9;object-fit:cover;border-radius:8px;box-shadow:0 4px 18px #0006;background:#000}
+.tp-stage.full video{inset:0;width:100%;height:100%;border-radius:0;box-shadow:none;object-fit:contain;background:#fff}
+.tp-stage .rmsg{position:absolute;left:12px;bottom:12px;background:#102a33dd;color:#fff;font-size:14px;padding:4px 12px;border-radius:6px}
+.tp-stage .rmsg:empty{display:none}
+.tp-runbox .tp-ctl{color:#c9d6da;font-size:14px}.tp-runbox .tp-ctl .sp{flex:1}
+.tp-runbox button{background:#22343c;color:#fff;border-color:#40575f}.tp-runbox button:hover:not(:disabled){background:#2e4650}
+.tp-rnote{margin:10px 0 0;padding:10px 12px;background:#16262d;border-radius:6px;white-space:pre-wrap;font-size:15px;line-height:1.5}
+.tp-lab{display:block;margin-top:12px;font:700 12px "Montserrat",Arial,sans-serif;color:var(--accent);text-transform:uppercase;letter-spacing:.1em}
+    </style>
+  </head>
+
+  <body class="outreach-body">
+    <header>
+      <div class="nav">
+        <a class="brand" href="../../index.html" aria-label="Sharaf Lab home"><img src="../../00%20Github%20assets/sharaf-lab-logo.png" alt="Sharaf Lab" /></a>
+        <nav aria-label="Primary navigation">
+          <a href="../../index.html">Home</a>
+          <a href="../../philosophy.html">Philosophy</a>
+          <a href="../../research.html">Research</a>
+          <a href="../../members.html">Lab Members</a>
+          <a href="../../photos.html">Photos</a>
+          <a href="../../links.html">Links of Interest</a>
+          <a class="active" href="../../tools.html" aria-current="page">Tools</a>
+          <a href="../../join.html">Join the Lab</a>
+        </nav>
+      </div>
+    </header>
+    <main>
+      <section class="outreach-hero">
+        <a class="tool-back" href="../../tools.html">← All lab tools</a>
+        <p class="eyebrow eyebrow-dark">Lab tools · Talks · Practice</p>
+        <h1>Practice your talk from a folder of PNGs.</h1>
+        <p>Pick the folder with your slide PNGs. Add notes under each slide and record a short practice video for each one. Notes and videos save into that same folder, and you can download a PowerPoint with your notes.</p>
+      </section>
+
+      <div class="tool-caution" role="note">
+        <strong>Chrome or Edge on a computer.</strong> These tools were vibe coded: built quickly with AI assistance. Saving into your folder and recording need Chrome or Edge; your browser will ask to use the folder, camera and microphone.
+      </div>
+
+      <section class="tool-section tool-section-soft" aria-label="Talk practice">
+        <div class="tp" id="tp">
+          <div class="tp-work">
+            <div class="tp-drop">
+              <div class="tp-icon" aria-hidden="true">▶</div>
+              <strong>Choose your PNG folder</strong>
+              <p>Every PNG, JPG or GIF in the folder becomes a slide, in file-name order.</p>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:12px">
+                <button type="button" id="pickDir" class="primary">Choose a folder…</button>
+                <button type="button" id="reconnect" class="primary" hidden>Reopen last folder</button>
+                <button type="button" id="pickFiles">Pick PNG files instead</button>
+              </div>
+              <input id="fileIn" type="file" accept="image/png,image/jpeg,image/gif,.png,.jpg,.jpeg,.gif" multiple hidden />
+              <span class="tp-where" id="where"></span>
+              <span class="tp-limit">Notes and videos are saved in a “practice” subfolder inside the folder you pick · nothing is uploaded</span>
+            </div>
+            <aside class="tp-settings" aria-label="Settings">
+              <div class="tp-row"><div><label for="limit">Video length</label><small>Recording stops on its own</small></div>
+                <select id="limit"><option value="0">No limit</option><option value="30">30 seconds</option><option value="60" selected>1 minute</option><option value="120">2 minutes</option><option value="300">5 minutes</option></select>
+              </div>
+              <div class="tp-row"><label for="size">PowerPoint slide size</label>
+                <select id="size"><option value="16x9" selected>Widescreen 16:9</option><option value="4x3">Standard 4:3</option><option value="7x4">7 × 4 in</option></select>
+              </div>
+              <div class="tp-row"><div><label for="addVid">Put videos on the slides</label><small>Adds each slide's video, small, in the bottom-right corner</small></div>
+                <input id="addVid" type="checkbox" />
+              </div>
+              <div class="tp-row"><label for="outName">File name</label>
+                <span class="tp-field"><input id="outName" type="text" value="practice" />.pptx</span>
+              </div>
+              <p class="tp-privacy">Your slides and videos never leave this device.</p>
+            </aside>
+          </div>
+
+          <div class="tp-bar">
+            <h2 id="count">Slides</h2>
+            <button type="button" id="practice" class="mini recb" disabled>● Practice from slide 1</button>
+            <button type="button" id="run" class="mini" disabled>▶ Full run-through</button>
+            <button type="button" id="sortAZ" class="mini" disabled>Sort by name</button>
+            <button type="button" id="make" class="primary" disabled>Download PowerPoint →</button>
+          </div>
+          <p class="tp-status" id="status" role="status" aria-live="polite">Drag cards to reorder them. Click a slide picture or “● Record” to practice that slide.</p>
+          <ol class="tp-list" id="list"></ol>
+          <div class="tp-empty" id="empty">No slides yet. Choose your PNG folder above.</div>
+
+          <div class="tp-modal" id="modal" hidden role="dialog" aria-modal="true" aria-labelledby="mTitle">
+            <div class="tp-box">
+              <h3><span id="mTitle"></span><span class="sp"></span><button type="button" id="mPrev">‹ Previous</button><button type="button" id="mNext">Next ›</button><button type="button" id="mClose">Close</button></h3>
+              <div><img id="mImg" class="tp-big" alt=""></div>
+              <div>
+                <div class="tp-cam" id="mCam"><video id="mVid" playsinline></video><div class="off" id="mOff">Starting camera…</div></div>
+                <div class="tp-ctl"><select id="mMode" aria-label="What to record"><option value="overlay">Record: slide + me</option><option value="camera">Record: camera only</option></select><button type="button" id="mRec">● Record</button><span id="mTimer"></span><button type="button" id="mPlay" hidden>▶ Play video</button><button type="button" id="mLive" hidden>Back to camera</button><button type="button" id="mDl" hidden>⤓ Download</button><button type="button" id="mDel" hidden>Delete video</button></div>
+                <label class="tp-lab" for="mNote">Notes</label>
+                <textarea id="mNote" placeholder="What you'll say on this slide"></textarea>
+                <p class="tp-status" style="margin:6px 0 0">Keys: ← → slide · R record/stop · Esc close</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="tp-modal" id="runModal" hidden role="dialog" aria-modal="true" aria-label="Full run-through">
+            <div class="tp-runbox">
+              <div class="tp-stage" id="rStage"><img id="rImg" alt=""><video id="rVid" playsinline></video><div class="rmsg" id="rMsg"></div></div>
+              <div class="tp-ctl"><button type="button" id="rPrev">⏮ Previous</button><button type="button" id="rPause">⏸ Pause</button><button type="button" id="rNext">Next ⏭</button><span id="rPos"></span><span class="sp"></span><label><input type="checkbox" id="rNotes"> Show notes</label><button type="button" id="rFull">⛶ Full screen</button><button type="button" id="rClose">Close</button></div>
+              <p class="tp-rnote" id="rNote" hidden></p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>© 2026 Sharaf Lab. Hosted on GitHub Pages. Created with the assistance of AI.</footer>
+
+    <!-- PptxGenJS 3.12.0 (MIT licence, see ../png-to-pptx/lib/LICENSE-pptxgenjs.txt) -->
+    <script src="../png-to-pptx/lib/pptxgen.bundle.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
