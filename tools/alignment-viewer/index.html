@@ -6,7 +6,8 @@
 .editor{background:white;border:1px solid #d8e1e9;border-radius:12px;padding:18px 22px;margin:0 0 20px}.editor h2{font-size:18px;margin:0 0 14px}.editor-grid{display:flex;align-items:center;flex-wrap:wrap;gap:16px 24px}.editor-grid label{display:flex;align-items:center;gap:8px}.editor input[type=text]{padding:9px;border:1px solid #b8c8d5;border-radius:5px;font:inherit;width:230px}.editor input[type=range]{width:100px;accent-color:#087f79}.editor output{min-width:25px}.edit-status{font-size:14px;color:#607589;margin-top:12px}.range-editor{margin-top:16px;padding-top:16px;border-top:1px solid #e4ebf0}.range-editor p{font-size:14px;color:#607589;margin:0 0 12px}
 header .back-link{display:block;color:#c2d1df;font-size:14px;text-decoration:none;margin-bottom:14px}header .back-link:hover{color:#ffffff;text-decoration:underline}header .back-link:focus-visible{outline:3px solid #72ddd4;outline-offset:3px}
 .vibe-caution{margin:0 0 20px;padding:14px 18px;background:#fff7ec;border:1px solid #f0d2a8;border-left:4px solid #d9822b;border-radius:8px;color:#5c3b12;font-size:15px;line-height:1.6}.vibe-caution strong{color:#8a4b0f}
-</style></head><body>
+</style>    <script src="../palette.js"></script>
+  </head><body>
 <header><a class="back-link" href="../../tools.html">← Sharaf Lab tools</a><small>SEQUENCE / ALIGNMENT</small><h1>Compare your sequences</h1><p>Multiple sequence alignments, colored column by column.</p></header>
 <main><div class="vibe-caution" role="note"><strong>Check every result.</strong> This tool was vibe coded: built quickly with AI assistance and not independently validated. Compare its output with your own data and standard software before using it in figures, analyses or publications.</div><div class="toolbar"><label class="file">Open alignment<input id="file" type="file" accept=".aln,.clustal,.clw,.fasta,.fa,.fas,.faa,.afa,.mfa,.sto,.stk,.txt"></label><button id="run" class="primary" disabled>Run viewer</button><button id="example">Try example</button><button id="reset">Clear data</button><button id="saveSession">Save session</button><label class="file">Open session<input id="sessionFile" type="file" accept=".json,application/json"></label><label>Residues per row <select id="wrap"><option value="fit" selected>Fit to width</option><option>30</option><option>40</option><option>50</option><option>60</option><option>80</option><option>100</option></select></label><label>Reference <select id="ref"></select></label><label>Number by <select id="numberBy"><option value="column">Alignment column</option><option value="ref">Reference residue</option><option value="struct">Structure residue (PDB)</option></select></label><label>Find residue <input id="find" type="number" placeholder="e.g. 45"></label><button id="go">Find</button><button id="export" class="primary">Download SVG</button></div>
 <section class="paste" aria-label="Paste an alignment"><label for="paste" class="paste-label">Or paste an alignment</label><textarea id="paste" placeholder="Paste Clustal, aligned FASTA, or Stockholm text here"></textarea><div class="toolbar"><button id="load" class="primary">Load pasted alignment</button><span class="note">Gaps may be written as - or . characters. All sequences must have the same aligned length. This viewer displays existing alignments; it does not align sequences.</span></div></section><div id="message" role="status"></div><p class="note" id="source"></p><div class="stats" id="stats"></div>
@@ -44,7 +45,7 @@ const classes=[{label:'Hydrophobic',set:'AILMFWV',key:'hydrophobic'},{label:'Pos
 const nucKey={A:'nucA',C:'nucC',G:'nucG',T:'nucT',U:'nucT'};
 const SESSION_APP='sharaf-lab-alignment-viewer',STORE_KEY='sharafLabAlignmentSession';
 let colors={...DEFAULT_COLORS},customNames=[],seqStart=[],rawText='',sites=[];
-const SITE_PALETTE=['#d63384','#7a3fb0','#1f6fd1','#e08a00','#138a52','#c0392b'];
+const SITE_PALETTE=['#c6327c','#564087','#4e9d9c','#f19737','#8dcd7b','#b24434'];
 function siteColumns(s){if(typeof struct!=='undefined'&&struct&&struct.map&&s.chain===struct.chain){s.cols=[...new Set(s.resi.map(r=>struct.map.resToCol.get(r)).filter(c=>c!==undefined))].sort((a,b)=>a-b)}return s.cols||[]}
 function startOf(i){const v=seqStart[i];return Number.isInteger(v)?v:1}
 function num(i,p){return p+startOf(i)-1}
@@ -81,7 +82,7 @@ sp|P04846|NLPA_ECOLI      LVAREDNKNAENVKEFLQSYQSPEVAKAAETIFNGGAVPGW	272
 let aln=null,pendingText='',sel=null,anchor=null,anchorRow=null,boxes=[],layout=null,order=[];
 function rowOf(s){const r=order.indexOf(s);return r<0?s:r}
 function ensureOrder(){const n=aln?aln.seqs.length:0;if(order.length!==n||new Set(order).size!==n||order.some(v=>!(v>=0&&v<n)))order=[...Array(n).keys()]}
-const OUTLINE_PALETTE=['#c0392b','#1f6fd1','#e08a00','#7a3fb0','#138a52','#d0397a','#0f7f86','#6b4f2a'];
+const OUTLINE_PALETTE=['#b24434','#151549','#f19737','#564087','#8dcd7b','#c6327c','#4e9d9c','#515151'];
 function normBox(b,L,n){if(Array.isArray(b))b={a:b[0],z:b[1]};if(!b||!Number.isInteger(b.a)||!Number.isInteger(b.z)||b.a<0||b.z>=L||b.a>b.z)return null;let r0=Number.isInteger(b.r0)?b.r0:0,r1=Number.isInteger(b.r1)?b.r1:n-1;r0=Math.max(0,Math.min(n-1,r0));r1=Math.max(r0,Math.min(n-1,r1));return {a:b.a,z:b.z,r0,r1,color:/^#[0-9a-f]{6}$/i.test(b.color||'')?b.color:'#c0392b',label:typeof b.label==='string'?b.label.slice(0,60):'',show3d:b.show3d!==false}}
 function boxText(b){return `Columns ${b.a+1}–${b.z+1}`+(aln&&(b.r0>0||b.r1<aln.seqs.length-1)?` · sequences ${b.r0+1}–${b.r1+1}`:' · all sequences')}
 

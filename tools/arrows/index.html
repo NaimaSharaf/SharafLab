@@ -56,6 +56,7 @@
 #arwToast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:#102a33;color:#fff;padding:10px 16px;border-radius:8px;font:600 14px Manrope,Arial,sans-serif;z-index:9999;box-shadow:0 6px 20px rgba(0,0,0,.2);opacity:0;transition:opacity .3s;pointer-events:none}
 @media(max-width:860px){.arw{grid-template-columns:1fr}.arw-panel{position:static}}
     </style>
+      <script src="../palette.js"></script>
   </head>
   <body class="outreach-body">
     <header>
@@ -135,7 +136,7 @@
   const $ = (id) => document.getElementById(id);
   const NS = "http://www.w3.org/2000/svg";
   const f = (x) => (Math.round(x * 100) / 100).toString();
-  const SWATCHES = ["#000000", "#b3b3b3", "#e0569a", "#d94040", "#f08c2e", "#e8c32a", "#4caf6a", "#2a9d8f", "#3a7bd5", "#7b4fc9", "#555555"];
+  const SWATCHES = ["#000000", "#515151", "#929292", "#ffffff", "#151549", "#564087", "#ababbb", "#4e9d9c", "#8dcd7b", "#efe75a", "#f19737", "#b24434", "#c6327c"];
   const DEFAULTS = { color: "#000000", lw: 1.5, cap: "round", dashed: false, head: "triangle", hl: 4.2, hw: 4.2, double: false, size: 0.6, rot: 0, flipH: false, flipV: false, dpi: 360 };
   const KEY = "arw-settings";
 

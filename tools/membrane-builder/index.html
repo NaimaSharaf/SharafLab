@@ -219,6 +219,7 @@
                 <p class="mb-note" style="margin:0 0 10px">Shift-click pieces in the figure to add or remove them. Drag any of them to move them together.</p>
                 <div class="mb-acts">
                   <button class="mini primary" id="mFuse" type="button" title="Turn the selected shapes into one piece with one outline">Fuse into one</button>
+                  <button class="mini primary" id="mCut" type="button" title="Cut the top shape out of the one underneath, like a binding site">Cut out (binding site)</button>
                   <button class="mini" id="mDup" type="button">Duplicate</button>
                   <button class="mini" id="mMirror" type="button" title="Mirror the selection across a vertical line (left ↔ right)">Mirror horizontally ↔</button>
                   <button class="mini" id="mFlip" type="button" title="Mirror the selection across a horizontal line (top ↕ bottom)">Mirror vertically ↕</button>
@@ -295,10 +296,12 @@
                 </span>
                 <button class="mini" id="undoBtn" type="button" title="Undo (Ctrl/⌘ Z)">↶ Undo</button>
                 <button class="mini" id="redoBtn" type="button" title="Redo (Ctrl/⌘ Shift Z)">↷ Redo</button>
-                <button class="mini" id="exampleBtn" type="button" title="Replace the figure with the example">Example</button>
+                <button class="mini" id="exampleBtn" type="button" title="Replace the figure with the example (Alt/Option-click for the original example)">Example</button>
+                <button class="mini" id="setExampleBtn" type="button" title="Use the current drawing as the example that loads with the tool">Make this the example</button>
                 <button class="mini" id="clearBtn" type="button" title="Remove everything but the membrane">Clear</button>
                 <button class="mini" id="memToggle" type="button" title="Hide or show the membrane (it's also left out of exports while hidden)">Hide membrane</button>
                 <button class="mini primary hidden" id="fuseBtn" type="button" title="Fuse the selected pieces into one">Fuse selected</button>
+                <button class="mini primary hidden" id="cutBtn" type="button" title="Cut the top shape out of the one underneath (binding site)">Cut out</button>
                 <button class="mini" id="saveSess" type="button" title="Save the figure and your library (Ctrl/⌘ S; Shift-click to save as a new file)">Save session</button>
                 <button class="mini" id="openSess" type="button" title="Open a saved session">Open session</button>
                 <input id="sessFile" type="file" accept=".json,application/json" hidden />
@@ -342,6 +345,8 @@
 
     <footer>© 2026 Sharaf Lab. Hosted on GitHub Pages. Created with the assistance of AI.</footer>
 
+    <script src="../palette.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/polygon-clipping@0.15.7/dist/polygon-clipping.umd.min.js"></script>
     <script>
 (function () {
   "use strict";
@@ -353,7 +358,7 @@
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
   const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   const STORE = "sharaf-membrane-builder-v2";
-  const PALETTE = ["#231f20", "#a7a9ac", "#e3e4e4", "#cbc9e2", "#5d5877", "#73bfa1", "#d9338a", "#f6e66b", "#f2ae3d", "#3a7bd5", "#d94040", "#452a75", "#ffffff"];
+  const PALETTE = window.SHARAF_PALETTE || ["#000000", "#515151", "#929292", "#ffffff", "#151549", "#564087", "#ababbb", "#4e9d9c", "#8dcd7b", "#efe75a", "#f19737", "#b24434", "#c6327c"];
 
   // ---------- colors ----------
   function mix(hex, to, k) {
@@ -570,6 +575,7 @@
         const out = [], g = lipoGeom(p), ll = g.ll, tip = g.tip;
         let head = "";
         if (p.headOn && !(o && o.noBase)) head = `<g data-part="head" transform="translate(${f(g.C[0])},${f(g.C[1])}) rotate(${f(p.headTurn + g.dd)})">${shapeMarkup(p.headShape, p.headSize, p.headStretch, p.headColor, p.outline, p.sw, null, ensurePts(p, "headShape", "headPts"), p.headCorner)}</g>`;
+        if (p.linkerOn && ll > 0) out.push(`<line data-part="linker" data-hit="1" x1="0" y1="0" x2="${f(tip[0])}" y2="${f(tip[1])}" stroke="transparent" stroke-width="${f(Math.max(2.5, p.linkerW * 3))}"/>`);
         if (p.linkerOn && ll > 0) out.push(`<line data-part="linker" x1="0" y1="0" x2="${f(tip[0])}" y2="${f(tip[1])}" stroke="${p.linkerColor}" stroke-width="${f(p.linkerW)}" stroke-linecap="round"/>`);
         out.push(`<g data-part="tails">` + tailBundle(p.tails, p.tailGap, p.tailLen, p.tailColor, p.tailW, p.waves, p.waveAmp, p.tailStyle) +
           (+p.tails > 1 || (p.linkerOn && ll > 0) ? `<circle r="${f(p.tailW / 2)}" fill="${p.tailColor}"/>` : "") + `</g>`);
@@ -586,8 +592,9 @@
     },
     receptor: {
       label: "Receptor dimer", push: true, y: () => 0.75,
-      p: Object.assign({ state: "closed", openAngle: 16, pivot: "top", rodW: 4.9, rodH: 24, gap: 0.4, rodColor: "#cbc9e2",
-        knobs: true, knobR: 2.6, knobColor: "#cbc9e2", domains: true, domainShape: "wedge", domainColor: "#5d5877", domainW: 8.25, domainH: 9.75 }, OUT),
+      // same sizes as the receptors in the example figure
+      p: Object.assign({ state: "closed", openAngle: 17, pivot: "top", rodW: 5.7, rodH: 22.5, gap: 0.6, rodColor: "#cbc9e2",
+        knobs: true, knobR: 3.3, knobColor: "#cbc9e2", domains: true, domainShape: "wedge", domainColor: "#5d5877", domainW: 11.4, domainH: 12 }, OUT),
       fields: [["state", "State", "select", [["closed", "Closed (together)"], ["open", "Open (apart)"]]], ["openAngle", "Opening angle", "range", 0, 70, 1],
         ["pivot", "Helices meet at", "select", [["top", "Top (Λ)"], ["bottom", "Bottom (V)"]]],
         ["§", "Helices"], ["rodColor", "Color", "color"], ["rodW", "Width", "range", 0.5, 20, 0.1], ["rodH", "Length", "range", 3, 100, 0.25], ["gap", "Gap (closed)", "range", -5, 15, 0.1],
@@ -647,16 +654,29 @@
     },
     barrel: {
       label: "Beta barrel", push: true, y: () => 0,
-      p: Object.assign({ w: 16.5, h: 21, color: "#8fb8de", stripes: 5, corner: 3.4 }, OUT),
-      fields: [["color", "Color", "color"], ["w", "Width", "range", 2, 100, 0.25], ["h", "Height", "range", 2, 100, 0.25], ["corner", "Corner rounding", "range", 0, 25, 0.1], ["stripes", "Strands", "range", 0, 16, 1], ...OUTLINE_FIELDS],
+      // drawn as a cylinder from three shapes: bottom ellipse, side, top ellipse (each with its own fill)
+      p: Object.assign({ style: "cyl", w: 16.5, h: 15, ry: 2.1, topColor: "#9dc350", color: "#80c56c", bottomColor: "#eff0f2", stripes: 0, corner: 3.4 }, OUT, { sw: 0 }),
+      fields: [["style", "Style", "select", [["cyl", "Cylinder"], ["flat", "Flat block"]]], ["w", "Width", "range", 2, 100, 0.25], ["h", "Height", "range", 2, 100, 0.25],
+        ["ry", "Ellipse depth", "range", 0, 30, 0.1, { when: (o) => o.style !== "flat" }], ["corner", "Corner rounding", "range", 0, 25, 0.1, { when: (o) => o.style === "flat" }],
+        ["§", "Top", { when: (o) => o.style !== "flat" }], ["topColor", "Fill", "color", { when: (o) => o.style !== "flat" }],
+        ["§", "Side"], ["color", "Fill", "color"], ["stripes", "Strands", "range", 0, 16, 1],
+        ["§", "Bottom", { when: (o) => o.style !== "flat" }], ["bottomColor", "Fill", "color", { when: (o) => o.style !== "flat" }], ...OUTLINE_FIELDS],
       draw(p) {
-        let out = `<rect x="${f(-p.w / 2)}" y="${f(-p.h / 2)}" width="${f(p.w)}" height="${f(p.h)}" rx="${f(Math.min(p.corner, p.w / 2, p.h / 2))}" ${st(p.color, p)}/>`;
-        const n = Math.round(p.stripes), m = Math.max(p.w * 0.09, p.corner * 0.6), s = p.h * 0.1, e = p.h * 0.07;
-        for (let i = 0; i < n; i++) {
-          const x = -p.w / 2 + m + ((p.w - 2 * m) * (i + 0.5)) / n;
-          out += `<line x1="${f(x - s)}" y1="${f(-p.h / 2 + e)}" x2="${f(x + s)}" y2="${f(p.h / 2 - e)}" stroke="${p.outline}" stroke-width="${f(Math.max(0.2, p.sw * 0.8))}" stroke-linecap="round"/>`;
-        }
-        return out;
+        const w = p.w, h = p.h, rx = w / 2, ry = Math.max(0, p.ry), y0 = -h / 2, y1 = h / 2;
+        const strands = (top, bot) => {
+          let out = "";
+          const n = Math.round(p.stripes), m = w * 0.12, s = h * 0.1;
+          for (let i = 0; i < n; i++) {
+            const x = -rx + m + ((w - 2 * m) * (i + 0.5)) / n;
+            out += `<line x1="${f(x - s)}" y1="${f(top)}" x2="${f(x + s)}" y2="${f(bot)}" stroke="${p.sw > 0 ? p.outline : mix(okHex(p.color) ? p.color : "#80c56c", "#000000", 0.25)}" stroke-width="${f(Math.max(0.2, (p.sw || 0.75) * 0.8))}" stroke-linecap="round"/>`;
+          }
+          return out;
+        };
+        if (p.style === "flat") return `<rect x="${f(-rx)}" y="${f(y0)}" width="${f(w)}" height="${f(h)}" rx="${f(Math.min(p.corner, rx, h / 2))}" ${st(p.color, p)}/>` + strands(y0 + h * 0.07, y1 - h * 0.07);
+        const bottom = `<ellipse data-part="bottom" cx="0" cy="${f(y1)}" rx="${f(rx)}" ry="${f(ry)}" ${st(p.bottomColor, p)}/>`;
+        const side = `<path data-part="side" d="M${f(-rx)},${f(y0)}L${f(-rx)},${f(y1)}A${f(rx)},${f(ry)} 0 0 1 ${f(rx)},${f(y1)}L${f(rx)},${f(y0)}Z" ${st(p.color, p)}/>`;
+        const top = `<ellipse data-part="top" cx="0" cy="${f(y0)}" rx="${f(rx)}" ry="${f(ry)}" ${st(p.topColor, p)}/>`;
+        return bottom + side + `<g data-part="side">${strands(y0 + ry + h * 0.04, y1 - h * 0.04)}</g>` + top;
       }
     },
     lipid: {
@@ -734,9 +754,10 @@
 
   // parts you can double-click: [name shown, field sections to show]
   const PARTS = {
-    lipoprotein: { head: ["Protein head", ["Protein head", "Outline"]], linker: ["Linker", ["Linker"]], tails: ["Lipid tails", ["Lipid tails"]] },
+    lipoprotein: { head: ["Protein head and linker", ["Protein head", "Linker", "Outline"]], linker: ["Linker", ["Linker", "Protein head"]], tails: ["Lipid tails and linker", ["Lipid tails", "Linker"]] },
     receptor: { rods: ["Helices", ["", "Helices", "Outline"]], knobs: ["Joints", ["Joints"]], domains: ["Inside domains", ["Inside domains", "Outline"]] },
-    bundle: { rods: ["Helices", ["", "Outline"]], loops: ["Loops", ["Loops"]] }
+    bundle: { rods: ["Helices", ["", "Outline"]], loops: ["Loops", ["Loops"]] },
+    barrel: { top: ["Top", ["Top", "Outline"]], side: ["Side", ["Side", "Outline"]], bottom: ["Bottom", ["Bottom", "Outline"]] }
   };
   function sectionFields(fields, names) {
     const out = []; let cur = "";
@@ -753,7 +774,7 @@
   // ---------- extra shapes and fusing ----------
   // Extra shapes live in the item's own frame. Fused shapes are drawn as one silhouette:
   // every shape's outline (twice the line width) first, then every fill on top, so inner edges disappear.
-  const EXTRA_FIELDS = [["shape", "Shape", SHAPE_SEL], ["color", "Color", "color"], ["size", "Size", "range", 0.2, 40, 0.05],
+  const EXTRA_FIELDS = [["cut", "Cut it out (binding site)", "check"], ["gap", "Gap around the cut-out (pt)", "range", 0, 3, 0.05, { when: (o) => o.cut }], ["shape", "Shape", SHAPE_SEL], ["color", "Color", "color", { when: (o) => !o.cut }], ["size", "Size", "range", 0.2, 40, 0.05],
     ["stretch", "Stretch", "range", 0.1, 6, 0.05], ["turn", "Turn", "range", -180, 180, 1], ["corner", "Corner radius (pt)", "range", 0, 10, 0.05, { when: (o) => isPoly(o.shape) }]];
   function primMarkup(pr, mode, outline, sw) {
     if (pr.rect) {
@@ -766,18 +787,150 @@
     if (mode === "fill") return (pr.defs || "") + shapeMarkup(pr.shape, pr.R, pr.stretch, pr.fill, outline, 0, pr.fillAttr, pr.pts, pr.corner);
     return (pr.defs || "") + shapeMarkup(pr.shape, pr.R, pr.stretch, pr.fill, outline, sw, pr.fillAttr, pr.pts, pr.corner);
   }
+  // lipid tails attached to a piece: a linker from the attachment point, then the tails, pointing along "angle" (90 = down)
+  const TAIL_DEFAULTS = { angle: 90, tails: 3, tailColor: "#b3b3b3", tailW: 1, tailLen: 6.84, tailGap: 1.89, tailStyle: "wavy", waves: 2.5, waveAmp: 0.396, linkerLen: 2.16, linkerAngle: 60, linkerColor: "#a7a9ac", linkerW: 1.3 };
+  const TAIL_FIELDS = [["tails", "Tails", "select", [1, 2, 3, 4]], ["tailColor", "Tail color", "color"], ["tailW", "Tail line width (pt)", "range", 0.1, 5, 0.05],
+    ["tailLen", "Tail length", "range", 1, 60, 0.05], ["tailGap", "Tail spacing", "range", 0.2, 6, 0.05], ["tailStyle", "Style", "select", [["wavy", "Wavy"], ["zigzag", "Zigzag"], ["straight", "Straight"]]],
+    ["waves", "Waves", "range", 0, 8, 0.5], ["waveAmp", "Wave height", "range", 0, 2, 0.01], ["angle", "Direction (90° = down)", "range", -180, 180, 1],
+    ["§", "Linker"], ["linkerLen", "Length", "range", 0, 20, 0.05], ["linkerAngle", "Lipid to linker angle", "range", -180, 180, 1], ["linkerColor", "Color", "color"], ["linkerW", "Line width (pt)", "range", 0.1, 4, 0.05]];
+  // drawn exactly like a lipoprotein without its head: tails hang from the branch point and the linker leaves it at
+  // "Lipid to linker angle"; the linker's far end is the point attached to the protein
+  // k = 1 / the piece's size %: the tails keep their real pt size whatever the piece's size setting
+  function tailsGeom(t, k) {
+    k = k || 1;
+    // the linker runs its visible length plus a hidden "tuck" under the protein, as in the lipoprotein
+    const la = rad(t.linkerAngle === undefined ? 60 : t.linkerAngle), L = Math.max(0, t.linkerLen) + Math.max(0, t.tuck || 0), E = [L * Math.sin(la), -L * Math.cos(la)];
+    const r = t.angle - 90, B = rotP([-E[0] * k, -E[1] * k], r);
+    return { E, r, k, B: [t.x + B[0], t.y + B[1]], dir: [Math.cos(rad(t.angle)), Math.sin(rad(t.angle))] };
+  }
+  function tailsMarkup(t, i, k) {
+    const g0 = tailsGeom(t, k), E = g0.E, L = Math.max(0, t.linkerLen) + Math.max(0, t.tuck || 0), w = t.tailW;
+    let g = "";
+    if (L > 0) g += `<line x1="0" y1="0" x2="${f(E[0])}" y2="${f(E[1])}" stroke="${t.linkerColor}" stroke-width="${f(t.linkerW)}" stroke-linecap="round"/>`;
+    g += tailBundle(t.tails, t.tailGap, t.tailLen, t.tailColor, w, t.waves, t.waveAmp, t.tailStyle);
+    if (+t.tails > 1 || L > 0) g += `<circle r="${f(w / 2)}" fill="${t.tailColor}"/>`;
+    return `<g data-part="t${i}" transform="translate(${f(t.x)},${f(t.y)}) rotate(${f(g0.r)})${g0.k !== 1 ? ` scale(${+g0.k.toFixed(5)})` : ""} translate(${f(-E[0])},${f(-E[1])})">${g}</g>`;
+  }
+  // place the tails the way the lipoprotein's tails sit relative to its head: linker at 60° from the tails,
+  // reaching the protein's edge, with its end tucked under the protein
+  function addTails(it, part) {
+    const pi = partInfo(it, part), b = localBox(it);
+    const c = pi && pi.poly ? pi.center : [b.x + b.w / 2, b.y + b.h / 2];
+    const R = pi && pi.poly ? (pi.rotH ? pi.half[1] / 1.05 : Math.min(pi.half[0], pi.half[1])) : Math.min(b.w, b.h) / 2;
+    // copy the tails of a lipoprotein already in the figure (at its real size), so they match it exactly
+    const lp = scene.items.find((q) => q.type === "lipoprotein"), base = Object.assign({}, TAIL_DEFAULTS);
+    if (lp) {
+      const q = lp.p, ls = (lp.scale || 100) / 100;
+      Object.assign(base, { tails: q.tails, tailColor: q.tailColor, tailStyle: q.tailStyle, waves: q.waves, linkerAngle: q.linkerAngle, linkerColor: q.linkerColor,
+        tailW: f(q.tailW * ls), tailLen: f(q.tailLen * ls), tailGap: f(q.tailGap * ls), waveAmp: f(q.waveAmp * ls), linkerLen: f(q.linkerLen * ls), linkerW: f(q.linkerW * ls) });
+    }
+    const s = (it.scale || 100) / 100, t = Object.assign(base, { tuck: f(R * 0.3 * s) }), la = rad(t.linkerAngle), d = [Math.sin(la), -Math.cos(la)], reach = R * 0.66;
+    t.x = f(c[0] - d[0] * reach); t.y = f(c[1] - d[1] * reach);
+    it.tails = it.tails || [];
+    it.tails.push(t);
+    bboxCache.delete(it.id);
+    return "t" + (it.tails.length - 1);
+  }
+  function extraPrim(e, i) {
+    return { part: "x" + i, shape: e.shape, pts: ensurePts(e, "shape", "pts"), corner: e.corner, R: e.size, stretch: e.stretch, fill: e.color,
+      tf: `translate(${f(e.x)},${f(e.y)}) rotate(${f(e.turn)})${e.fx || e.fy ? ` scale(${e.fx ? -1 : 1},${e.fy ? -1 : 1})` : ""}` };
+  }
   function itemMarkup(it) {
-    const T = TYPES[it.type], p = it.p, ex = it.extras || [];
-    const fuseBase = !!(it.fuse && ex.length && T.base && T.base(p, it));
-    let out = `<g data-part="main">${T.draw(p, it, { noBase: fuseBase })}</g>`;
-    if (!ex.length) return out;
+    const T = TYPES[it.type], p = it.p, all = it.extras || [];
+    const solid = all.map((e, i) => [e, i]).filter(([e]) => !e.cut), cuts = all.map((e, i) => [e, i]).filter(([e]) => e.cut);
+    const base = T.base ? T.base(p, it) : null;
+    const fuseBase = !!(it.fuse && solid.length && base);
     const outline = p.outline || "#231f20", sw = p.sw === undefined ? 0.75 : p.sw;
-    const prims = ex.map((e, i) => ({ part: "x" + i, shape: e.shape, pts: ensurePts(e, "shape", "pts"), corner: e.corner, R: e.size, stretch: e.stretch, fill: e.color,
-      tf: `translate(${f(e.x)},${f(e.y)}) rotate(${f(e.turn)})${e.fx || e.fy ? ` scale(${e.fx ? -1 : 1},${e.fy ? -1 : 1})` : ""}` }));
-    if (fuseBase) prims.unshift(T.base(p, it));
+    let body = `<g data-part="main">${T.draw(p, it, { noBase: fuseBase })}</g>`;
+    const prims = solid.map(([e, i]) => extraPrim(e, i));
+    if (fuseBase) prims.unshift(base);
     const g = (pr, mode) => `<g data-part="${pr.part}"${pr.tf ? ` transform="${pr.tf}"` : ""}>${primMarkup(pr, mode, outline, sw)}</g>`;
-    if (it.fuse) out += `<g>${prims.map((pr) => g(pr, "out")).join("")}${prims.map((pr) => g(pr, "fill")).join("")}</g>`;
-    else out += prims.map((pr) => g(pr, "both")).join("");
+    if (prims.length) {
+      if (it.fuse) body += `<g>${prims.map((pr) => g(pr, "out")).join("")}${prims.map((pr) => g(pr, "fill")).join("")}</g>`;
+      else body += (fuseBase ? "" : "") + prims.map((pr) => g(pr, "both")).join("");
+    }
+    const tails = (it.tails || []).map((t, i) => tailsMarkup(t, i, 100 / (it.scale || 100))).join("");
+    if (!cuts.length || !base) return tails + body;
+    // binding sites: cut the added shapes out of the piece (a gap around each), and outline the pocket where it lies inside the piece
+    const id = "mbcut" + String(it.id).replace(/[^a-z0-9]/gi, "_"), big = 1e4;
+    const silhouette = [base].concat(solid.map(([e, i]) => extraPrim(e, i))).map((pr) => `<g${pr.tf ? ` transform="${pr.tf}"` : ""}>${primMarkup(Object.assign({}, pr, { fill: "#fff", fillAttr: null, defs: "" }), "fill", "#fff", 0)}</g>`).join("");
+    const holes = (fill, grow) => cuts.map(([e, i]) => { const pr = extraPrim(e, i); return `<g data-part="${pr.part}" transform="${pr.tf}">${shapeMarkup(pr.shape, pr.R, pr.stretch, fill, fill, Math.max(0, grow), null, pr.pts, pr.corner)}</g>`; }).join("");
+    const gapOf = (e) => Math.max(0, e.gap === undefined ? 0.4 : e.gap);
+    const holeMask = cuts.map(([e, i]) => { const pr = extraPrim(e, i); return `<g transform="${pr.tf}">${shapeMarkup(pr.shape, pr.R, pr.stretch, "#000", "#000", 2 * gapOf(e), null, pr.pts, pr.corner)}</g>`; }).join("");
+    const band = sw > 0 ? cuts.map(([e, i]) => { const pr = extraPrim(e, i); return `<g transform="${pr.tf}">${shapeMarkup(pr.shape, pr.R, pr.stretch, outline, outline, 2 * (gapOf(e) + sw), null, pr.pts, pr.corner)}</g>`; }).join("") : "";
+    const defs = `<defs><mask id="${id}h" maskUnits="userSpaceOnUse" x="${-big}" y="${-big}" width="${2 * big}" height="${2 * big}"><rect x="${-big}" y="${-big}" width="${2 * big}" height="${2 * big}" fill="#fff"/>${holeMask}</mask>` +
+      `<mask id="${id}s" maskUnits="userSpaceOnUse" x="${-big}" y="${-big}" width="${2 * big}" height="${2 * big}"><rect x="${-big}" y="${-big}" width="${2 * big}" height="${2 * big}" fill="#000"/>${silhouette}</mask></defs>`;
+    // an invisible copy of each hole keeps it clickable for editing
+    const hit = holes("none", 0).replace(/<(path|ellipse|line)/g, "<$1 pointer-events=\"all\"");
+    return tails + defs + `<g mask="url(#${id}h)">${body}${band ? `<g mask="url(#${id}s)">${band}</g>` : ""}</g>` + hit;
+  }
+
+
+  // ---------- real shapes for export: fused and cut-out pieces become single outlines ----------
+  // Each shape is traced into polygons in the browser, then joined (fuse) or subtracted (binding site)
+  // with the polygon-clipping library, so other programs get one path whose outline follows the pocket.
+  const PC = () => window.polygonClipping;
+  function primPolys(pr) {
+    measureBox.innerHTML = `<svg xmlns="${NS}" width="10" height="10"><g id="mbRoot"><g${pr.tf ? ` transform="${pr.tf}"` : ""}>${primMarkup(Object.assign({}, pr, { defs: "", fillAttr: null }), "fill", "#000", 0)}</g></g></svg>`;
+    const root = measureBox.querySelector("#mbRoot"), inv = root.getCTM().inverse();
+    const toRoot = (el, x, y) => { const m = inv.multiply(el.getCTM()), q = new DOMPoint(x, y).matrixTransform(m); return [q.x, q.y]; };
+    let acc = [];
+    root.querySelectorAll("path,ellipse,rect,circle,line").forEach((el) => {
+      if (el.tagName === "line") {
+        // thick round-capped line: a capsule
+        const x1 = +el.getAttribute("x1"), y1 = +el.getAttribute("y1"), x2 = +el.getAttribute("x2"), y2 = +el.getAttribute("y2"), r = +el.getAttribute("stroke-width") / 2;
+        const a = Math.atan2(y2 - y1, x2 - x1), pts = [];
+        for (let i = 0; i <= 12; i++) { const t = a + Math.PI / 2 + (Math.PI * i) / 12; pts.push(toRoot(el, x2 + r * Math.cos(t + Math.PI), y2 + r * Math.sin(t + Math.PI))); }
+        for (let i = 0; i <= 12; i++) { const t = a + Math.PI / 2 + (Math.PI * i) / 12; pts.push(toRoot(el, x1 + r * Math.cos(t), y1 + r * Math.sin(t))); }
+        acc.push([[pts]]);
+        return;
+      }
+      const sub = el.tagName === "path" ? (el.getAttribute("d") || "").split(/(?=M)/).filter((d) => d.trim()) : [null];
+      let polys = [];
+      sub.forEach((d) => {
+        let g = el;
+        if (d !== null) { g = document.createElementNS(NS, "path"); g.setAttribute("d", d); el.parentNode.appendChild(g); }
+        const L = g.getTotalLength(), n = Math.max(24, Math.min(600, Math.ceil(L / 0.08))), ring = [];
+        for (let i = 0; i < n; i++) { const p = g.getPointAtLength((L * i) / n); ring.push(toRoot(el, p.x, p.y)); }
+        if (d !== null) g.remove();
+        if (ring.length > 2) polys.push([[ring]]);
+      });
+      if (polys.length) acc.push(polys.length > 1 ? PC().xor(...polys) : polys[0]);
+    });
+    measureBox.innerHTML = "";
+    return acc.length ? (acc.length > 1 ? PC().union(...acc) : acc[0]) : [];
+  }
+  function growPoly(mp, d) {
+    if (!(d > 0) || !mp.length) return mp;
+    const parts = [mp];
+    for (let i = 0; i < 16; i++) { const a = (2 * Math.PI * i) / 16, dx = d * Math.cos(a), dy = d * Math.sin(a); parts.push(mp.map((poly) => poly.map((ring) => ring.map((q) => [q[0] + dx, q[1] + dy])))); }
+    return PC().union(...parts);
+  }
+  const polyD = (mp) => mp.map((poly) => poly.map((ring) => "M" + ring.map((q) => f(q[0]) + "," + f(q[1])).join("L") + "Z").join("")).join("");
+  function itemMarkupExport(it) {
+    const T = TYPES[it.type], p = it.p, all = it.extras || [];
+    const solid = all.map((e, i) => [e, i]).filter(([e]) => !e.cut), cuts = all.map((e, i) => [e, i]).filter(([e]) => e.cut);
+    const base = T.base ? T.base(p, it) : null;
+    if (!PC() || !(cuts.length && base) && !(it.fuse && solid.length)) return itemMarkup(it);
+    const outline = p.outline || "#231f20", sw = p.sw === undefined ? 0.75 : p.sw;
+    const fuseAll = !!(it.fuse && solid.length && base), cutting = !!(cuts.length && base);
+    // shapes that make up the piece's body: the base (when it is fused or cut) and the added shapes
+    const bodyPrims = [];
+    if (base && (fuseAll || cutting)) bodyPrims.push(base);
+    solid.forEach(([e, i]) => bodyPrims.push(extraPrim(e, i)));
+    let hole = [];
+    if (cutting) { const hs = cuts.map(([e, i]) => growPoly(primPolys(extraPrim(e, i)), Math.max(0, e.gap === undefined ? 0.4 : e.gap))).filter((m) => m.length); if (hs.length) hole = hs.length > 1 ? PC().union(...hs) : hs[0]; }
+    const minus = (mp) => (hole.length && mp.length ? PC().difference(mp, hole) : mp);
+    const tails = (it.tails || []).map((t, i) => tailsMarkup(t, i, 100 / (it.scale || 100))).join("");
+    let out = tails + T.draw(p, it, { noBase: !!(base && (fuseAll || cutting)) });
+    const st2 = (fill, stroke) => `fill="${fill}" stroke="${stroke ? outline : "none"}" stroke-width="${stroke ? f(sw) : 0}" stroke-linejoin="round" fill-rule="evenodd"`;
+    const pieces = bodyPrims.map((pr) => ({ fill: pr.fill, mp: minus(primPolys(pr)) })).filter((o) => o.mp.length);
+    if (it.fuse) {
+      const allMp = PC().union(...pieces.map((o) => o.mp));
+      const fills = [...new Set(pieces.map((o) => o.fill))];
+      if (fills.length === 1) out += `<path d="${polyD(allMp)}" ${st2(fills[0], sw > 0)}/>`;
+      else out += pieces.map((o) => `<path d="${polyD(o.mp)}" ${st2(o.fill, false)}/>`).join("") + (sw > 0 ? `<path d="${polyD(allMp)}" fill="none" stroke="${outline}" stroke-width="${f(sw)}" stroke-linejoin="round"/>` : "");
+    } else out += pieces.map((o) => `<path d="${polyD(o.mp)}" ${st2(o.fill, sw > 0)}/>`).join("");
     return out;
   }
 
@@ -814,11 +967,22 @@
   }
   function partInfo(it, part) {
     const p = it.p, t = it.type, M = Math.max;
+    if (/^t\d+$/.test(part)) {
+      const t = (it.tails || [])[+part.slice(1)]; if (!t) return null;
+      const k = 100 / (it.scale || 100), g0 = tailsGeom(t, k), A = [t.x, t.y], B = g0.B, tip = [B[0] + g0.dir[0] * t.tailLen * k, B[1] + g0.dir[1] * t.tailLen * k];
+      return { poly: null, center: A, half: [1, 1], color: t.tailColor, handles: [
+        { dot: true, at: A, set: (lp) => { t.x = f(lp[0]); t.y = f(lp[1]); } },
+        { at: tip, set: (lp) => { const v = [lp[0] - B[0], lp[1] - B[1]]; t.angle = f(deg(Math.atan2(v[1], v[0]))); t.tailLen = f(Math.max(0.5, Math.hypot(v[0], v[1]) / k)); } }] };
+    }
     if (/^x\d+$/.test(part)) { const e = (it.extras || [])[+part.slice(1)]; return e ? shapeFrame(e, { size: "size", stretch: "stretch", turn: "turn", shape: "shape", pts: "pts", flip: true }, e.x, e.y, 0, 0.1) : null; }
     if ((t === "protein" || t === "ligand") && part === "main") return shapeFrame(p, { size: "size", stretch: "stretch", turn: "turn", shape: "shape", pts: "pts" }, 0, 0, 0, 0.1);
     if (t === "lipoprotein") {
       const g = lipoGeom(p);
-      if (part === "head" && p.headOn) return shapeFrame(p, { size: "headSize", stretch: "headStretch", turn: "headTurn", shape: "headShape", pts: "headPts" }, g.C[0], g.C[1], g.dd, 0.2);
+      if (part === "head" && p.headOn) {
+        const fr = shapeFrame(p, { size: "headSize", stretch: "headStretch", turn: "headTurn", shape: "headShape", pts: "headPts" }, g.C[0], g.C[1], g.dd, 0.2);
+        if (p.linkerOn) fr.handles.push({ dot: true, at: g.E, set: (lp) => { p.linkerLen = f(Math.max(0, Math.hypot(lp[0], lp[1]))); p.linkerAngle = f(deg(Math.atan2(lp[0], -lp[1]))); } });
+        return fr;
+      }
       if (part === "linker" && p.linkerOn) return { poly: null, handles: [{ at: g.E, set: (lp) => { p.linkerLen = f(M(0, Math.hypot(lp[0], lp[1]))); p.linkerAngle = f(deg(Math.atan2(lp[0], -lp[1]))); } }], center: g.E, half: [1, 1], color: p.linkerColor };
       if (part === "tails") {
         const n = +p.tails, gp = M(p.tailGap, p.tailW * 1.8), amp = p.tailStyle === "straight" ? 0 : p.waveAmp, hw = ((n - 1) * gp) / 2 + amp + p.tailW / 2, L = p.tailLen;
@@ -828,7 +992,7 @@
       }
       return null;
     }
-    if ((t === "tm" || t === "barrel") && part === "main") return rectFrame(0, 0, p.w / 2, p.h / 2, (x) => (p.w = f(M(0.3, 2 * x))), (y) => (p.h = f(M(1, 2 * y))), p.color);
+    if ((t === "tm" && part === "main") || t === "barrel") return rectFrame(0, 0, p.w / 2, p.h / 2, (x) => (p.w = f(M(0.3, 2 * x))), (y) => (p.h = f(M(1, 2 * y))), p.color);
     if (t === "receptor") {
       const w = p.rodW, h = p.rodH, gap = p.gap, open = p.state === "open", th = open ? p.openAngle : 0, top = p.pivot !== "bottom";
       const px = open ? w * 0.3 : w / 2 + gap / 2, py = top ? -h / 2 : h / 2, ang = top ? -th : th, b0 = rotP([0, top ? h : 0], ang), B = [px + b0[0], py + b0[1]];
@@ -886,6 +1050,7 @@
   // turn the part being edited into another shape; pieces that aren't shapes become a shape of the same size, colour and place
   function switchShape(it, part, k) {
     const p = it.p;
+    if (/^t\d+$/.test(part)) part = "main";
     if (/^x\d+$/.test(part)) { it.extras[+part.slice(1)].shape = k; bboxCache.delete(it.id); return { it, part }; }
     if ((it.type === "protein" || it.type === "ligand") && part === "main") { p.shape = k; if (isPoly(k) && !p.corner) p.corner = 0.3; bboxCache.delete(it.id); return { it, part }; }
     if (it.type === "lipoprotein" && part === "head") { p.headShape = k; bboxCache.delete(it.id); return { it, part }; }
@@ -920,8 +1085,6 @@
     ["Lipid tails", "lipoprotein", { headOn: false, linkerOn: false }],
     ["Phospholipid", "lipid", {}],
     ["TM helix", "tm", {}],
-    ["Receptor, closed", "receptor", {}],
-    ["Receptor, open", "receptor", { state: "open" }],
     ["Channel", "bundle", { n: 4 }],
     ["GPCR (7 TM)", "bundle", { n: 7, rodW: 3.4, loops: true, termini: true, gap: 0.2 }],
     ["Beta barrel", "barrel", {}],
@@ -973,7 +1136,20 @@
     return { id: scene.next++, type, x: x || 0, y: y === undefined ? T.y(scene.m.T) : y, rot: rot || 0, scale: 100, flip: false, push: T.push, p: Object.assign({}, T.p, over || {}) };
   }
   // the example figure: a lipoprotein hands its ligand to a receptor dimer, which opens and releases it inside
-  function exampleScene() {
+  // a drawing saved with "Make this the example" (this browser) or built into the page (BUILT_IN_EXAMPLE)
+  const EXAMPLE_KEY = "sharaf-membrane-example-v1";
+  const BUILT_IN_EXAMPLE = null;
+  function savedExample() { try { return localStorage.getItem(EXAMPLE_KEY) || BUILT_IN_EXAMPLE; } catch (e) { return BUILT_IN_EXAMPLE; } }
+  function exampleScene(original) {
+    const ex = original ? null : savedExample();
+    if (ex) {
+      try {
+        const d = JSON.parse(ex);
+        scene = { m: Object.assign({}, MEM_DEFAULTS, d.m || {}), items: (d.items || []).filter((it) => TYPES[it.type]), next: d.next || 1 };
+        scene.next = Math.max(scene.next, ...scene.items.map((it) => it.id + 1), 1);
+        return;
+      } catch (e) { /* fall back to the built-in example */ }
+    }
     scene = { m: Object.assign({}, MEM_DEFAULTS), items: [], next: 1 };
     const add = (t, o, x, y, r) => { const it = makeItem(t, o, x, y, r); scene.items.push(it); return it; };
     const lig = { shape: "poly:tri", size: 2, stretch: 1.65, turn: 0, corner: 0.15 };
@@ -997,7 +1173,7 @@
   document.body.appendChild(measureBox);
   const bboxCache = new Map();
   function localBox(it) {
-    const key = it.type + JSON.stringify(it.p) + JSON.stringify(it.extras || []) + (it.fuse ? "F" : "") + (it.type === "ligand" ? it.rot : "");
+    const key = it.type + JSON.stringify(it.p) + JSON.stringify(it.extras || []) + JSON.stringify(it.tails || []) + (it.fuse ? "F" : "") + (it.type === "ligand" ? it.rot : "");
     const c = bboxCache.get(it.id);
     if (c && c.key === key) return c.box;
     measureBox.innerHTML = `<svg xmlns="${NS}" width="10" height="10"><g>${itemMarkup(it)}</g></svg>`;
@@ -1104,7 +1280,7 @@
     let body = bgOn ? `<image href="${bg.href}" x="${f(bg.x)}" y="${f(bg.y)}" width="${f(bg.w)}" height="${f(bgH())}" opacity="${f(bg.opacity)}" preserveAspectRatio="none"${preview ? (bg.locked ? ' pointer-events="none"' : ' data-bg="1"') : ""}/>` : "";
     body += `<g id="mbMembrane"${preview ? ' data-part="membrane"' : ""}>${membraneMarkup(ext, boxes)}</g>`;
     scene.items.forEach((it) => {
-      let inner = itemMarkup(it);
+      let inner = preview ? itemMarkup(it) : itemMarkupExport(it);
       if (preview && TYPES[it.type].hit) { const b = localBox(it); inner = `<rect x="${f(b.x)}" y="${f(b.y)}" width="${f(b.w)}" height="${f(b.h)}" fill="transparent"/>` + inner; }
       body += `<g${preview ? ` data-id="${it.id}"` : ""} transform="${itemTransform(it)}">${inner}</g>`;
     });
@@ -1176,6 +1352,7 @@
       overlay += `<polygon points="${c.map((v) => f(v[0]) + "," + f(v[1])).join(" ")}" fill="#0b6870" fill-opacity=".05" stroke="#0b6870" stroke-width="${f(1.2 * u)}" stroke-dasharray="${f(4 * u)} ${f(3 * u)}" pointer-events="none"/>`;
     });
     $("fuseBtn").classList.toggle("hidden", multi.size < 2);
+    $("cutBtn").classList.toggle("hidden", multi.size < 2);
     $("memToggle").textContent = scene.m.show ? "Hide membrane" : "Show membrane";
     const canRestore = typeof clearedSnap === "string" && clearedSnap && !scene.items.length;
     $("clearBtn").textContent = canRestore ? "Undo clear" : "Clear";
@@ -1461,6 +1638,7 @@
   function openPop(e, it, part) {
     let title, defs, obj;
     if (!it) { title = "Membrane"; defs = MEM_FIELDS; obj = scene.m; }
+    else if (/^t\d+$/.test(part)) { title = TYPES[it.type].label + " · Lipid tails"; defs = TAIL_FIELDS; obj = it.tails[+part.slice(1)]; }
     else if (/^x\d+$/.test(part)) { title = TYPES[it.type].label + " · Added shape " + (+part.slice(1) + 1); defs = EXTRA_FIELDS; obj = it.extras[+part.slice(1)]; }
     else {
       const pm = PARTS[it.type] && PARTS[it.type][part];
@@ -1475,12 +1653,13 @@
     if (it) {
       const tools = document.createElement("div");
       tools.className = "mb-pop-tools";
-      const isX = /^x\d+$/.test(part), n = (it.extras || []).length, T = TYPES[it.type];
+      const isX = /^x\d+$/.test(part), n = (it.extras || []).filter((e) => !e.cut).length, T = TYPES[it.type];
       const canHandles = !!partInfo(it, part);
       tools.innerHTML = (canHandles ? `<p class="mb-note" style="margin:0 0 8px">Drag the orange squares in the figure to resize${isX ? "; drag the shape itself to move it" : ""}.</p>` : "") +
         `<div class="mb-acts"><button class="mini" type="button" data-t="mx" title="Mirror across a vertical line (left ↔ right)">Mirror horizontally ↔</button><button class="mini" type="button" data-t="my" title="Mirror across a horizontal line (top ↕ bottom)">Mirror vertically ↕</button>` +
         `<button class="mini" type="button" data-t="cp" title="Copy (or Alt/Option-drag in the figure)">Copy</button><button class="mini" type="button" data-t="mc" title="A left-right mirror-image copy on the other side">Mirrored copy ↔</button><button class="mini" type="button" data-t="mcv" title="A top-bottom mirror-image copy on the other side">Mirrored copy ↕</button>` +
-        `${isX ? `<button class="mini" type="button" data-t="del">Remove this shape</button>` : ""}</div>` +
+        `${isX ? `<button class="mini" type="button" data-t="del">Remove this shape</button>` : ""}` +
+        `${/^t\d+$/.test(part) ? `<button class="mini" type="button" data-t="deltails">Remove these tails</button>` : `<button class="mini" type="button" data-t="addtails" title="Attach lipid tails to this piece">+ Lipid tails</button>`}</div>` +
         `<div class="mb-pickmode" role="radiogroup" aria-label="What clicking a shape does"><label><input type="radio" name="pickmode" value="switch"${pickMode === "switch" ? " checked" : ""}/> Switch this to</label><label><input type="radio" name="pickmode" value="add"${pickMode === "add" ? " checked" : ""}/> Add a new</label><span>shape (click one)</span></div><div class="mb-picker">${PICK.map((k) => `<button type="button" data-pick="${k}" title="${esc(SHAPE_NAME[k] || k)}"><svg viewBox="-13 -13 26 26" aria-hidden="true">${shapeIcon(k)}</svg></button>`).join("")}</div>` +
         (n ? `<div class="mb-row"><label for="popFuse">Fuse ${T.base && T.base(it.p, it) ? "with the " + (it.type === "lipoprotein" ? "head" : "shape") : "added shapes"} into one outline</label><span class="val"><input id="popFuse" type="checkbox"${it.fuse ? " checked" : ""}/></span></div>` : "");
       box.appendChild(tools);
@@ -1503,6 +1682,10 @@
         if (xe) { const ay = mirrorAxisY(it), c = JSON.parse(JSON.stringify(xe)); c.y = f(2 * ay - c.y); c.turn = f(-c.turn); c.fy = !c.fy; it.extras.push(c); again("x" + (it.extras.length - 1)); }
         else { closePop(); const b = worldBox(it), c = cloneItem(it, 0, 0); mirrorGroup([c], true, b.y1 + 2); select(c.id); commit(); }
       });
+      const at = tools.querySelector('[data-t="addtails"]');
+      if (at) at.addEventListener("click", () => { const np = addTails(it, part); edit = { id: it.id, part: np }; render(); commit(); const pos = { left: pop.style.left, top: pop.style.top }; openPop(null, it, np); pop.style.left = pos.left; pop.style.top = pos.top; status("Lipid tails added. Drag the orange dot to move them, and the square at their tip to turn or lengthen them."); });
+      const dt = tools.querySelector('[data-t="deltails"]');
+      if (dt) dt.addEventListener("click", () => { it.tails.splice(+part.slice(1), 1); bboxCache.delete(it.id); commit(); closePop(); });
       const del = tools.querySelector('[data-t="del"]');
       if (del) del.addEventListener("click", () => { it.extras.splice(+part.slice(1), 1); if (!it.extras.length) it.fuse = false; bboxCache.delete(it.id); commit(); closePop(); });
       const fu = tools.querySelector("#popFuse");
@@ -1729,7 +1912,15 @@
   });
   $("undoBtn").addEventListener("click", undo);
   $("redoBtn").addEventListener("click", redo);
-  $("exampleBtn").addEventListener("click", () => { sel = null; exampleScene(); bboxCache.clear(); buildMem(); buildSel(); render(); commit(); status("Example figure loaded. Undo brings your figure back."); });
+  $("setExampleBtn").addEventListener("click", async () => {
+    clearTimeout(commitT); commit();
+    const text = JSON.stringify(scene);
+    try { localStorage.setItem(EXAMPLE_KEY, text); } catch (e) { status("Your browser would not store it."); return; }
+    let copied = false;
+    try { await navigator.clipboard.writeText(text); copied = true; } catch (e) { /* not allowed here */ }
+    status("This drawing is now the example: it loads with the tool and with the Example button." + (copied ? " It's also on your clipboard; paste it to Claude to make it the example on the website for everyone." : ""));
+  });
+  $("exampleBtn").addEventListener("click", (e) => { sel = null; exampleScene(e.altKey); bboxCache.clear(); buildMem(); buildSel(); render(); commit(); status("Example figure loaded. Undo brings your figure back."); });
   // Clear keeps a copy of what it removed, even across visits, so "Undo clear" can bring it back
   const CLEARED = "sharaf-membrane-cleared-v1";
   let clearedSnap = null;
@@ -1768,7 +1959,9 @@
     if (e.key === "Escape" && bgSel) { bgSel = false; render(); return; }
     if (e.key === "Escape" && sel !== null) { select(null); return; }
     const it = current(); if (!it) return;
-    if ((e.key === "Delete" || e.key === "Backspace") && edit && edit.id === it.id && /^x\d+$/.test(edit.part)) {
+    if ((e.key === "Delete" || e.key === "Backspace") && edit && edit.id === it.id && /^t\d+$/.test(edit.part)) {
+      e.preventDefault(); it.tails.splice(+edit.part.slice(1), 1); bboxCache.delete(it.id); commit(); closePop(); status("Lipid tails removed.");
+    } else if ((e.key === "Delete" || e.key === "Backspace") && edit && edit.id === it.id && /^x\d+$/.test(edit.part)) {
       e.preventDefault(); it.extras.splice(+edit.part.slice(1), 1); if (!it.extras.length) it.fuse = false; commit(); closePop(); status("Shape removed.");
     } else if ((e.key === "Delete" || e.key === "Backspace") && multi.size > 1) { e.preventDefault(); removeMulti(); }
     else if (e.key === "Delete" || e.key === "Backspace") { e.preventDefault(); removeSel(); }
@@ -1856,7 +2049,7 @@
     switch (it.type) {
       case "protein": case "ligand": scaleShape(p, K, lx, ly); if (p.corner) p.corner = f(p.corner * Math.min(lx, ly)); break;
       case "tm": p.w = f(p.w * lx); p.h = f(p.h * ly); break;
-      case "barrel": p.w = f(p.w * lx); p.h = f(p.h * ly); p.corner = f(p.corner * Math.min(lx, ly)); break;
+      case "barrel": p.w = f(p.w * lx); p.h = f(p.h * ly); p.corner = f(p.corner * Math.min(lx, ly)); if (p.ry !== undefined) p.ry = f(p.ry * ly); break;
       case "lipoprotein": p.tailLen = f(p.tailLen * ly); p.linkerLen = f(p.linkerLen * ly); p.tailGap = f(p.tailGap * lx); p.waveAmp = f(p.waveAmp * lx); p.tailW = f(p.tailW * g); p.headSize = f(p.headSize * g); break;
       case "lipid": p.tailLen = f(p.tailLen * ly); p.tailGap = f(p.tailGap * lx); p.amp = f(p.amp * lx); p.tailW = f(p.tailW * g); p.headR = f(p.headR * g); break;
       case "receptor": p.rodW = f(p.rodW * lx); p.rodH = f(p.rodH * ly); p.gap = f(p.gap * lx); p.knobR = f(p.knobR * g); p.domainW = f(p.domainW * lx); p.domainH = f(p.domainH * ly); break;
@@ -1865,6 +2058,7 @@
       case "text": p.size = f(p.size * ly); break;
       case "image": p.w = f(p.w * lx); p.nh = p.nh * (ly / lx); break;
     }
+    (it.tails || []).forEach((t) => { t.x = f(t.x * lx); t.y = f(t.y * ly); t.tailLen = f(t.tailLen * ly); t.linkerLen = f(t.linkerLen * ly); t.tailGap = f(t.tailGap * lx); t.waveAmp = f(t.waveAmp * lx); t.tailW = f(t.tailW * g); });
     (it.extras || []).forEach((e) => { e.x = f(e.x * lx); e.y = f(e.y * ly); scaleShape(e, K, lx, ly); if (e.corner) e.corner = f(e.corner * Math.min(lx, ly)); });
     bboxCache.delete(it.id);
   }
@@ -1936,6 +2130,35 @@
     (B.extras || []).forEach((e) => out.push(JSON.parse(JSON.stringify(e))));
     return out;
   }
+  // binding site: the selected piece lowest in the drawing order is cut by the others; the cutters stay where they are
+  function cutSelected() {
+    const list = scene.items.filter((q) => multi.has(q.id));
+    if (list.length < 2) { status("Shift-click the shape to cut into and the shape to cut with."); return; }
+    const A = list.find((q) => TYPES[q.type].base && TYPES[q.type].base(q.p, q));
+    if (!A) { status("Pick a protein, shape, ligand, TM helix or lipoprotein head to cut into."); return; }
+    const cutters = list.filter((q) => q !== A && SIMPLE[q.type]);
+    if (!cutters.length) { status("The cutting piece has to be a shape, protein, ligand or TM helix."); return; }
+    const sA = A.scale / 100;
+    A.extras = A.extras || [];
+    cutters.forEach((B) => {
+      const sB = B.scale / 100;
+      piecePrims(B).slice(0, 1).forEach((e) => {
+        const l = toLocal(A, toWorld(B, [e.x, e.y]));
+        const wt = B.rot + (B.flip ? -e.turn : e.turn), wf = !!e.fx !== !!B.flip;
+        A.extras.push(Object.assign(e, { x: f(l[0]), y: f(l[1]), size: f((e.size * sB) / sA), turn: f(A.flip ? -(wt - A.rot) : wt - A.rot), fx: wf !== !!A.flip, fy: !!e.fy, corner: e.corner ? f((e.corner * sB) / sA) : e.corner, cut: true, gap: 0.4 }));
+      });
+    });
+    // the cutting shapes go away; the pocket opens for editing so it can be resized straight away
+    const firstCut = "x" + (A.extras.length - cutters.length);
+    scene.items = scene.items.filter((q) => !cutters.includes(q));
+    bboxCache.delete(A.id); multi.clear(); sel = A.id;
+    buildSel(); render(); commit();
+    edit = { id: A.id, part: firstCut }; render();
+    openPop(null, A, firstCut); placePop({ clientX: 0, clientY: 0 }, A, firstCut);
+    status("Binding site cut. Drag the orange squares to resize the pocket, or change its size and gap in the box.");
+  }
+  $("mCut").addEventListener("click", cutSelected);
+  $("cutBtn").addEventListener("click", cutSelected);
   function fuseSelected() {
     const list = scene.items.filter((q) => multi.has(q.id));
     if (list.length < 2) { status("Shift-click at least two pieces to fuse them."); return; }
@@ -1945,6 +2168,13 @@
     A.extras = A.extras || [];
     list.filter((q) => q !== A).forEach((B) => {
       const sB = B.scale / 100;
+      (B.tails || []).forEach((t) => {
+        const l = toLocal(A, toWorld(B, [t.x, t.y]));
+        let wa = B.flip ? 180 - t.angle : t.angle; wa += B.rot;
+        let la = wa - A.rot; if (A.flip) la = 180 - la;
+        A.tails = A.tails || [];
+        A.tails.push(Object.assign({}, t, { x: f(l[0]), y: f(l[1]), angle: f(((la + 540) % 360) - 180) }));
+      });
       piecePrims(B).forEach((e) => {
         const l = toLocal(A, toWorld(B, [e.x, e.y]));
         const wt = B.rot + (B.flip ? -e.turn : e.turn), wf = !!e.fx !== !!B.flip;
@@ -2155,7 +2385,7 @@
     let unit = pxW ? "" : "pt", Wout = W, Hout = H;
     if (!pxW && $("pasteInto").value === "affinity") { const d = +$("docDpi").value || 288; Wout = (W / 72) * d; Hout = (H / 72) * d; unit = ""; }
     const back = bg ? `<rect x="${f(b.x)}" y="${f(b.y)}" width="${f(b.w)}" height="${f(b.h)}" fill="${bg}"/>` : "";
-    return `<svg xmlns="${NS}" version="1.1" viewBox="${f(b.x)} ${f(b.y)} ${f(b.w)} ${f(b.h)}" width="${f(Wout)}${unit}" height="${f(Hout)}${unit}">${back}${fig.body.replace(' id="mbMembrane"', "").replace(/ data-part="[^"]*"/g, "")}</svg>`;
+    return `<svg xmlns="${NS}" version="1.1" viewBox="${f(b.x)} ${f(b.y)} ${f(b.w)} ${f(b.h)}" width="${f(Wout)}${unit}" height="${f(Hout)}${unit}">${back}${fig.body.replace(' id="mbMembrane"', "").replace(/<line data-part="linker" data-hit="1"[^>]*\/>/g, "").replace(/ data-part="[^"]*"/g, "")}</svg>`;
   }
   // write the DPI into the PNG (pHYs chunk) so other programs place it at its real size in inches
   const CRC_T = (() => { const t = new Uint32Array(256); for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();

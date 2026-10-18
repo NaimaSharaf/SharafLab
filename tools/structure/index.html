@@ -217,6 +217,7 @@
 @media(max-width:800px){.pdf-workspace{grid-template-columns:1fr}.tool-section{padding-top:70px;padding-bottom:76px}.tool-index{margin-top:-30px}}
     </style>
     <style>.tool-back{display:inline-block;margin:0 0 22px;color:#0b6870;font-weight:600;text-decoration:none}.tool-back:hover{text-decoration:underline;text-underline-offset:4px}.tool-section{border-top:0;padding-top:0}</style>
+      <script src="../palette.js"></script>
   </head>
 
   <body class="outreach-body">
@@ -568,7 +569,7 @@ render();
     // Topology diagram: helices as cylinders, strands as arrows, laid out by β-sheet order from the CIF file.
     (() => {
       const $ = (id) => document.getElementById(id), NS = 'http://www.w3.org/2000/svg';
-      const PALETTE = ['#3a9b9b', '#7a86f0', '#d9825b', '#8b6fc4', '#5c9f4e', '#c45b7d'];
+      const PALETTE = ['#4e9d9c', '#564087', '#f19737', '#8dcd7b', '#c6327c', '#b24434', '#151549', '#efe75a'];
       const SP = 50, SHEET_GAP = 46, ROW_GAP = 34, HW = { H: 14, G: 12, I: 14, E: 17 };
       const state = { all: [], orders: {}, ca: {}, sourceName: '', notes: [], manual: new Map(), hidden: new Set(), sel: null, frozenBox: null, lastLayout: null };
       let domains = [];
