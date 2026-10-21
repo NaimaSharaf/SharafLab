@@ -98,7 +98,7 @@
     <main>
       <section class="outreach-hero">
         <a class="tool-back" href="../../tools.html">← All lab tools</a>
-        <p class="eyebrow eyebrow-dark">Lab tools · Figures · Arrows · Bacteria · Animals · Symbols</p>
+        <p class="eyebrow eyebrow-dark">Lab tools · Figures · Arrows · Bacteria · Animals · Symbols · Objects · Medical</p>
         <h1>Figure library.</h1>
         <p>
           Arrows, bacteria, animal silhouettes and symbols for figures, each in
@@ -165,6 +165,14 @@
           <p class="arw-note">Line symbols are strokes; the star, bolt and burst are filled shapes. Size is the width of the symbol's square.</p>
           </div>
 
+          <div data-sec="objects medical" hidden>
+          <h3>Size and style</h3>
+          <div class="arw-row"><label for="objSize">Height (in)</label><span class="val"><input id="objSize" type="range" min="0.2" max="6" step="0.05" value="1.5" /><input id="objSizeNum" type="number" step="any" min="0.05" value="1.5" aria-label="Object height in inches" /></span></div>
+          <div class="arw-row"><label for="objStyle">Style</label><span class="val"><select id="objStyle"><option value="fill">Filled shape</option><option value="outline">Outline (stroke)</option></select></span></div>
+          <div class="arw-row"><label for="objLw">Outline width (pt)</label><span class="val"><input id="objLw" type="range" min="0.1" max="6" step="0.05" value="2" /><input id="objLwNum" type="number" step="any" min="0.01" value="2" aria-label="Outline width in pt" /></span></div>
+          <p class="arw-note">Each object or icon is one shape built from regular parts, with details cut out. Doors open from closed to wide open; flip ↔ to hinge one on the other side.</p>
+          </div>
+
           <h3>Direction</h3>
           <div class="arw-row"><label for="rot">Rotate</label><span class="val"><input id="rot" type="range" min="-180" max="180" step="15" value="0" /><input id="rotNum" type="number" step="any" value="0" aria-label="Rotation in degrees" /></span></div>
           <div class="arw-row"><label>Flip</label><span class="val"><label style="font-weight:400;display:inline-flex;gap:5px;align-items:center"><input id="flipH" type="checkbox" />↔</label><label style="font-weight:400;display:inline-flex;gap:5px;align-items:center"><input id="flipV" type="checkbox" />↕</label></span></div>
@@ -206,7 +214,7 @@
   const f = (x) => (Math.round(x * 100) / 100).toString();
   const SWATCHES = ["#000000", "#515151", "#929292", "#ffffff", "#151549", "#564087", "#ababbb", "#4e9d9c", "#8dcd7b", "#efe75a", "#f19737", "#b24434", "#c6327c"];
   const DEFAULTS = { color: "#929292", lw: 1.5, cap: "round", dashed: false, head: "triangle", hl: 4.2, hw: 4.2, double: false, size: 0.6, rot: 0, flipH: false, flipV: false, dpi: 360,
-    cellSize: 4, cellLw: 2, membranes: "2", gap: 3, fillIn: false, fillInC: "#ffffff", fillPeri: false, fillPeriC: "#ababbb", aniSize: 1, aniStyle: "fill", aniLw: 2, symSize: 0.3, symLw: 2, symCap: "round" };
+    cellSize: 4, cellLw: 2, membranes: "2", gap: 3, fillIn: false, fillInC: "#ffffff", fillPeri: false, fillPeriC: "#ababbb", aniSize: 1, aniStyle: "fill", aniLw: 2, symSize: 0.3, symLw: 2, symCap: "round", objSize: 1.5, objStyle: "fill", objLw: 2 };
   const KEY = "arw-settings-v2";
 
   // ---------- geometry helpers (unit coordinates: main span = 1, y points down) ----------
@@ -463,7 +471,7 @@
     const wh = opts && opts.preview ? ` style="width:${f(w * k)}px;height:${f(h * k)}px"` : ` width="${f(w)}" height="${f(h)}"`;
     return `<svg xmlns="${NS}" viewBox="${f(x0)} ${f(y0)} ${f(w)} ${f(h)}"${wh} role="img" aria-label="${def.name}">${parts.join("")}</svg>`;
   }
-  const figSVG = (d, p, opts) => (d.cell ? cellSVG(d, p, opts) : d.animal || d.traced ? aniSVG(d, p, opts) : d.sym ? symSVG(d, p, opts) : arrowSVG(d, p, opts));
+  const figSVG = (d, p, opts) => (d.cell ? cellSVG(d, p, opts) : d.animal || d.traced || d.obj ? aniSVG(d, p, opts) : d.sym ? symSVG(d, p, opts) : arrowSVG(d, p, opts));
 
   // ---------- drawing ----------
   function read() {
@@ -477,6 +485,7 @@
       fillIn: $("fillIn").checked, fillInC: $("fillInC").value, fillPeri: $("fillPeri").checked, fillPeriC: $("fillPeriC").value,
       aniSize: Math.max(0.01, +$("aniSize").value || DEFAULTS.aniSize), aniStyle: $("aniStyle").value, aniLw: Math.max(0.01, +$("aniLw").value || DEFAULTS.aniLw),
       symSize: Math.max(0.01, +$("symSize").value || DEFAULTS.symSize), symLw: Math.max(0.01, +$("symLw").value || DEFAULTS.symLw), symCap: $("symCap").value,
+      objSize: Math.max(0.01, +$("objSize").value || DEFAULTS.objSize), objStyle: $("objStyle").value, objLw: Math.max(0.01, +$("objLw").value || DEFAULTS.objLw),
     };
   }
   const len = (a, b) => Math.hypot(b[0] - a[0], b[1] - a[1]);
@@ -732,7 +741,8 @@
   const aniCache = new Map();
   function aniSVG(def, p, opts) {
     if (def.traced) return tracedSVG(def, p, opts);
-    if (!aniCache.has(def.name)) aniCache.set(def.name, unionParts(def.animal()));
+    if (def.obj) p = Object.assign({}, p, { aniSize: p.objSize, aniStyle: p.objStyle, aniLw: p.objLw });
+    if (!aniCache.has(def.name)) aniCache.set(def.name, def.mpoly ? def.mpoly() : unionParts(def.animal()));
     const mp = aniCache.get(def.name), outline = p.aniStyle === "outline", lw = outline ? (p.aniLw * p.dpi) / 72 : 0;
     let mx0 = Infinity, my0 = Infinity, mx1 = -Infinity, my1 = -Infinity;
     mp.forEach((pg) => pg.forEach((r) => r.forEach(([x, y]) => { mx0 = Math.min(mx0, x); mx1 = Math.max(mx1, x); my0 = Math.min(my0, y); my1 = Math.max(my1, y); })));
@@ -796,9 +806,130 @@
     return `<svg xmlns="${NS}" viewBox="${f(x0)} ${f(y0)} ${f(w)} ${f(h)}"${wh} role="img" aria-label="${def.name}">${parts.join("")}</svg>`;
   }
 
+  // ---------- objects: doors built from regular shapes (frame, leaf with panel and handle cut-outs, hinges) ----------
+  // opening is 1 wide and 2.1 tall; the door hinges on the right and swings toward the viewer by `deg`
+  // grow a convex polygon outward by d (each edge moves out; corners meet where the moved edges cross)
+  function grow(pts, d) {
+    const n = pts.length, area = pts.reduce((acc, p, i) => acc + p[0] * pts[(i + 1) % n][1] - pts[(i + 1) % n][0] * p[1], 0), sg = area > 0 ? -1 : 1;
+    const lines = pts.map((p, i) => { const q = pts[(i + 1) % n], dx = q[0] - p[0], dy = q[1] - p[1], l = Math.hypot(dx, dy) || 1, nx = (sg * dy) / l, ny = (-sg * dx) / l; return [[p[0] + nx * d, p[1] + ny * d], [dx, dy]]; });
+    return lines.map((L, i) => { const M = lines[(i - 1 + n) % n], den = M[1][0] * L[1][1] - M[1][1] * L[1][0]; if (Math.abs(den) < 1e-12) return L[0]; const t = ((L[0][0] - M[0][0]) * L[1][1] - (L[0][1] - M[0][1]) * L[1][0]) / den; return [M[0][0] + M[1][0] * t, M[0][1] + M[1][1] * t]; });
+  }
+  function door(deg) {
+    const th = rad(deg), c = Math.cos(th), sn = Math.sin(th), e = 0.08 * sn, t = 0.05;
+    const ring = (pts) => [[...pts, pts[0]]];
+    const Ht = [0.98, 0.02], Hb = [0.98, 2.08], Ft = [0.98 - 0.96 * c, 0.02 - e], Fb = [0.98 - 0.96 * c, 2.08 + e];
+    const at = (u, v) => { const tp = [Ht[0] + (Ft[0] - Ht[0]) * u, Ht[1] + (Ft[1] - Ht[1]) * u], bt = [Hb[0] + (Fb[0] - Hb[0]) * u, Hb[1] + (Fb[1] - Hb[1]) * u]; return [tp[0] + (bt[0] - tp[0]) * v, tp[1] + (bt[1] - tp[1]) * v]; };
+    const quad = (u0, v0, u1, v1) => [at(u0, v0), at(u1, v0), at(u1, v1), at(u0, v1)];
+    const leaf = sn > 0.01 ? [Ht, [Ft[0] - t * sn, Ft[1] + 0.01 * sn], [Fb[0] - t * sn, Fb[1] - 0.01 * sn], Hb] : [Ht, Ft, Fb, Hb]; // door face plus its edge
+    let frame = [ring([[-0.08, 2.1], [-0.08, -0.08], [1.08, -0.08], [1.08, 2.1], [1, 2.1], [1, 0], [0, 0], [0, 2.1]])];
+    // where the opened door passes in front of the frame, cut a thin gap so the door reads as in front
+    if (sn > 0.01) frame = polygonClipping.difference(frame, ring(grow(leaf, 0.03)));
+    const solid = [frame, ring(leaf)];
+    [[0.24, 0.36], [1.72, 1.84]].forEach(([y0, y1]) => solid.push(ring([[0.965, y0], [1.012, y0], [1.012, y1], [0.965, y1]]))); // hinges
+    let mp = polygonClipping.union(...solid);
+    if (c > 0.3) {
+      // two panels drawn as thin grooves, and a lever handle near the free edge
+      const gu = 0.024 / (0.96 * c), gv = 0.024 / 2.06, groove = (u0, v0, u1, v1) => polygonClipping.difference(ring(quad(u0, v0, u1, v1)), ring(quad(u0 + gu, v0 + gv, u1 - gu, v1 - gv)));
+      const hc = at(0.88, 0.5), r = 0.04, ros = Array.from({ length: 32 }, (_, i) => [hc[0] + r * c * Math.cos((i * Math.PI) / 16), hc[1] + r * Math.sin((i * Math.PI) / 16)]);
+      mp = polygonClipping.difference(mp, groove(0.2, 0.07, 0.8, 0.45), groove(0.2, 0.53, 0.8, 0.93), ring(ros), ring(quad(0.72, 0.49, 0.88, 0.51)));
+    }
+    return mp;
+  }
+  const OBJECTS = [["Door, closed", 0], ["Door, ajar", 22], ["Door, half open", 45], ["Door, mostly open", 68], ["Door, wide open", 88]]
+    .map(([name, deg]) => ({ g: "Objects", obj: true, name, mpoly: () => door(deg) }));
+  LIB.push(...OBJECTS);
+
+  // ---------- medical icons: regular shapes merged and cut with polygon operations ----------
+  const R1 = (pts) => [[...pts, pts[0]]];
+  const capsule = (a, b, r) => R1(tube([a, b], () => r, true));
+  const disc = (cx, cy, r) => R1(circ(cx, cy, r).slice(0, -1));
+  const box = (x0, y0, x1, y1, r = 0) => R1(rrect(x0, y0, x1, y1, r));
+  const turn = (mp, deg, cx = 0, cy = 0) => { const c = Math.cos(rad(deg)), s = Math.sin(rad(deg)); return mp.map((pg) => pg.map((r) => r.map(([x, y]) => [cx + (x - cx) * c - (y - cy) * s, cy + (x - cx) * s + (y - cy) * c]))); };
+  const U = (...a) => polygonClipping.union(...a), D = (a, ...b) => polygonClipping.difference(a, ...b);
+  // intranasal spray bottle: body with a label groove, shoulder, collar, finger flange and a tapered nozzle
+  function nasal(spray) {
+    const label = D(box(-0.2, 0.74, 0.2, 1.16, 0.03), box(-0.17, 0.77, 0.17, 1.13, 0.02));
+    const body = D(U(box(-0.28, 0.58, 0.28, 1.3, [0, 0, 0.08, 0.08]), R1([[-0.28, 0.585], [0.28, 0.585], [0.16, 0.47], [-0.16, 0.47]])), label);
+    const collar = box(-0.17, 0.4, 0.17, 0.47, 0.02), flange = box(-0.38, 0.31, 0.38, 0.385, 0.035);
+    const nozzle = U(R1([[-0.11, 0.315], [0.11, 0.315], [0.05, 0.0], [-0.05, 0.0]]), disc(0, 0.0, 0.05));
+    const parts = [body, collar, flange, nozzle];
+    if (spray) for (let row = 1; row <= 4; row++) for (let k = -row; k <= row; k++) { // a widening cone of droplets
+      const ang = rad(-90 + (k * 26) / Math.max(1, row)), d = 0.03 + row * 0.08;
+      parts.push(disc(d * Math.cos(ang), -0.05 + d * Math.sin(ang), 0.014));
+    }
+    return U(...parts);
+  }
+  const MEDICAL = [
+    { name: "Syringe", mpoly: () => {
+      const barrel = box(0.3, -0.12, 1.3, 0.12, 0.03), marks = [0.5, 0.65, 0.8, 0.95, 1.1].map((x) => box(x - 0.012, -0.13, x + 0.012, -0.02));
+      const body = U(D(barrel, ...marks), box(0.25, -0.21, 0.3, 0.21, 0.02), box(0.0, -0.035, 0.26, 0.035), box(-0.05, -0.15, 0.0, 0.15, 0.02),
+        R1([[1.3, -0.08], [1.42, -0.04], [1.42, 0.04], [1.3, 0.08]]), R1([[1.42, -0.014], [1.78, -0.014], [1.86, 0.014], [1.42, 0.014]]));
+      return turn(body, -40);
+    } },
+    { name: "Blood drop", mpoly: () => {
+      // a circle with a point above it: the sides are the tangent lines from the point to the circle
+      const r = 0.5, d = 1.05, be = (Math.acos(r / d) * 180) / Math.PI;
+      const drop = R1([[0, -d], ...circ(0, 0, r, -90 + be, 270 - be, 90)]);
+      const shine = R1(tube(circ(0, 0, 0.32, 195, 245, 20), () => 0.045, true));
+      return D(drop, shine);
+    } },
+    { name: "Thermometer", mpoly: () => {
+      const shell = U(capsule([0, 0.12], [0, 1.2], 0.12), disc(0, 1.27, 0.25)), bore = U(capsule([0, 0.12], [0, 1.2], 0.06), disc(0, 1.27, 0.17));
+      const fluid = U(box(-0.035, 0.5, 0.035, 1.25), disc(0, 1.27, 0.11)), ticks = [0.25, 0.42, 0.59, 0.76, 0.93].map((y, i) => box(0.17, y - 0.014, i % 2 ? 0.27 : 0.32, y + 0.014));
+      return U(D(shell, bore), fluid, ...ticks);
+    } },
+    { name: "Capsule pill", mpoly: () => turn(D(capsule([-0.5, 0], [0.5, 0], 0.25), box(-0.012, -0.3, 0.012, 0.3)), -40) },
+    { name: "Tablet", mpoly: () => D(disc(0, 0, 0.5), box(-0.36, -0.025, 0.36, 0.025, 0.02)) },
+    { name: "Medical cross", mpoly: () => U(box(-0.17, -0.5, 0.17, 0.5, 0.04), box(-0.5, -0.17, 0.5, 0.17, 0.04)) },
+    { name: "Heartbeat", mpoly: () => { const pts = [[0, 0], [0.35, 0], [0.45, -0.2], [0.58, 0.35], [0.72, -0.55], [0.84, 0.18], [0.92, 0], [1.3, 0]]; return U(...pts.slice(1).map((q, i) => capsule(pts[i], q, 0.035))); } },
+    { name: "Bandage", mpoly: () => {
+      const strip = box(-0.7, -0.22, 0.7, 0.22, 0.22), pad = D(box(-0.26, -0.16, 0.26, 0.16, 0.03), box(-0.23, -0.13, 0.23, 0.13, 0.02));
+      const dots = []; [-0.48, 0.48].forEach((x) => [-0.08, 0.08].forEach((y) => dots.push(disc(x, y, 0.028))));
+      return turn(D(strip, pad, ...dots), -40);
+    } },
+    { name: "Medicine vial", mpoly: () => {
+      const cap = box(-0.3, 0, 0.3, 0.22, 0.03), neck = box(-0.24, 0.24, 0.24, 0.32), body = box(-0.36, 0.34, 0.36, 1.2, 0.08);
+      const label = D(box(-0.26, 0.6, 0.26, 0.98, 0.03), box(-0.23, 0.63, 0.23, 0.95, 0.02));
+      return U(cap, neck, D(body, label, box(-0.12, 0.755, 0.12, 0.825, 0.01), box(-0.035, 0.67, 0.035, 0.91, 0.01))); // cross cut into the label
+    } },
+    { name: "Trojan horse with pill", mpoly: () => {
+      // wooden horse on a wheeled platform; a window in its side shows a capsule pill inside
+      const window_ = box(0.3, 0.47, 0.8, 0.73, 0.05);
+      const planks = [0.53, 0.67].map((y) => box(0.1, y - 0.01, 1.03, y + 0.01));
+      const body = D(box(0.08, 0.4, 1.05, 0.8, 0.12), window_, ...planks);
+      const frameWin = D(box(0.27, 0.44, 0.83, 0.76, 0.07), window_); // a trim around the window, so the window reads clearly
+      const legs = [0.14, 0.3, 0.74, 0.9].map((x) => box(x, 0.75, x + 0.1, 1.17, 0.02));
+      const neck = R1([[0.7, 0.5], [1.0, 0.46], [1.2, 0.04], [0.92, -0.05]]);
+      const head = capsule([1.02, -0.04], [1.34, 0.17], 0.105), ear = R1([[0.97, -0.08], [1.0, -0.27], [1.09, -0.12]]);
+      const tail = capsule([0.12, 0.46], [-0.06, 0.74], 0.035);
+      const platform = box(0.0, 1.15, 1.2, 1.26, 0.03);
+      const wheels = [0.15, 0.6, 1.05].map((x) => D(disc(x, 1.33, 0.11), disc(x, 1.33, 0.035)));
+      const horse = D(U(body, frameWin, ...legs, neck, head, ear, tail, platform, ...wheels), disc(1.12, 0.03, 0.03)); // eye
+      const pill = turn(D(capsule([0.42, 0.6], [0.68, 0.6], 0.07), box(0.542, 0.5, 0.558, 0.7)), -10, 0.55, 0.6);
+      return U(horse, pill);
+    } },
+    { name: "Nasal spray", mpoly: () => nasal(false) },
+    { name: "Nasal spray, spraying", mpoly: () => nasal(true) },
+  ].map((d) => Object.assign({ g: "Medical", obj: true, med: true }, d));
+  LIB.push(...MEDICAL);
+  LIB.push({ g: "Objects", obj: true, name: "Battering ram", mpoly: () => {
+    // a log with an iron head, hung by ropes from two A-frames on a wheeled cart
+    const platform = box(0.0, 1.0, 1.4, 1.1, 0.03);
+    const wheels = [0.2, 0.7, 1.2].map((x) => D(disc(x, 1.19, 0.12), disc(x, 1.19, 0.038)));
+    const frames = [0.35, 1.05].flatMap((x) => [capsule([x - 0.24, 1.0], [x, 0.17], 0.035), capsule([x + 0.24, 1.0], [x, 0.17], 0.035)]);
+    const beam = box(0.22, 0.11, 1.18, 0.2, 0.03);
+    const ropes = [0.56, 0.84].map((x) => box(x - 0.014, 0.2, x + 0.014, 0.54));
+    const log = D(U(capsule([-0.05, 0.63], [1.5, 0.63], 0.1), box(1.48, 0.5, 1.72, 0.76, 0.05)), // log + iron head
+      ...[0.25, 0.7, 1.15].map((x) => box(x - 0.012, 0.5, x + 0.012, 0.76)), box(1.462, 0.5, 1.48, 0.76)); // bands, and a seam before the head
+    // a thin gap where the log passes in front of the frame legs, so it reads as hanging in front
+    const legsCut = D(U(...frames), box(-0.2, 0.513, 1.8, 0.747, 0.12));
+    return U(platform, ...wheels, legsCut, beam, ...ropes, log);
+  } });
+
+
   // ---------- page ----------
-  const SECTIONS = [["arrows", "Arrows"], ["bacteria", "Bacteria"], ["animals", "Animals"], ["symbols", "Symbols"]];
-  const secOf = (d) => (d.cell ? "bacteria" : d.animal || d.traced ? "animals" : d.sym ? "symbols" : "arrows");
+  const SECTIONS = [["arrows", "Arrows"], ["bacteria", "Bacteria"], ["animals", "Animals"], ["symbols", "Symbols"], ["objects", "Objects"], ["medical", "Medical"]];
+  const secOf = (d) => (d.cell ? "bacteria" : d.animal || d.traced ? "animals" : d.sym ? "symbols" : d.med ? "medical" : d.obj ? "objects" : "arrows");
   let section = "arrows";
   try { const s0 = localStorage.getItem("arw-section"); if (SECTIONS.some(([k]) => k === s0)) section = s0; } catch (e) {}
   const h0 = (location.hash || "").slice(1); if (SECTIONS.some(([k]) => k === h0)) section = h0;
@@ -810,7 +941,7 @@
   });
   function showSection() {
     document.querySelectorAll("#sections button").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.sec === section)));
-    document.querySelectorAll(".arw-panel [data-sec]").forEach((el) => (el.hidden = el.dataset.sec !== section));
+    document.querySelectorAll(".arw-panel [data-sec]").forEach((el) => (el.hidden = !el.dataset.sec.split(" ").includes(section)));
     $("filter").innerHTML = "";
     if (section !== "arrows") return;
     ["All", ...new Set(LIB.filter((d) => secOf(d) === "arrows").map((d) => d.g))].forEach((g) => {
@@ -843,7 +974,7 @@
   function download(svg, name) {
     const a = document.createElement("a");
     a.href = URL.createObjectURL(new Blob(['<?xml version="1.0" encoding="UTF-8"?>\n' + svg], { type: "image/svg+xml" }));
-    a.download = ({ bacteria: "cell-", animals: "animal-", symbols: "symbol-", arrows: "arrow-" })[secOf(LIB.find((d) => d.name === name) || {})] + name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/-$/, "") + ".svg";
+    a.download = ({ bacteria: "cell-", animals: "animal-", symbols: "symbol-", objects: "", medical: "medical-", arrows: "arrow-" })[secOf(LIB.find((d) => d.name === name) || {})] + name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/-$/, "") + ".svg";
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(a.href), 1000);
   }
@@ -856,7 +987,7 @@
     const grid = $("grid"); grid.innerHTML = "";
     LIB.filter((d) => secOf(d) === section && (group === "All" || d.g === group)).forEach((d) => {
       const card = document.createElement("div"); card.className = "arw-card";
-      card.innerHTML = `<h4>${d.name}</h4><small>${d.g}</small><div class="arw-stage">${figSVG(d, p, { preview: d.cell ? 165 / (p.cellSize * p.dpi) : d.animal || d.traced ? 120 / (p.aniSize * p.dpi) : d.sym ? 90 / (p.symSize * p.dpi) : scale })}</div>`;
+      card.innerHTML = `<h4>${d.name}</h4><small>${d.g}</small><div class="arw-stage">${figSVG(d, p, { preview: d.cell ? 165 / (p.cellSize * p.dpi) : d.animal || d.traced ? 120 / (p.aniSize * p.dpi) : d.sym ? 90 / (p.symSize * p.dpi) : d.obj ? 140 / (p.objSize * p.dpi) : scale })}</div>`;
       const act = document.createElement("div"); act.className = "arw-actions";
       const cp = document.createElement("button"); cp.type = "button"; cp.className = "btn primary"; cp.textContent = "Copy SVG";
       cp.addEventListener("click", () => copySVG(figSVG(d, read()), d.name));
@@ -919,7 +1050,7 @@
   window.addEventListener("resize", drawEditor);
 
   // sliders with typed values (typed values may go past the slider's range)
-  const pairs = [["lw", "lwNum"], ["hl", "hlNum"], ["hw", "hwNum"], ["size", "sizeNum"], ["rot", "rotNum"], ["cellSize", "cellSizeNum"], ["cellLw", "cellLwNum"], ["gap", "gapNum"], ["aniSize", "aniSizeNum"], ["aniLw", "aniLwNum"], ["symSize", "symSizeNum"], ["symLw", "symLwNum"]];
+  const pairs = [["lw", "lwNum"], ["hl", "hlNum"], ["hw", "hwNum"], ["size", "sizeNum"], ["rot", "rotNum"], ["cellSize", "cellSizeNum"], ["cellLw", "cellLwNum"], ["gap", "gapNum"], ["aniSize", "aniSizeNum"], ["aniLw", "aniLwNum"], ["symSize", "symSizeNum"], ["symLw", "symLwNum"], ["objSize", "objSizeNum"], ["objLw", "objLwNum"]];
   pairs.forEach(([r, n]) => {
     $(r).addEventListener("input", () => { $(n).value = $(r).value; changed(); });
     $(n).addEventListener("input", () => {
@@ -928,7 +1059,7 @@
     });
     $(n).addEventListener("keydown", (e) => { if (e.key === "Enter") $(n).blur(); });
   });
-  ["color", "cap", "dashed", "head", "double", "flipH", "flipV", "dpi", "membranes", "fillIn", "fillInC", "fillPeri", "fillPeriC", "aniStyle", "symCap"].forEach((id) => $(id).addEventListener("input", changed));
+  ["color", "cap", "dashed", "head", "double", "flipH", "flipV", "dpi", "membranes", "fillIn", "fillInC", "fillPeri", "fillPeriC", "aniStyle", "symCap", "objStyle"].forEach((id) => $(id).addEventListener("input", changed));
 
   function save() { try { localStorage.setItem(KEY, JSON.stringify(read())); } catch (e) {} }
   function apply(v) {
