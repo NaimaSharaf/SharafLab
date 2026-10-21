@@ -63,7 +63,7 @@
 .mt-actions{display:flex;flex-wrap:wrap;gap:10px;padding:14px 18px;border-top:1px solid #e4ebeb;align-items:center}
 .mt-actions label{font-size:14px;display:inline-flex;gap:6px;align-items:center}
 .mt-sel{display:inline-flex;flex-wrap:wrap;gap:8px;align-items:center;padding:6px 10px;border:1px solid #c9d6dc;border-radius:8px;background:#f4fbfa;font-size:13px}
-.mt-figgrid{display:grid;grid-template-columns:244px minmax(0,1fr);gap:0;align-items:start}
+.mt-figgrid{display:grid;grid-template-columns:300px minmax(0,1fr);gap:0;align-items:start}
 .mt-canvases{min-width:0;border-left:1px solid #e4ebeb}
 .mt-libcol{padding:12px 10px 12px 18px;max-height:calc(100vh - 120px);overflow-y:auto;position:sticky;top:90px}
 .mt-libcol .mt-list{gap:6px;margin-top:8px}
@@ -91,6 +91,17 @@
 .mt-lib .thumb{width:64px;height:44px;flex:none;display:grid;place-items:center}
 .mt-lib .thumb svg{max-width:64px;max-height:44px}
 .mt-lib .nm{flex:1;min-width:0;font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mt-nuc{margin-top:14px;border:1px solid #d8e0e0;border-radius:8px;padding:8px 12px;background:#fbfcfc}
+.mt-nuc summary{cursor:pointer;font:600 14px "Montserrat",Arial,sans-serif;color:#0b6870}
+.mt-nuc select{max-width:200px}
+.mt-nucprev{display:flex;align-items:center;gap:10px;padding:8px 0;font-size:13px;font-weight:600}
+.mt-nucprev .thumb{width:90px;height:70px;display:grid;place-items:center;flex:none}
+.mt-nucprev .thumb svg{max-width:90px;max-height:70px}
+.mt-nuc .err{color:#aa3030;font-weight:500}
+.mt-settings .mt-row{font-size:13px;gap:8px}
+.mt-settings .mt-row label{font-weight:600;min-width:0}
+.mt-settings select{max-width:140px}
+.mt-settings h3{font-family:"Montserrat",Arial,sans-serif;font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#0b6870;margin:18px 0 4px}
 #mt-status{font-size:13px;color:#0b6870;min-height:18px}
 .hidden{display:none!important}
 .mt-editor{position:fixed;inset:0;z-index:3000;background:rgba(16,42,51,.45);display:grid;place-items:center;padding:16px}
@@ -103,6 +114,7 @@
 @media(max-width:1000px){.mt{grid-template-columns:1fr}}
     </style>
       <script src="../palette.js"></script>
+      <script src="nucleosides.js"></script>
   </head>
 
   <body class="outreach-body">
@@ -146,16 +158,107 @@
         <div class="mt">
           <div class="mt-panel">
             <h2>Molecules</h2>
+            <div class="mt-row" style="border-bottom:0"><label>Add to</label><span class="val"><span class="mt-mode" role="group" aria-label="Where new molecules go"><button type="button" id="toTiles" aria-pressed="true">Tiled figure</button><button type="button" id="toPage" aria-pressed="false">Blank page</button></span></span></div>
             <div class="mt-add">
               <input type="text" id="addQ" placeholder="CAS number, name or SMILES" aria-label="CAS number, name or SMILES" />
               <button class="primary" id="addBtn" type="button" title="Look up and add">+</button>
             </div>
             <p class="mt-note">Press + (or Enter) to look it up on PubChem and add it. You can also <label class="file mini" style="display:inline-block">load a MOL/SDF file<input type="file" id="addFile" accept=".mol,.sdf,.mdl,chemical/x-mdl-molfile" /></label>.</p>
+            <details class="mt-nuc" id="nucBox" open>
+              <summary>Nucleosides &amp; nucleotides</summary>
+              <p class="mt-note" style="margin-top:4px">Built in, no lookup needed. Stereochemistry checked against PubChem.</p>
+              <div class="mt-row"><label for="nucBase">Base</label><span class="val"><select id="nucBase">
+                <optgroup label="Canonical"><option value="A">Adenine (A)</option><option value="G">Guanine (G)</option><option value="C">Cytosine (C)</option><option value="U">Uracil (U)</option><option value="T">Thymine (T)</option></optgroup>
+                <optgroup label="Other"><option value="I">Hypoxanthine (I, inosine)</option><option value="X">Xanthine (X, xanthosine)</option></optgroup>
+                <optgroup label="Modified"><option value="m5C">5-Methylcytosine (m5C)</option><option value="hm5C">5-Hydroxymethylcytosine (hm5C)</option><option value="m6A">N6-Methyladenine (m6A)</option><option value="m1A">1-Methyladenine (m1A)</option><option value="m7G">7-Methylguanine (m7G)</option><option value="Psi">Pseudouridine (Ψ)</option><option value="D">Dihydrouracil (D)</option></optgroup>
+              </select></span></div>
+              <div class="mt-row"><label for="nucForm">Form</label><span class="val"><select id="nucForm">
+                <option value="base">Base only</option><option value="ns" selected>Nucleoside</option><option value="mp">Nucleotide, 5′-monophosphate (NMP)</option><option value="dp">5′-Diphosphate (NDP)</option><option value="tp">5′-Triphosphate (NTP)</option><option value="cmp">3′,5′-Cyclic monophosphate (cNMP)</option><option value="mp3">3′-Monophosphate</option>
+              </select></span></div>
+              <div class="mt-row"><label for="nucSugar">Sugar</label><span class="val"><select id="nucSugar">
+                <option value="r">Ribose (RNA)</option><option value="d">2′-Deoxyribose (DNA)</option><option value="dd">2′,3′-Dideoxyribose</option><option value="ara">Arabinose</option><option value="ome">2′-O-Methylribose</option>
+              </select></span></div>
+              <div class="mt-row"><label for="nucIon">Phosphates</label><span class="val"><select id="nucIon"><option value="0">Neutral (–OH)</option><option value="1">Charged, pH 7 (–O⁻)</option></select></span></div>
+              <div class="mt-row"><label for="nucLabel">Name</label><span class="val"><select id="nucLabel"><option value="short">Abbreviation (dATP)</option><option value="full">Full name</option></select></span></div>
+              <div class="mt-row"><label for="nucRot">Rotate when added (°)</label><span class="val"><input id="nucRot" type="number" min="-360" max="360" step="15" value="0" /></span></div>
+              <div class="mt-nucprev"><span class="thumb" id="nucThumb"></span><span id="nucName"></span></div>
+              <div class="mt-libtools">
+                <button type="button" class="mini primary" id="nucAdd">+ Add</button>
+                <button type="button" class="mini" id="nucRNA" title="A, G, C, U in the chosen form">+ RNA set</button>
+                <button type="button" class="mini" id="nucDNA" title="dA, dG, dC, dT in the chosen form">+ DNA set</button>
+                <button type="button" class="mini" id="nucAll" title="Every base in the list, in the chosen sugar and form">+ All bases</button>
+                <button type="button" class="mini" id="nucForms" title="The chosen base in every form: base, nucleoside, NMP, NDP, NTP, cyclic">+ All forms</button>
+              </div>
+            </details>
+            <details class="mt-nuc" id="aaBox">
+              <summary>Amino acids &amp; peptides</summary>
+              <p class="mt-note" style="margin-top:4px">Built in, L-amino acids. Type a sequence to build a peptide: one-letter (GAKVR) or three-letter (Gly-Ala-Lys); lowercase or D- for D-amino acids.</p>
+              <div class="mt-row"><label for="aaPick">Amino acid</label><span class="val"><select id="aaPick"></select></span></div>
+              <div class="mt-row"><label for="aaSeq">Peptide sequence</label><span class="val"><input type="text" id="aaSeq" placeholder="e.g. GAKVR" style="width:130px" /></span></div>
+              <div class="mt-row"><label for="aaN">N-terminus</label><span class="val"><select id="aaN"><option value="free">Free amine (H₂N–)</option><option value="ac">Acetyl (Ac–)</option><option value="ion">Charged (H₃N⁺–)</option></select></span></div>
+              <div class="mt-row"><label for="aaC">C-terminus</label><span class="val"><select id="aaC"><option value="acid">Acid (–COOH)</option><option value="amide">Amide (–CONH₂)</option><option value="ion">Charged (–COO⁻)</option></select></span></div>
+              <div class="mt-row"><label for="aaSide">Side chains</label><span class="val"><select id="aaSide"><option value="0">Neutral</option><option value="1">Charged, pH 7 (D E K R)</option></select></span></div>
+              <div class="mt-row"><label for="aaLabel">Peptide name</label><span class="val"><select id="aaLabel"><option value="one">One-letter (GAK)</option><option value="three">Three-letter (Gly-Ala-Lys)</option></select></span></div>
+              <div class="mt-row"><label for="aaRot">Rotate when added (°)</label><span class="val"><input id="aaRot" type="number" min="-360" max="360" step="15" value="0" /></span></div>
+              <div class="mt-nucprev"><span class="thumb" id="aaThumb"></span><span id="aaName"></span></div>
+              <div class="mt-libtools">
+                <button type="button" class="mini primary" id="aaAdd" title="Add the chosen amino acid">+ Amino acid</button>
+                <button type="button" class="mini" id="aaAll" title="All 20 amino acids, each on its own">+ All 20</button>
+                <button type="button" class="mini primary" id="aaPep" title="Build the peptide typed above">+ Peptide</button>
+              </div>
+            </details>
+            <details class="mt-nuc" id="dyeBox">
+              <summary>Xanthene dyes</summary>
+              <div class="mt-row"><label for="dyePick">Dye</label><span class="val"><select id="dyePick"></select></span></div>
+              <div class="mt-row"><label for="dyeRot">Rotate when added (°)</label><span class="val"><input id="dyeRot" type="number" min="-360" max="360" step="15" value="0" /></span></div>
+              <div class="mt-nucprev"><span class="thumb" id="dyeThumb"></span><span id="dyeName"></span></div>
+              <div class="mt-libtools">
+                <button type="button" class="mini primary" id="dyeAdd">+ Add</button>
+                <button type="button" class="mini" id="dyeAll" title="Rose Bengal, Phloxine B, Erythrosin B, Rhodamine B, Fluorescein">+ All dyes</button>
+              </div>
+            </details>
+            <details class="mt-nuc" id="xanBox">
+              <summary>Xanthines</summary>
+              <p class="mt-note" style="margin-top:4px">Built in and drawn with the same ring orientation, so a set lines up.</p>
+              <div class="mt-row"><label for="xanPick">Molecule</label><span class="val"><select id="xanPick"></select></span></div>
+              <div class="mt-row"><label for="xanRot">Rotate when added (°)</label><span class="val"><input id="xanRot" type="number" min="-360" max="360" step="15" value="0" /></span></div>
+              <div class="mt-nucprev"><span class="thumb" id="xanThumb"></span><span id="xanName"></span></div>
+              <div class="mt-libtools">
+                <button type="button" class="mini primary" id="xanAdd">+ Add</button>
+                <button type="button" class="mini" id="xanMethyl" title="Caffeine, theophylline, theobromine, paraxanthine">+ Methylxanthines</button>
+                <button type="button" class="mini" id="xanAll" title="Every xanthine in the list">+ All xanthines</button>
+              </div>
+            </details>
             <div class="mt-list" id="list"></div>
-            <p class="mt-note" id="reloadRow"><button type="button" class="mini" id="reloadEx" title="Put back the five example dyes and the original settings (the blank page and library are kept)">Reset examples and settings</button></p>
+            <p class="mt-note" id="reloadRow"><button type="button" class="mini" id="reloadEx" title="Clear the tiled figure and put the settings back to how they started (the blank page is kept)">Reset list and settings</button></p>
 
-            <h3>Canvas</h3>
-            <div id="pageCanvas" class="hidden">
+          </div>
+
+          <div class="mt-editor hidden" id="molEditor" role="dialog" aria-modal="true" aria-labelledby="edTitle">
+            <div class="mt-edbox">
+              <div class="mt-edhead"><strong id="edTitle">Edit molecule</strong><span class="small" style="color:#6b7f83">Click atoms or bonds to select them; Shift-click to select several. Changes show up everywhere this molecule is used.</span></div>
+              <div class="mt-edstage" id="edStage"></div>
+              <div class="mt-edtools">
+                <button type="button" class="mini" id="edAll">Select all</button>
+                <button type="button" class="mini" id="edNone">Select none</button>
+                <label class="mini">Color <input type="color" id="edColor" value="#d6338a" /></label>
+                <button type="button" class="mini primary" id="edApply">Color selected</button>
+                <button type="button" class="mini" id="edUncolor">Remove color</button>
+                <button type="button" class="mini" id="edHide">Hide selected</button>
+                <button type="button" class="mini" id="edShow">Show all</button>
+                <button type="button" class="mini" id="edReset">Reset molecule</button>
+                <span id="edCount" class="small" style="color:#0b6870"></span>
+                <button type="button" class="primary" id="edDone" style="margin-left:auto">Done</button>
+              </div>
+            </div>
+          </div>
+          <div class="mt-view">
+            <header>Figures <small>Click a canvas to work on it; the buttons below act on the highlighted one.</small></header>
+            <div class="mt-figgrid">
+            <div id="libPanel" class="mt-libcol">
+              <div class="mt-settings">
+            <h3 style="margin-top:0">Canvas</h3>
+            <div id="pageCanvas">
               <div class="mt-row"><label for="pageW">Blank page width (in)</label><span class="val"><input id="pageW" type="number" min="0.5" max="40" step="0.1" value="7" /></span></div>
               <div class="mt-row"><label for="pageH">Blank page height (in)</label><span class="val"><input id="pageH" type="number" min="0.5" max="40" step="0.1" value="7" /></span></div>
             </div>
@@ -189,35 +292,14 @@
             <div class="mt-row"><label for="arHw">Head width (pt)</label><span class="val"><input id="arHw" type="number" min="1" max="60" step="0.5" value="4" /></span></div>
             <div class="mt-row"><label for="arColor">Color</label><span class="val"><input id="arColor" type="color" value="#8c8c8c" /></span></div>
             <p class="mt-note">Fonts and sizes are the same for every molecule, so labels stay consistent. They are kept as live text in the SVG.</p>
-          </div>
-
-          <div class="mt-editor hidden" id="molEditor" role="dialog" aria-modal="true" aria-labelledby="edTitle">
-            <div class="mt-edbox">
-              <div class="mt-edhead"><strong id="edTitle">Edit molecule</strong><span class="small" style="color:#6b7f83">Click atoms or bonds to select them; Shift-click to select several. Changes show up everywhere this molecule is used.</span></div>
-              <div class="mt-edstage" id="edStage"></div>
-              <div class="mt-edtools">
-                <button type="button" class="mini" id="edAll">Select all</button>
-                <button type="button" class="mini" id="edNone">Select none</button>
-                <label class="mini">Color <input type="color" id="edColor" value="#d6338a" /></label>
-                <button type="button" class="mini primary" id="edApply">Color selected</button>
-                <button type="button" class="mini" id="edUncolor">Remove color</button>
-                <button type="button" class="mini" id="edHide">Hide selected</button>
-                <button type="button" class="mini" id="edShow">Show all</button>
-                <button type="button" class="mini" id="edReset">Reset molecule</button>
-                <span id="edCount" class="small" style="color:#0b6870"></span>
-                <button type="button" class="primary" id="edDone" style="margin-left:auto">Done</button>
               </div>
-            </div>
-          </div>
-          <div class="mt-view">
-            <header>Figures <small>Click a canvas to work on it; the buttons below act on the highlighted one.</small></header>
-            <div class="mt-figgrid">
-            <div id="libPanel" class="mt-libcol">
+              <div id="libSection" class="hidden">
                   <p class="mt-note" style="margin:0">Library: every molecule you've added. <strong>+ Page</strong> places it on the blank page, <strong>+ Tiles</strong> adds it to the tiled figure.</p>
                   <div class="mt-libtools">
                   <label class="file mini">Import list<input type="file" id="libImport" accept=".txt,.csv,text/plain" /></label>
                   <button type="button" class="mini" id="libSave" title="Download the library as a list of CAS numbers">Save list</button>
                   <button type="button" class="mini" id="libCopy" title="Copy the CAS list to the clipboard">Copy list</button>
+                  <button type="button" class="mini" id="libClear" title="Remove every molecule from the library and the blank page">Clear library</button>
                 </div>
                 <details class="mt-libpaste"><summary>Paste a CAS list</summary>
                   <textarea id="libPasteText" rows="4" placeholder="One CAS number (or name) per line" aria-label="CAS numbers, one per line"></textarea>
@@ -225,21 +307,24 @@
                 </details>
                 <input type="text" id="libSearch" placeholder="Filter the library" aria-label="Filter the library" style="width:100%;margin-top:8px" />
                   <div class="mt-list" id="libList"></div>
+              </div>
                   <p class="mt-note" style="margin:14px 0 0;font-weight:700;color:#0b6870;letter-spacing:.08em;text-transform:uppercase;font-size:11px">Arrows</p>
                   <div class="mt-list" id="arrowLib"></div>
                 </div>
               <div class="mt-canvases">
             <div class="mt-sub" id="subTiles">
-              <div class="mt-subhead"><span>Tiled figure</span> <small id="countTiles"></small> <button type="button" class="mini" id="jiggleTiles" title="Line up molecules that are nearly in a row or column and push apart any that overlap">Jiggle</button> <button type="button" class="mini" id="copyTiles">Copy SVG</button></div>
+              <div class="mt-subhead"><span>Tiled figure</span> <small id="countTiles"></small> <button type="button" class="mini" id="clearTiles" title="Remove every molecule and arrow from the tiled figure (the library is kept)">Clear all</button> <button type="button" class="mini" id="jiggleTiles" title="Line up molecules that are nearly in a row or column and push apart any that overlap">Jiggle</button> <button type="button" class="mini" id="copyTiles">Copy SVG</button></div>
               <div class="mt-stage" id="stage"></div>
             </div>
             <div class="mt-sub" id="subPage">
-              <div class="mt-subhead"><span>Blank page</span> <small id="countPage"></small> <button type="button" class="mini" id="jigglePage" title="Line up molecules that are nearly in a row or column and push apart any that overlap">Jiggle</button> <button type="button" class="mini" id="copyPage">Copy SVG</button></div>
+              <div class="mt-subhead"><span>Blank page</span> <small id="countPage"></small> <button type="button" class="mini" id="clearPage2" title="Remove everything from the blank page (the library is kept)">Clear all</button> <button type="button" class="mini" id="jigglePage" title="Line up molecules that are nearly in a row or column and push apart any that overlap">Jiggle</button> <button type="button" class="mini" id="copyPage">Copy SVG</button></div>
               <div class="mt-stage" id="stage2"></div>
             </div>
               </div>
             </div>
             <div class="mt-actions">
+              <button id="undoBtn" type="button" title="Undo (Ctrl/⌘ Z)" disabled>↶ Undo</button>
+              <button id="redoBtn" type="button" title="Redo (Ctrl/⌘ Shift Z or Ctrl Y)" disabled>↷ Redo</button>
               <button class="primary" id="copySvg" type="button">Copy SVG (highlighted)</button>
               <button id="dlSvg" type="button">Download SVG</button>
               <button id="resetPos" type="button" title="Put every molecule back in its tile">Reset positions</button>
@@ -258,6 +343,8 @@
                 <strong id="pageSelName"></strong>
                 <label for="psScale">Scale <input type="range" id="psScale" min="20" max="400" step="5" value="100" style="width:130px;accent-color:#0b6870" /></label><label><input type="number" id="psSize" min="20" max="400" step="5" style="width:58px" aria-label="Scale in percent" />%</label>
                 <button type="button" class="mini" id="psAll" title="Give every molecule on this canvas the same scale">Apply to all</button>
+                <label for="psRot">Angle <input type="range" id="psRotR" min="-180" max="180" step="1" value="0" style="width:110px;accent-color:#0b6870" aria-label="Rotation angle" /></label><label><input type="number" id="psRot" min="-360" max="360" step="1" style="width:58px" aria-label="Rotation in degrees" />°</label>
+                <button type="button" class="mini" id="psRotAll" title="Give every molecule on this canvas the same angle">Angle to all</button>
                 <button type="button" class="mini" id="psRl" title="Rotate left 15°">⟲</button>
                 <button type="button" class="mini" id="psRr" title="Rotate right 15°">⟳</button>
                 <button type="button" class="mini" id="psFp" title="Flip left–right">⇋</button>
@@ -477,11 +564,13 @@ const EXAMPLES = [{"name": "Rose Bengal (RB)", "cas": "632-69-9", "mol": "\n    
       const chg = a.charge ? (Math.abs(a.charge) > 1 ? Math.abs(a.charge) : "") + (a.charge > 0 ? "+" : "−") : "";
       const wChg = chg ? tw(chg, fs * 0.7, fam) : 0;
       const base = y + fs * 0.36;
-      let start = x - wSym / 2, inner = "";
-      const sub = (t) => `<tspan font-size="${f(fs * 0.7)}" dy="${f(fs * 0.25)}">${t}</tspan><tspan dy="${f(-fs * 0.25)}"></tspan>`;
-      const sup = (t) => `<tspan font-size="${f(fs * 0.7)}" dy="${f(-fs * 0.42)}">${esc(t)}</tspan>`;
-      if (hLeft) { start -= wH + wSub; inner = hTxt + (hSub ? sub(hSub) : "") + esc(a.el) + (chg ? sup(chg) : ""); }
-      else inner = esc(a.el) + hTxt + (hSub ? sub(hSub) : "") + (chg ? sup(chg) : "");
+      let start = x - wSym / 2;
+      // every piece gets its own absolute x and y, so Affinity, Illustrator and browsers all place it the same way
+      const SYM = [esc(a.el), 1, 0, wSym], HH = [hTxt, 1, 0, wH], SUB = [hSub, 0.7, fs * 0.25, wSub], SUP = [esc(chg), 0.7, -fs * 0.42, wChg];
+      const parts = (hLeft ? [HH, SUB, SYM, SUP] : [SYM, HH, SUB, SUP]).filter((q) => q[0]);
+      if (hLeft) start -= wH + wSub;
+      let cx = start, inner = "";
+      parts.forEach(([t, k, dyy, w]) => { inner += `<tspan x="${f(cx)}" y="${f(base + dyy)}"${k !== 1 ? ` font-size="${f(fs * k)}"` : ""}>${t}</tspan>`; cx += w; });
       const total = wSym + wH + wSub + wChg;
       grow(start, y - fs * 0.75); grow(start + total, y + fs * 0.55);
       labels.push(`<text x="${f(start)}" y="${f(base)}"${AC[i] ? ` fill="${AC[i]}"` : ""}>${inner}</text>`);
@@ -516,6 +605,7 @@ const EXAMPLES = [{"name": "Rose Bengal (RB)", "cas": "632-69-9", "mol": "\n    
   let nextId = 1;
   function save() {
     syncArrows();
+    histTick();
     try {
       localStorage.setItem("mt-items", JSON.stringify(items.map(({ prep, ...rest }) => rest)));
       localStorage.setItem("mt-arrows", JSON.stringify(tileArrows));
@@ -714,6 +804,7 @@ const EXAMPLES = [{"name": "Rose Bengal (RB)", "cas": "632-69-9", "mol": "\n    
         <div class="line">
           <input type="text" class="nm" value="${esc(it.name)}" placeholder="Name shown above" aria-label="Name for molecule ${idx + 1}" />
           <label class="mini" style="font-size:12px;display:inline-flex;gap:4px;align-items:center">Size <input type="number" class="sz" min="20" max="400" step="5" value="${it.size || 100}" style="width:58px" aria-label="Size of molecule ${idx + 1} in percent" />%</label>
+          <label class="mini" style="font-size:12px;display:inline-flex;gap:4px;align-items:center">Angle <input type="number" class="ang" min="-360" max="360" step="1" value="${it.rot || 0}" style="width:54px" aria-label="Rotation of molecule ${idx + 1} in degrees" />°</label>
           <button type="button" class="mini rl" title="Rotate left 15°">⟲</button>
           <button type="button" class="mini rr" title="Rotate right 15°">⟳</button>
           <button type="button" class="mini fp" title="Flip left–right">⇋</button>
@@ -728,6 +819,7 @@ const EXAMPLES = [{"name": "Rose Bengal (RB)", "cas": "632-69-9", "mol": "\n    
       el.querySelector(".col").addEventListener("input", (e) => { it.color = e.target.value; draw(); });
       el.querySelector(".sz").addEventListener("input", (e) => { it.size = Math.max(20, Math.min(400, +e.target.value || 100)); draw(); });
       el.querySelector(".nm").addEventListener("input", (e) => { it.name = e.target.value; draw(); });
+      el.querySelector(".ang").addEventListener("input", (e) => { it.rot = normRot(e.target.value); draw(); });
       el.querySelector(".rl").addEventListener("click", () => { it.rot = ((it.rot || 0) - 15) % 360; update(); });
       el.querySelector(".rr").addEventListener("click", () => { it.rot = ((it.rot || 0) + 15) % 360; update(); });
       el.querySelector(".fp").addEventListener("click", () => { it.flip = !it.flip; update(); });
@@ -761,6 +853,9 @@ const EXAMPLES = [{"name": "Rose Bengal (RB)", "cas": "632-69-9", "mol": "\n    
       const sz = ps.size || 100;
       if (document.activeElement !== $("psSize")) $("psSize").value = sz;
       if (document.activeElement !== $("psScale")) $("psScale").value = sz;
+      const rr = Math.round(ps.rot || 0);
+      if (document.activeElement !== $("psRot")) $("psRot").value = rr;
+      if (document.activeElement !== $("psRotR")) $("psRotR").value = ((rr + 540) % 360) - 180;
       $("psColor").value = ps.color || "#000000"; $("psName").checked = !!ps.showName;
       $("psName").parentElement.classList.toggle("hidden", !onPage);
     }
@@ -858,6 +953,10 @@ const EXAMPLES = [{"name": "Rose Bengal (RB)", "cas": "632-69-9", "mol": "\n    
       status(`Importing ${i + 1} of ${entries.length}: ${q}…`);
       const ex = EXAMPLES.find((x) => x.cas === q);
       if (ex) { addToLibrary({ q: ex.cas, name: ex.name, mol: ex.mol, prep: prepare(parseMol(ex.mol)) }); added++; continue; }
+      const nb = nucByName(q);
+      if (nb) { const e = nucEntry(...nb); if (e) { addToLibrary({ q: e.q, name: e.name, mol: e.mol, prep: prepare(parseMol(e.mol)) }); added++; continue; } }
+      const xb = xanByName(q);
+      if (xb) { const mol = xanMol(xb[1]); addToLibrary({ q: xb[0], name: xb[0], mol, prep: prepare(parseMol(mol)) }); added++; continue; }
       const tmp = { q, name: "", color: "#000000" };
       await lookup(tmp, q);
       if (tmp.prep) added++; else failed.push(q);
@@ -907,6 +1006,7 @@ const EXAMPLES = [{"name": "Rose Bengal (RB)", "cas": "632-69-9", "mol": "\n    
     applyModeSettings(mode); arrows = mode === "page" ? pageArrows : tileArrows; arrowSel = null; pageSel = null;
     $("delArrow").classList.add("hidden"); $("branchArrow").classList.add("hidden");
     $("subTiles").classList.toggle("active", mode === "tiles");
+    $("toTiles").setAttribute("aria-pressed", mode === "tiles"); $("toPage").setAttribute("aria-pressed", mode === "page");
     $("subPage").classList.toggle("active", mode === "page");
     try { localStorage.setItem("mt-mode", mode); } catch (e) {}
     if (!quiet) update();
@@ -947,6 +1047,301 @@ const EXAMPLES = [{"name": "Rose Bengal (RB)", "cas": "632-69-9", "mol": "\n    
     page = []; arrows = []; syncArrows(); pageSel = null; arrowSel = null; $("delArrow").classList.add("hidden"); $("branchArrow").classList.add("hidden"); draw(); status("Page cleared.");
   });
 
+  // ---------- built-in nucleosides and nucleotides (data in nucleosides.js) ----------
+  const NUC = window.NUCLEOSIDE_DATA || {};
+  const NB = { // code: [short letter, base name, ribonucleoside name, purine?]
+    A: ["A", "Adenine", "Adenosine", 1], G: ["G", "Guanine", "Guanosine", 1], C: ["C", "Cytosine", "Cytidine", 0], U: ["U", "Uracil", "Uridine", 0],
+    T: ["T", "Thymine", "5-Methyluridine", 0], I: ["I", "Hypoxanthine", "Inosine", 1], X: ["X", "Xanthine", "Xanthosine", 1],
+    m5C: ["m5C", "5-Methylcytosine", "5-Methylcytidine", 0], hm5C: ["hm5C", "5-Hydroxymethylcytosine", "5-Hydroxymethylcytidine", 0],
+    m6A: ["m6A", "N6-Methyladenine", "N6-Methyladenosine", 1], m1A: ["m1A", "1-Methyladenine", "1-Methyladenosine", 1],
+    m7G: ["m7G", "7-Methylguanine", "7-Methylguanosine", 1], Psi: ["Ψ", "Uracil", "Pseudouridine", 0], D: ["D", "5,6-Dihydrouracil", "Dihydrouridine", 0]
+  };
+  const lc1 = (s) => (/^[A-Z][a-z]/.test(s) ? s[0].toLowerCase() + s.slice(1) : s);
+  function nucKey(b, s, fm) { return fm === "base" ? `${b}|base` : `${b}|${s}|${fm}`; }
+  function nucNames(b, s, fm) {
+    const [L, baseName, ribo, pur] = NB[b];
+    if (fm === "base") return { short: L, full: baseName };
+    let full;
+    if (s === "r") full = ribo;
+    else if (s === "d") full = b === "T" ? "Thymidine" : "2′-Deoxy" + lc1(ribo);
+    else if (s === "dd") full = (b === "T" ? "3′-Deoxythymidine" : "2′,3′-Dideoxy" + lc1(ribo));
+    else if (s === "ara") full = b === "Psi" ? "5-β-D-Arabinofuranosyluracil" : (pur ? "9" : "1") + "-β-D-Arabinofuranosyl" + lc1(baseName).replace(/^n6/, "N6");
+    else full = "2′-O-Methyl" + lc1(ribo);
+    if (s === "dd" && b === "T") full = "3′-Deoxythymidine";
+    const suf = { ns: "", mp: " 5′-monophosphate", dp: " 5′-diphosphate", tp: " 5′-triphosphate", cmp: " 3′,5′-cyclic monophosphate", mp3: " 3′-monophosphate" }[fm];
+    const core = (b === "T" && s === "r" ? "rT" : ({ r: "", d: "d", dd: "dd", ara: "ara-", ome: "" }[s] + L)) + (s === "ome" ? "m" : "");
+    const short = { ns: core, mp: core + "MP", dp: core + "DP", tp: core + "TP", cmp: "c" + core + "MP", mp3: core + "3′P" }[fm];
+    return { short, full: full + suf };
+  }
+  // compact atoms|bonds -> V2000 MOL text; optionally put a negative charge on each P–OH oxygen
+  function nucMol(key, ionize) { const c = NUC[key]; return c ? compactToMol(c, ionize) : null; }
+  function compactToMol(c, ionize) {
+    const [as, bs] = c.split("|");
+    const atoms = as.split(";").map((t) => { const p = t.split(" "); return { x: +p[0], y: +p[1], el: p[2], ch: +(p[3] || 0) }; });
+    const bonds = bs.split(";").map((t) => t.split(" ").map(Number));
+    if (ionize) {
+      const deg = atoms.map(() => 0); bonds.forEach(([a, b]) => { deg[a]++; deg[b]++; });
+      bonds.forEach(([a, b, o]) => {
+        if (o !== 1) return;
+        [[a, b], [b, a]].forEach(([oi, pi]) => { if (atoms[oi].el === "O" && atoms[pi].el === "P" && deg[oi] === 1) atoms[oi].ch = -1; });
+      });
+    }
+    const pad = (v, n) => String(v).padStart(n);
+    let out = `\n  SharafLab nucleosides\n\n${pad(atoms.length, 3)}${pad(bonds.length, 3)}  0  0  0  0  0  0  0  0999 V2000\n`;
+    atoms.forEach((a) => { out += `${pad(a.x.toFixed(4), 10)}${pad(a.y.toFixed(4), 10)}${pad("0.0000", 10)} ${a.el.padEnd(3)} 0  0  0  0  0  0  0  0  0  0  0  0\n`; });
+    bonds.forEach(([a, b, o, st]) => { out += `${pad(a + 1, 3)}${pad(b + 1, 3)}${pad(o, 3)}${pad(st || 0, 3)}\n`; });
+    const ch = atoms.map((a, i) => [i + 1, a.ch]).filter((x) => x[1]);
+    for (let i = 0; i < ch.length; i += 8) { const g = ch.slice(i, i + 8); out += `M  CHG${pad(g.length, 3)}` + g.map(([i2, v]) => ` ${pad(i2, 3)} ${pad(v, 3)}`).join("") + "\n"; }
+    return out + "M  END\n";
+  }
+  const nucOK = (s, fm) => fm === "base" || !(s === "dd" && (fm === "cmp" || fm === "mp3"));
+  function nucEntry(b, s, fm) {
+    if (!nucOK(s, fm)) return null;
+    const key = nucKey(b, s, fm), ion = $("nucIon").value === "1" && /p/.test(fm);
+    const mol = nucMol(key, ion); if (!mol) return null;
+    const nm = nucNames(b, s, fm);
+    return { q: nm.full, name: $("nucLabel").value === "full" ? nm.full : nm.short, mol, full: nm.full };
+  }
+  function nucPreview() {
+    const b = $("nucBase").value, s = $("nucSugar").value, fm = $("nucForm").value;
+    $("nucSugar").disabled = fm === "base";
+    $("nucIon").disabled = !/p/.test(fm);
+    const e = nucEntry(b, s, fm);
+    if (!e) { $("nucThumb").innerHTML = ""; $("nucName").innerHTML = `<span class="err">No 3′-OH on a dideoxy sugar, so this form doesn't exist.</span>`; $("nucAdd").disabled = true; return; }
+    $("nucAdd").disabled = false;
+    try { const d = drawMolecule({ prep: prepare(parseMol(e.mol)), color: "#000000", rot: normRot($("nucRot").value) }, thumbS()); $("nucThumb").innerHTML = `<svg xmlns="${NS}" viewBox="${f(d.x0)} ${f(d.y0)} ${f(d.w)} ${f(d.h)}">${d.svg}</svg>`; } catch (err) { $("nucThumb").innerHTML = ""; }
+    $("nucName").textContent = e.name + (e.name !== e.full ? " · " + e.full : "");
+  }
+  function addNuc(list) {
+    const rot = normRot($("nucRot").value);
+    addBuilt(list.map((x) => nucEntry(...x)).filter(Boolean).map((e) => Object.assign(e, { rot })));
+  }
+  function addBuilt(entries) {
+    let n = 0, last = null;
+    entries.forEach((e) => {
+      const prep = prepare(parseMol(e.mol));
+      if (mode === "page") { const le = addToLibrary({ q: e.q, name: e.name, mol: e.mol, prep }); if (le) { placeOnPage(le); page[page.length - 1].rot = e.rot || 0; n++; } }
+      else { const it = addItem({ q: e.q, name: e.name, mol: e.mol, rot: e.rot || 0, msg: "Built in · " + e.full }); addToLibrary(it); last = it; n++; }
+    });
+    if (last) tileSel = last.id;
+    update();
+    status(n ? `Added ${n} molecule${n === 1 ? "" : "s"}${mode === "page" ? " to the blank page" : ""}.` : "Nothing to add for that combination.");
+  }
+  const NUC_BASES = Object.keys(NB);
+  if (Object.keys(NUC).length) {
+    ["nucBase", "nucSugar", "nucForm", "nucIon", "nucLabel"].forEach((id) => $(id).addEventListener("change", nucPreview));
+    $("nucRot").addEventListener("input", nucPreview);
+    $("nucAdd").addEventListener("click", () => addNuc([[$("nucBase").value, $("nucSugar").value, $("nucForm").value]]));
+    $("nucRNA").addEventListener("click", () => addNuc(["A", "G", "C", "U"].map((b) => [b, "r", $("nucForm").value])));
+    $("nucDNA").addEventListener("click", () => addNuc(["A", "G", "C", "T"].map((b) => [b, "d", $("nucForm").value])));
+    $("nucAll").addEventListener("click", () => addNuc(NUC_BASES.map((b) => [b, $("nucSugar").value, $("nucForm").value])));
+    $("nucForms").addEventListener("click", () => addNuc(["base", "ns", "mp", "dp", "tp", "cmp"].map((fm) => [$("nucBase").value, $("nucSugar").value, fm])));
+    setTimeout(nucPreview, 0);
+  } else $("nucBox").classList.add("hidden");
+  // full names typed in the add box or a pasted list are matched to the built-in set before PubChem
+  function nucByName(q) {
+    const t = q.trim().toLowerCase().replace(/'/g, "′");
+    for (const b of NUC_BASES) for (const s of ["r", "d", "dd", "ara", "ome"]) for (const fm of ["ns", "mp", "dp", "tp", "cmp", "mp3"]) {
+      if (!nucOK(s, fm)) continue; const nm = nucNames(b, s, fm);
+      if (nm.full.toLowerCase() === t || nm.short.toLowerCase() === t && nm.short.length > 2) return [b, s, fm];
+    }
+    return null;
+  }
+
+
+  // ---------- free rotation ----------
+  function normRot(v) { v = Math.round(+v || 0) % 360; return v > 180 ? v - 360 : v < -180 ? v + 360 : v; }
+  function setSelRot(v) { const p = selObj(); if (!p) return; p.rot = normRot(v); if (mode === "tiles") renderList(); draw(); }
+  $("psRot").addEventListener("input", (e) => setSelRot(e.target.value));
+  $("psRotR").addEventListener("input", (e) => setSelRot(e.target.value));
+  $("psRotAll").addEventListener("click", () => {
+    const p = selObj(); if (!p) return; const r = p.rot || 0;
+    const list = mode === "page" ? page : items; list.forEach((x) => { x.rot = r; });
+    if (mode === "tiles") renderList(); draw();
+    status(`All ${list.length} molecule${list.length === 1 ? "" : "s"} set to ${r}°.`);
+  });
+
+  // ---------- clear all (two clicks, so a stray click doesn't wipe anything) ----------
+  function twoClick(id, label, fn) {
+    let t = null; const b = $(id);
+    b.addEventListener("click", () => {
+      if (!t) { b.textContent = "Click again to clear"; t = setTimeout(() => { t = null; b.textContent = label; }, 3000); return; }
+      clearTimeout(t); t = null; b.textContent = label; fn();
+    });
+  }
+  twoClick("clearTiles", "Clear all", () => {
+    items = []; tileArrows = []; tileSel = null;
+    if (mode === "tiles") { arrows = tileArrows; arrowSel = null; $("delArrow").classList.add("hidden"); $("branchArrow").classList.add("hidden"); }
+    update(); status("Tiled figure cleared. The library still has every molecule.");
+  });
+  twoClick("clearPage2", "Clear all", () => {
+    page = []; pageArrows = []; pageSel = null;
+    if (mode === "page") { arrows = pageArrows; arrowSel = null; $("delArrow").classList.add("hidden"); $("branchArrow").classList.add("hidden"); }
+    draw(); status("Blank page cleared.");
+  });
+  twoClick("libClear", "Clear library", () => {
+    library = []; page = []; pageSel = null; update(); status("Library cleared.");
+  });
+
+  // ---------- built-in xanthines ----------
+  const XAN = window.XANTHINE_DATA || [];
+  const XAN_METHYL = ["Caffeine", "Theophylline", "Theobromine", "Paraxanthine"];
+  function xanMol(c) { return compactToMol(c, false); }
+  function xanPreview() {
+    const x = XAN[+$("xanPick").value]; if (!x) return;
+    try { const d = drawMolecule({ prep: prepare(parseMol(xanMol(x[1]))), color: "#000000", rot: normRot($("xanRot").value) }, thumbS()); $("xanThumb").innerHTML = `<svg xmlns="${NS}" viewBox="${f(d.x0)} ${f(d.y0)} ${f(d.w)} ${f(d.h)}">${d.svg}</svg>`; } catch (e) { $("xanThumb").innerHTML = ""; }
+    $("xanName").textContent = x[0];
+  }
+  function addXan(list) {
+    const rot = normRot($("xanRot").value);
+    addBuilt(list.map((x) => ({ q: x[0], name: x[0], mol: xanMol(x[1]), full: x[0], rot })));
+  }
+  if (XAN.length) {
+    XAN.forEach((x, i) => { const o = document.createElement("option"); o.value = i; o.textContent = x[0]; $("xanPick").appendChild(o); });
+    ["xanPick", "xanRot"].forEach((id) => $(id).addEventListener("input", xanPreview));
+    $("xanAdd").addEventListener("click", () => addXan([XAN[+$("xanPick").value]]));
+    $("xanMethyl").addEventListener("click", () => addXan(XAN.filter((x) => XAN_METHYL.includes(x[0]))));
+    $("xanAll").addEventListener("click", () => addXan(XAN));
+    $("xanBox").addEventListener("toggle", xanPreview);
+    setTimeout(xanPreview, 0);
+  } else $("xanBox").classList.add("hidden");
+  function xanByName(q) { const t = q.trim().toLowerCase(); return XAN.find((x) => x[0].toLowerCase() === t) || null; }
+
+
+  // ---------- built-in xanthene dyes (the old start-up examples) ----------
+  function dyePreview() {
+    const x = EXAMPLES[+$("dyePick").value]; if (!x) return;
+    try { const d = drawMolecule({ prep: prepare(parseMol(x.mol)), color: "#000000", rot: normRot($("dyeRot").value) }, thumbS()); $("dyeThumb").innerHTML = `<svg xmlns="${NS}" viewBox="${f(d.x0)} ${f(d.y0)} ${f(d.w)} ${f(d.h)}">${d.svg}</svg>`; } catch (e) { $("dyeThumb").innerHTML = ""; }
+    $("dyeName").textContent = `${x.name} · CAS ${x.cas}`;
+  }
+  function addDyes(list) { const rot = normRot($("dyeRot").value); addBuilt(list.map((x) => ({ q: x.cas, name: x.name, mol: x.mol, full: "CAS " + x.cas, rot }))); }
+  EXAMPLES.forEach((x, i) => { const o = document.createElement("option"); o.value = i; o.textContent = x.name; $("dyePick").appendChild(o); });
+  ["dyePick", "dyeRot"].forEach((id) => $(id).addEventListener("input", dyePreview));
+  $("dyeAdd").addEventListener("click", () => addDyes([EXAMPLES[+$("dyePick").value]]));
+  $("dyeAll").addEventListener("click", () => addDyes(EXAMPLES));
+  $("dyeBox").addEventListener("toggle", dyePreview);
+  setTimeout(dyePreview, 0);
+
+
+  // ---------- amino acids and peptides (templates in nucleosides.js) ----------
+  const AAD = window.AMINO_DATA || {};
+  const AA3 = {}; Object.keys(AAD).forEach((k) => (AA3[AAD[k].t.toLowerCase()] = k));
+  const molText = (atoms, bonds) => compactToMol(atoms.map((a) => `${a.x} ${a.y} ${a.el}${a.ch ? " " + a.ch : ""}`).join(";") + "|" + bonds.map((b) => b.join(" ")).join(";"), false);
+  function parseSeq(t) {
+    t = t.trim(); if (!t) return { err: "Type a sequence first." };
+    const out = [];
+    if (/[-\s]/.test(t) || /^[A-Z][a-z]{2}$/.test(t)) {
+      for (let tok of t.replace(/\bD-(?=[A-Za-z]{3}\b)/g, "D_").split(/[-\s,]+/).filter(Boolean)) {
+        let D = false; if (/^d_/i.test(tok)) { D = true; tok = tok.slice(2); }
+        if (/^(ac|h|oh|nh2)$/i.test(tok)) continue;
+        const k = AA3[tok.toLowerCase()] || (tok.length === 1 && AAD[tok.toUpperCase()] ? tok.toUpperCase() : null);
+        if (!k) return { err: `Don't know “${tok}”.` };
+        if (tok.length === 1 && tok === tok.toLowerCase()) D = true;
+        out.push({ k, D });
+      }
+    } else {
+      for (const ch of t) { const k = ch.toUpperCase(); if (!AAD[k]) return { err: `Don't know “${ch}”. Use the 20 one-letter codes.` }; out.push({ k, D: ch !== k }); }
+    }
+    return out.length ? { res: out } : { err: "Type a sequence first." };
+  }
+  function buildPeptide(res, nt, ct, side) {
+    const atoms = [], bonds = [], STEP = 3 * 0.866;
+    res.forEach((r, i) => {
+      const T = AAD[r.k], [as, bs] = (i % 2 ? T.d : T.u).split("|"), base = atoms.length, off = i * STEP;
+      as.split(";").forEach((q) => { const p = q.split(" "); atoms.push({ x: +(+p[0] + off).toFixed(3), y: +p[1], el: p[2], ch: 0 }); });
+      bs.split(";").forEach((q) => { const p = q.split(" ").map(Number); let st = p[3] || 0; if (r.D && st) st = st === 1 ? 6 : 1; bonds.push([p[0] + base, p[1] + base, p[2], st]); });
+      if (side && T.q != null && r.k !== "G") atoms[base + T.q].ch = T.c;
+      if (i) bonds.push([r.prevC, base, 1, 0]);
+      res[i + 1] && (res[i + 1].prevC = base + 2);
+      r.base = base;
+    });
+    if (nt === "ion") atoms[0].ch = 1;
+    if (nt === "ac") { const c = atoms.length; atoms.push({ x: -0.866, y: 0.5, el: "C" }, { x: -0.866, y: 1.5, el: "O" }, { x: -1.732, y: 0, el: "C" }); bonds.push([c, 0, 1, 0], [c, c + 1, 2, 0], [c, c + 2, 1, 0]); }
+    const n = res.length, last = res[n - 1].base, ix = atoms.length;
+    atoms.push({ x: +((n - 1) * STEP + STEP).toFixed(3), y: (n - 1) % 2 ? 0 : 0.5, el: ct === "amide" ? "N" : "O", ch: ct === "ion" ? -1 : 0 });
+    bonds.push([last + 2, ix, 1, 0]);
+    res.forEach((r) => { delete r.prevC; delete r.base; });
+    return molText(atoms, bonds);
+  }
+  function aaNames(res, nt, ct, single) {
+    if (single) { const r = res[0], nm = AAD[r.k].n; return (r.D ? "D-" : "") + nm; }
+    const three = $("aaLabel").value === "three";
+    let core = three ? res.map((r) => (r.D ? "D-" : "") + AAD[r.k].t).join("-") : res.map((r) => (r.D ? r.k.toLowerCase() : r.k)).join("");
+    if (nt === "ac") core = "Ac-" + core;
+    if (ct === "amide") core += "-NH₂";
+    return core;
+  }
+  function aaEntry(res, single) {
+    const nt = $("aaN").value, ct = $("aaC").value, side = $("aaSide").value === "1";
+    const mol = buildPeptide(res.map((r) => ({ ...r })), nt, ct, side), name = aaNames(res, nt, ct, single);
+    return { q: name, name, mol, full: single ? name : res.length + "-residue peptide", rot: normRot($("aaRot").value) };
+  }
+  function aaPreview() {
+    const seq = $("aaSeq").value.trim();
+    let e = null, msg = "";
+    if (seq) { const pr = parseSeq(seq); if (pr.err) msg = pr.err; else e = aaEntry(pr.res, false); }
+    else e = aaEntry([{ k: $("aaPick").value, D: false }], true);
+    $("aaPep").disabled = !seq || !!msg;
+    if (!e) { $("aaThumb").innerHTML = ""; $("aaName").innerHTML = `<span class="err">${esc(msg)}</span>`; return; }
+    try { const d = drawMolecule({ prep: prepare(parseMol(e.mol)), color: "#000000", rot: e.rot }, thumbS()); $("aaThumb").innerHTML = `<svg xmlns="${NS}" viewBox="${f(d.x0)} ${f(d.y0)} ${f(d.w)} ${f(d.h)}">${d.svg}</svg>`; } catch (err) { $("aaThumb").innerHTML = ""; }
+    $("aaName").textContent = e.name;
+  }
+  if (Object.keys(AAD).length) {
+    Object.keys(AAD).forEach((k) => { const o = document.createElement("option"); o.value = k; o.textContent = `${AAD[k].n} (${AAD[k].t}, ${k})`; $("aaPick").appendChild(o); });
+    ["aaPick", "aaSeq", "aaN", "aaC", "aaSide", "aaLabel", "aaRot"].forEach((id) => $(id).addEventListener("input", aaPreview));
+    $("aaPick").addEventListener("change", () => { $("aaSeq").value = ""; aaPreview(); });
+    $("aaAdd").addEventListener("click", () => addBuilt([aaEntry([{ k: $("aaPick").value, D: false }], true)]));
+    $("aaAll").addEventListener("click", () => addBuilt(Object.keys(AAD).map((k) => aaEntry([{ k, D: false }], true))));
+    $("aaPep").addEventListener("click", () => { const pr = parseSeq($("aaSeq").value); if (pr.err) { status(pr.err); return; } addBuilt([aaEntry(pr.res, false)]); });
+    $("aaSeq").addEventListener("keydown", (ev) => { if (ev.key === "Enter") $("aaPep").click(); });
+    $("aaBox").addEventListener("toggle", aaPreview);
+    setTimeout(aaPreview, 0);
+  } else $("aaBox").classList.add("hidden");
+
+  // "Add to" switch: picks the canvas that new molecules go to (same as clicking that canvas)
+  $("toTiles").addEventListener("click", () => setMode("tiles"));
+  $("toPage").addEventListener("click", () => setMode("page"));
+
+
+  // ---------- undo / redo ----------
+  // A snapshot of the molecules, positions, arrows and library is taken a moment after each change settles,
+  // so one drag or one slider move is one step. Style settings (fonts, bond length...) are not part of it.
+  const hist = { past: [], future: [], cur: null, t: null, muted: false };
+  function snap() { syncArrows(); return JSON.stringify({ items: items.map(({ prep, ...r }) => r), page, tileArrows, pageArrows, library: library.map(({ prep, ...r }) => r) }); }
+  function histButtons() { $("undoBtn").disabled = !hist.past.length && !hist.t; $("redoBtn").disabled = !hist.future.length; }
+  function histTick() { if (hist.muted) return; clearTimeout(hist.t); hist.t = setTimeout(histCommit, 350); histButtons(); }
+  function histCommit() {
+    clearTimeout(hist.t); hist.t = null;
+    const sn = snap();
+    if (sn !== hist.cur) { if (hist.cur != null) { hist.past.push(hist.cur); if (hist.past.length > 200) hist.past.shift(); hist.future = []; } hist.cur = sn; }
+    histButtons();
+  }
+  function restore(sn) {
+    const o = JSON.parse(sn);
+    hist.muted = true;
+    items = o.items.map((x) => { if (x.mol) { try { x.prep = prepare(parseMol(x.mol)); } catch (e) {} } return x; });
+    library = o.library; page = o.page; tileArrows = o.tileArrows; pageArrows = o.pageArrows;
+    arrows = mode === "page" ? pageArrows : tileArrows; arrowSel = null; tileSel = null; pageSel = null;
+    nextId = items.reduce((mx, x) => Math.max(mx, x.id + 1), nextId);
+    nextPage = page.reduce((mx, x) => Math.max(mx, x.id + 1), nextPage);
+    nextArrow = tileArrows.concat(pageArrows).reduce((mx, a) => Math.max(mx, a.id + 1), nextArrow);
+    $("delArrow").classList.add("hidden"); $("branchArrow").classList.add("hidden"); closeScale();
+    update();
+    hist.muted = false; hist.cur = sn; histButtons();
+  }
+  function undo() {
+    if (hist.t) histCommit();
+    if (!hist.past.length) { status("Nothing to undo."); return; }
+    hist.future.push(hist.cur); restore(hist.past.pop()); status("Undone.");
+  }
+  function redo() {
+    if (hist.t) histCommit();
+    if (!hist.future.length) { status("Nothing to redo."); return; }
+    hist.past.push(hist.cur); restore(hist.future.pop()); status("Redone.");
+  }
+  $("undoBtn").addEventListener("click", undo);
+  $("redoBtn").addEventListener("click", redo);
+
   // ---------- PubChem lookup ----------
   const PUG = "https://pubchem.ncbi.nlm.nih.gov/rest/pug";
   const looksLikeSmiles = (s) => /[=#()\[\]@\\/]/.test(s) || (/^[A-Za-z0-9]+$/.test(s) && /[a-z]/.test(s) && /\d/.test(s) && !/^\d+-\d+-\d$/.test(s) && /c\d/.test(s));
@@ -985,6 +1380,10 @@ const EXAMPLES = [{"name": "Rose Bengal (RB)", "cas": "632-69-9", "mol": "\n    
   function addFromQuery() {
     const q = $("addQ").value.trim();
     if (!q) { $("addQ").focus(); return; }
+    const nb = nucByName(q);
+    if (nb) { $("addQ").value = ""; addNuc([nb]); return; }
+    const xb = xanByName(q);
+    if (xb) { $("addQ").value = ""; addXan([xb]); return; }
     if (mode === "page") { // look it up, add it to the library and put it on the page
       const tmp = { q, name: "", color: "#000000", onDone: (le) => { placeOnPage(le); update(); status(`${le.name} added to the library and placed.`); } };
       $("addQ").value = ""; status("Looking up on PubChem…"); lookup(tmp, q); return;
@@ -1196,6 +1595,8 @@ const EXAMPLES = [{"name": "Rose Bengal (RB)", "cas": "632-69-9", "mol": "\n    
     if (/input|select|textarea/i.test(e.target.tagName) && e.target.type !== "checkbox" && e.target.type !== "range") return;
     if (!(e.metaKey || e.ctrlKey) || e.altKey) return;
     const k = e.key.toLowerCase();
+    if (k === "z" && !e.shiftKey) { e.preventDefault(); undo(); return; }
+    if ((k === "z" && e.shiftKey) || k === "y") { e.preventDefault(); redo(); return; }
     if (k === "c") { const what = copySelected(); if (what) { e.preventDefault(); status(`Copied ${what}. Click the other canvas and press Ctrl/⌘ V to paste.`); } }
     else if (k === "v") { if (pasteClip()) { e.preventDefault(); status("Pasted."); } }
   });
@@ -1339,29 +1740,21 @@ const EXAMPLES = [{"name": "Rose Bengal (RB)", "cas": "632-69-9", "mol": "\n    
   try { library = JSON.parse(localStorage.getItem("mt-library") || "[]") || []; } catch (e) { library = []; }
   try { page = JSON.parse(localStorage.getItem("mt-page") || "[]") || []; nextPage = page.reduce((mx, x) => Math.max(mx, x.id + 1), 1); } catch (e) { page = []; }
   if (saved && saved.length) saved.forEach((o) => addToLibrary(addItem(o)));
-  else loadExamples();
-  try {
-    if (localStorage.getItem("mt-lib-examples") !== "2") {
-      EXAMPLES.forEach((x) => { if (!library.some((l) => l.q === x.cas || l.name === x.name)) addToLibrary({ q: x.cas, name: x.name, mol: x.mol, prep: prepare(parseMol(x.mol)) }); });
-      localStorage.setItem("mt-lib-examples", "2");
-    }
-  } catch (e) {}
-  function loadExamples() { EXAMPLES.forEach((x, i) => addToLibrary(addItem({ q: x.cas, name: x.name, mol: x.mol, color: i === 0 ? "#d6338a" : "#000000", msg: "Example (CAS " + x.cas + ")" }))); }
   // two clicks, so a stray click doesn't wipe your list
   let armed = null;
   $("reloadEx").addEventListener("click", () => {
     const b = $("reloadEx");
     if (items.length && !armed) {
       b.textContent = "Click again to reset list and settings";
-      armed = setTimeout(() => { armed = null; b.textContent = "Reset examples and settings"; }, 3000);
+      armed = setTimeout(() => { armed = null; b.textContent = "Reset list and settings"; }, 3000);
       return;
     }
-    clearTimeout(armed); armed = null; b.textContent = "Reset examples and settings";
+    clearTimeout(armed); armed = null; b.textContent = "Reset list and settings";
     items = []; arrows = []; syncArrows(); arrowSel = null; $("delArrow").classList.add("hidden"); $("branchArrow").classList.add("hidden"); closeScale();
     // settings back to how they were the first time the page loaded
     SETTINGS.forEach((id) => { setVal($(id), FIRST[id]); try { localStorage.removeItem("mt-" + id); } catch (e) {} $(id).dispatchEvent(new Event("change")); });
     modeSettings = { tiles: {}, page: {} }; try { localStorage.removeItem("mt-modeset"); } catch (e) {}
-    loadExamples(); update(); status("Examples and settings reset.");
+    update(); status("List and settings reset.");
   });
   let startMode = "tiles"; try { startMode = localStorage.getItem("mt-mode") || "tiles"; } catch (e) {}
   setMode(startMode === "page" ? "page" : "tiles");
