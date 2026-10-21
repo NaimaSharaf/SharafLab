@@ -103,6 +103,8 @@
 .mb-rzlock{font-weight:500!important}
 .mb-rzbtns{display:inline-flex;gap:5px;flex-basis:100%}
 .mb-lib-save{display:flex;gap:6px;margin:2px 0 10px}
+.mb-objsvg{align-items:center}.mb-objsvg span{font-size:12px;color:#5b6b6b;margin-right:2px}
+#popLibRow{margin:8px 0 4px}
 .mb-lib-save input[type=text]{flex:1;min-width:0;width:auto}
 .mb kbd{font:600 11px "Manrope",Arial,sans-serif;border:1px solid #c9d6dc;border-bottom-width:2px;border-radius:4px;padding:0 4px;background:#f7fafa}
 .mb .mb-tabs button{padding-left:4px;padding-right:4px}
@@ -220,6 +222,8 @@
                 <div class="mb-acts">
                   <button class="mini primary" id="mFuse" type="button" title="Turn the selected shapes into one piece with one outline">Fuse into one</button>
                   <button class="mini primary" id="mCut" type="button" title="Cut the top shape out of the one underneath, like a binding site">Cut out (binding site)</button>
+                  <button class="mini primary" id="mGroup" type="button" title="Group: clicking any of these selects them all (Ctrl/⌘ G)">Group</button>
+                  <button class="mini" id="mUngroup" type="button" title="Ungroup (Ctrl/⌘ Shift G)">Ungroup</button>
                   <button class="mini" id="mDup" type="button">Duplicate</button>
                   <button class="mini" id="mMirror" type="button" title="Mirror the selection across a vertical line (left ↔ right)">Mirror horizontally ↔</button>
                   <button class="mini" id="mFlip" type="button" title="Mirror the selection across a horizontal line (top ↕ bottom)">Mirror vertically ↕</button>
@@ -229,6 +233,7 @@
                 </div>
                 <div class="mb-align"><span>Align</span><button class="mini mb-ico" type="button" data-al="left" title="Align left edges" aria-label="Align left edges"><svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><line x1="2" y1="1.5" x2="2" y2="14.5"/><rect x="4" y="3.5" width="9" height="3" fill="currentColor" stroke="none"/><rect x="4" y="9.5" width="5" height="3" fill="currentColor" stroke="none"/></svg></button><button class="mini mb-ico" type="button" data-al="hcenter" title="Align centres (left to right)" aria-label="Align centres (left to right)"><svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><line x1="8" y1="1.5" x2="8" y2="14.5"/><rect x="3" y="3.5" width="10" height="3" fill="currentColor" stroke="none" opacity=".75"/><rect x="5" y="9.5" width="6" height="3" fill="currentColor" stroke="none" opacity=".75"/></svg></button><button class="mini mb-ico" type="button" data-al="right" title="Align right edges" aria-label="Align right edges"><svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><line x1="14" y1="1.5" x2="14" y2="14.5"/><rect x="3" y="3.5" width="9" height="3" fill="currentColor" stroke="none"/><rect x="7" y="9.5" width="5" height="3" fill="currentColor" stroke="none"/></svg></button><button class="mini mb-ico" type="button" data-al="top" title="Align top edges" aria-label="Align top edges"><svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><line x1="1.5" y1="2" x2="14.5" y2="2"/><rect x="3.5" y="4" width="3" height="9" fill="currentColor" stroke="none"/><rect x="9.5" y="4" width="3" height="5" fill="currentColor" stroke="none"/></svg></button><button class="mini mb-ico" type="button" data-al="vcenter" title="Align middles (top to bottom)" aria-label="Align middles (top to bottom)"><svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><line x1="1.5" y1="8" x2="14.5" y2="8"/><rect x="3.5" y="3" width="3" height="10" fill="currentColor" stroke="none" opacity=".75"/><rect x="9.5" y="5" width="3" height="6" fill="currentColor" stroke="none" opacity=".75"/></svg></button><button class="mini mb-ico" type="button" data-al="bottom" title="Align bottom edges" aria-label="Align bottom edges"><svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><line x1="1.5" y1="14" x2="14.5" y2="14"/><rect x="3.5" y="3" width="3" height="9" fill="currentColor" stroke="none"/><rect x="9.5" y="7" width="3" height="5" fill="currentColor" stroke="none"/></svg></button></div>
                 <div class="mb-align"><span>Distribute</span><button class="mini mb-ico" type="button" data-al="dh" title="Space evenly left to right" aria-label="Space evenly left to right"><svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><line x1="1.5" y1="2" x2="1.5" y2="14"/><line x1="14.5" y1="2" x2="14.5" y2="14"/><rect x="6.5" y="4" width="3" height="8" fill="currentColor" stroke="none"/></svg></button><button class="mini mb-ico" type="button" data-al="dv" title="Space evenly top to bottom" aria-label="Space evenly top to bottom"><svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><line x1="2" y1="1.5" x2="14" y2="1.5"/><line x1="2" y1="14.5" x2="14" y2="14.5"/><rect x="4" y="6.5" width="8" height="3" fill="currentColor" stroke="none"/></svg></button></div>
+                <div class="mb-acts mb-objsvg"><span>Just this selection:</span><button class="mini" id="mSvgDl" type="button">Download SVG</button><button class="mini" id="mSvgCopy" type="button">Copy SVG</button></div>
                 <div class="mb-lib-save"><input type="text" id="mLibName" placeholder="Name for your library" aria-label="Name for your library" /><button class="mini" id="mLibSave" type="button">Save to library</button></div>
               </div>
               <div id="selBody" class="hidden">
@@ -244,6 +249,7 @@
                   <button class="mini" id="actSplit" type="button" title="Turn each added shape into its own piece">Split added shapes</button>
                   <button class="mini" id="actRemove" type="button" title="Remove (Delete)">Remove</button>
                 </div>
+                <div class="mb-acts mb-objsvg"><span>Just this piece:</span><button class="mini" id="sSvgDl" type="button">Download SVG</button><button class="mini" id="sSvgCopy" type="button">Copy SVG</button></div>
                 <div class="mb-lib-save"><input type="text" id="sLibName" placeholder="Name for your library" aria-label="Name for your library" /><button class="mini" id="sLibSave" type="button">Save to library</button></div>
                 <div id="selFields"></div>
               </div>
@@ -255,6 +261,7 @@
               <h3>My library</h3>
               <div class="mb-lib" id="libGrid"></div>
               <p class="mb-note" id="libEmpty" style="margin:0 0 6px">Select a piece (or Shift-click several) and use <em>Save to library</em> in the Selected tab. Your molecules show up here.</p>
+              <form class="mb-lib-save hidden" id="libExportRow"><input type="text" id="libExportName" aria-label="Name for the exported library file" placeholder="Library name" /><button class="mini" type="submit">Export</button></form>
               <div class="mb-acts"><button class="mini" id="libExport" type="button">Export library</button><label class="file mini">Import library<input id="libImport" type="file" accept=".json,application/json" /></label></div>
               <div class="mb-add" id="addGrid"></div>
               <label class="file hidden" id="imgPick">Upload<input id="imgFile" type="file" accept="image/svg+xml,.svg,image/png,image/jpeg,image/webp" /></label>
@@ -309,7 +316,8 @@
             </header>
             <div class="mb-stage" id="stage"></div>
             <div class="mb-pop" id="pop" role="dialog" aria-labelledby="popTitle" hidden>
-              <div class="mb-pop-h"><strong id="popTitle"></strong><span><button class="mini" id="popMore" type="button">All settings</button><button class="mini" id="popClose" type="button" aria-label="Close">✕</button></span></div>
+              <div class="mb-pop-h"><strong id="popTitle"></strong><span><button class="mini" id="popLib" type="button" title="Save this molecule to My library (Add tab)">+ Library</button><button class="mini" id="popMore" type="button">All settings</button><button class="mini" id="popClose" type="button" aria-label="Close">✕</button></span></div>
+              <form class="mb-lib-save hidden" id="popLibRow"><input type="text" id="popLibName" aria-label="Name for your library" /><button class="mini" type="submit">Save</button></form>
               <div id="popFields"></div>
             </div>
             <div class="mb-hint" id="hint">Zoom with <kbd>+</kbd> <kbd>−</kbd> (or pinch / <kbd>⌘</kbd>/<kbd>Ctrl</kbd>-scroll); scroll or <kbd>Space</kbd>-drag to move around; <kbd>0</kbd> fits the figure. Drag the teal squares around a selected piece to resize it: the opposite side stays put (<kbd>Alt</kbd>/<kbd>Option</kbd> resizes from the centre, <kbd>Shift</kbd> keeps proportions). <strong>Double-click</strong> any part (a head, the tails, a domain, the membrane) to edit it: drag the orange squares to resize (corners change width and height; hold <kbd>Shift</kbd> to keep proportions), drag the orange dots to reshape corners, add shapes, mirror, copy and fuse them. Drag to move (hold <kbd>Shift</kbd> while dragging to keep it level or straight up and down). Drag the round handle to rotate (hold <kbd>Shift</kbd> for 30° steps). <kbd>Alt</kbd>/<kbd>Option</kbd>-drag makes a copy. <kbd>Delete</kbd> removes, arrow keys nudge.</div>
@@ -566,7 +574,7 @@
         ["headSize", "Size", "range", 0.5, 30, 0.05], ["headStretch", "Stretch", "range", 0.1, 6, 0.05], ["headTurn", "Head turn", "range", -180, 180, 1], ["headCorner", "Corner radius (pt)", "range", 0, 10, 0.05, { when: (o) => isPoly(o.headShape) }],
         ["§", "Linker"], ["linkerOn", "Show linker", "check"], ["linkerColor", "Color", "color"], ["linkerW", "Line width (pt)", "range", 0.1, 4, 0.05],
         ["linkerLen", "Length", "range", 0, 20, 0.05], ["linkerAngle", "Lipid to linker angle", "range", -180, 180, 1], ["headAngle", "Linker to protein angle", "range", -90, 90, 1],
-        ["§", "Lipid tails"], ["tails", "Tails", "select", [1, 2, 3, 4]], ["tailColor", "Color", "color"], ["tailW", "Line width (pt)", "range", 0.1, 5, 0.05],
+        ["§", "Lipid tails"], ["tails", "Tails", "select", [[0, "None"], [1, "1"], [2, "2"], [3, "3"], [4, "4"]]], ["tailColor", "Color", "color"], ["tailW", "Line width (pt)", "range", 0.1, 5, 0.05],
         ["tailLen", "Length", "range", 1, 40, 0.05], ["tailGap", "Spacing", "range", 0.2, 6, 0.05],
         ["tailStyle", "Style", "select", [["wavy", "Wavy"], ["zigzag", "Zigzag"], ["straight", "Straight"]]],
         ["waves", "Waves", "range", 0, 8, 0.5], ["waveAmp", "Wave height", "range", 0, 2, 0.01], ...OUTLINE_FIELDS],
@@ -577,7 +585,7 @@
         if (p.headOn && !(o && o.noBase)) head = `<g data-part="head" transform="translate(${f(g.C[0])},${f(g.C[1])}) rotate(${f(p.headTurn + g.dd)})">${shapeMarkup(p.headShape, p.headSize, p.headStretch, p.headColor, p.outline, p.sw, null, ensurePts(p, "headShape", "headPts"), p.headCorner)}</g>`;
         if (p.linkerOn && ll > 0) out.push(`<line data-part="linker" data-hit="1" x1="0" y1="0" x2="${f(tip[0])}" y2="${f(tip[1])}" stroke="transparent" stroke-width="${f(Math.max(2.5, p.linkerW * 3))}"/>`);
         if (p.linkerOn && ll > 0) out.push(`<line data-part="linker" x1="0" y1="0" x2="${f(tip[0])}" y2="${f(tip[1])}" stroke="${p.linkerColor}" stroke-width="${f(p.linkerW)}" stroke-linecap="round"/>`);
-        out.push(`<g data-part="tails">` + tailBundle(p.tails, p.tailGap, p.tailLen, p.tailColor, p.tailW, p.waves, p.waveAmp, p.tailStyle) +
+        if (+p.tails > 0) out.push(`<g data-part="tails">` + tailBundle(p.tails, p.tailGap, p.tailLen, p.tailColor, p.tailW, p.waves, p.waveAmp, p.tailStyle) +
           (+p.tails > 1 || (p.linkerOn && ll > 0) ? `<circle r="${f(p.tailW / 2)}" fill="${p.tailColor}"/>` : "") + `</g>`);
         out.push(head);
         return out.join("");
@@ -659,8 +667,9 @@
       fields: [["style", "Style", "select", [["cyl", "Cylinder"], ["flat", "Flat block"]]], ["w", "Width", "range", 2, 100, 0.25], ["h", "Height", "range", 2, 100, 0.25],
         ["ry", "Ellipse depth", "range", 0, 30, 0.1, { when: (o) => o.style !== "flat" }], ["corner", "Corner rounding", "range", 0, 25, 0.1, { when: (o) => o.style === "flat" }],
         ["§", "Top", { when: (o) => o.style !== "flat" }], ["topColor", "Fill", "color", { when: (o) => o.style !== "flat" }],
+        ["pore", "Pore (hole) size", "range", 0, 0.95, 0.01, { when: (o) => o.style !== "flat" }], ["poreColor", "Pore fill", "color", { when: (o) => o.style !== "flat" && o.pore > 0 }],
         ["§", "Side"], ["color", "Fill", "color"], ["stripes", "Strands", "range", 0, 16, 1],
-        ["§", "Bottom", { when: (o) => o.style !== "flat" }], ["bottomColor", "Fill", "color", { when: (o) => o.style !== "flat" }], ...OUTLINE_FIELDS],
+        ["§", "Bottom", { when: (o) => o.style !== "flat" }], ["bottomOn", "Show bottom", "check", { when: (o) => o.style !== "flat" }], ["bottomColor", "Fill", "color", { when: (o) => o.style !== "flat" && o.bottomOn !== false }], ...OUTLINE_FIELDS],
       draw(p) {
         const w = p.w, h = p.h, rx = w / 2, ry = Math.max(0, p.ry), y0 = -h / 2, y1 = h / 2;
         const strands = (top, bot) => {
@@ -673,9 +682,13 @@
           return out;
         };
         if (p.style === "flat") return `<rect x="${f(-rx)}" y="${f(y0)}" width="${f(w)}" height="${f(h)}" rx="${f(Math.min(p.corner, rx, h / 2))}" ${st(p.color, p)}/>` + strands(y0 + h * 0.07, y1 - h * 0.07);
-        const bottom = `<ellipse data-part="bottom" cx="0" cy="${f(y1)}" rx="${f(rx)}" ry="${f(ry)}" ${st(p.bottomColor, p)}/>`;
-        const side = `<path data-part="side" d="M${f(-rx)},${f(y0)}L${f(-rx)},${f(y1)}A${f(rx)},${f(ry)} 0 0 1 ${f(rx)},${f(y1)}L${f(rx)},${f(y0)}Z" ${st(p.color, p)}/>`;
-        const top = `<ellipse data-part="top" cx="0" cy="${f(y0)}" rx="${f(rx)}" ry="${f(ry)}" ${st(p.topColor, p)}/>`;
+        // "Show bottom" off: no bottom oval, the side simply curves round underneath (a solid cylinder)
+        const showBottom = p.bottomOn !== false;
+        const bottom = showBottom ? `<ellipse data-part="bottom" cx="0" cy="${f(y1)}" rx="${f(rx)}" ry="${f(ry)}" ${st(p.bottomColor, p)}/>` : "";
+        const side = `<path data-part="side" d="M${f(-rx)},${f(y0)}L${f(-rx)},${f(y1)}A${f(rx)},${f(ry)} 0 0 ${showBottom ? 1 : 0} ${f(rx)},${f(y1)}L${f(rx)},${f(y0)}Z" ${st(p.color, p)}/>`;
+        const k = Math.min(0.95, Math.max(0, +p.pore || 0));
+        const top = `<ellipse data-part="top" cx="0" cy="${f(y0)}" rx="${f(rx)}" ry="${f(ry)}" ${st(p.topColor, p)}/>` +
+          (k > 0 ? `<ellipse data-part="top" cx="0" cy="${f(y0)}" rx="${f(rx * k)}" ry="${f(ry * k)}" fill="${okHex(p.poreColor) ? p.poreColor : p.color}"/>` : "");
         return bottom + side + `<g data-part="side">${strands(y0 + ry + h * 0.04, y1 - h * 0.04)}</g>` + top;
       }
     },
@@ -1041,8 +1054,18 @@
   // added shapes mirror across the main shape's centre line
   function mirrorAxisY(it) { if (it.type === "lipoprotein" && it.p.headOn) return lipoGeom(it.p).C[1]; return 0; }
   function mirrorAxis(it) { if (it.type === "lipoprotein" && it.p.headOn) return lipoGeom(it.p).C[0]; return 0; }
+  // groups: items sharing the same "group" value are selected and moved together
+  const newGroupId = () => "g" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  let cloneGroups = null; // within one copy operation, copies of the same group share one new group
+  function regroup(c) {
+    if (!c.group) return;
+    if (!cloneGroups) { cloneGroups = new Map(); queueMicrotask(() => { cloneGroups = null; }); }
+    if (!cloneGroups.has(c.group)) cloneGroups.set(c.group, newGroupId());
+    c.group = cloneGroups.get(c.group);
+  }
+  function groupOf(it) { if (!it || !it.group) return null; const g = scene.items.filter((q) => q.group === it.group); return g.length > 1 ? g : null; }
   function cloneItem(it, dx, dy) {
-    const c = JSON.parse(JSON.stringify(it)); c.id = scene.next++; c.x += dx; c.y += dy;
+    const c = JSON.parse(JSON.stringify(it)); c.id = scene.next++; c.x += dx; c.y += dy; regroup(c);
     scene.items.splice(scene.items.indexOf(it) + 1, 0, c);
     return c;
   }
@@ -1203,6 +1226,7 @@
     const p = it.p, rect = (x0, y0, x1, y1) => [[x0, y0], [x1, y0], [x1, y1], [x0, y1]];
     if (it.type === "lipoprotein") {
       const n = +p.tails, g = Math.max(p.tailGap, p.tailW * 1.8), hw = ((n - 1) * g) / 2 + p.waveAmp + p.tailW;
+      if (n <= 0) return [rect(-0.01, 0, 0.01, 0.01)]; // no lipid tails: nothing sits in the membrane
       return [rect(-hw, 0, hw, p.tailLen)];
     }
     if (it.type === "lipid") { const hw = ((p.tails - 1) * p.tailGap) / 2 + p.amp + p.headR; return [rect(-hw, -p.headR, hw, p.tailLen)]; }
@@ -1493,7 +1517,9 @@
     const it = many ? null : scene.items.find((q) => q.id === sel);
     $("selEmpty").classList.toggle("hidden", !!it || many);
     $("selBody").classList.toggle("hidden", !it);
-    $("selTitle").textContent = many ? multi.size + " pieces selected" : it ? TYPES[it.type].label : "Selected";
+    const ms = many ? scene.items.filter((q) => multi.has(q.id)) : [], isGroup = !!(many && ms[0].group) && ms.every((q) => q.group === ms[0].group) && scene.items.filter((q) => q.group === ms[0].group).length === ms.length;
+    $("mGroup").classList.toggle("hidden", isGroup); $("mUngroup").classList.toggle("hidden", !ms.some((q) => q.group));
+    $("selTitle").textContent = isGroup ? "Group of " + multi.size : many ? multi.size + " pieces selected" : it ? TYPES[it.type].label : "Selected";
     if (it) $("actSplit").classList.toggle("hidden", !(it.extras && it.extras.length));
     $("rzBox").classList.toggle("hidden", !(it || many));
     fillRz();
@@ -1635,8 +1661,10 @@
     clearTimeout(commitT); commit();
     buildMem(); buildSel();
   }
+  let popItem = null;
   function openPop(e, it, part) {
     let title, defs, obj;
+    popItem = it || null; $("popLibRow").classList.add("hidden");
     if (!it) { title = "Membrane"; defs = MEM_FIELDS; obj = scene.m; }
     else if (/^t\d+$/.test(part)) { title = TYPES[it.type].label + " · Lipid tails"; defs = TAIL_FIELDS; obj = it.tails[+part.slice(1)]; }
     else if (/^x\d+$/.test(part)) { title = TYPES[it.type].label + " · Added shape " + (+part.slice(1) + 1); defs = EXTRA_FIELDS; obj = it.extras[+part.slice(1)]; }
@@ -1650,6 +1678,7 @@
     const box = $("popFields");
     const v = buildForm(box, defs, obj, () => { v(); render(); }, commitSoon);
     $("popMore").classList.toggle("hidden", !it);
+    $("popLib").classList.toggle("hidden", !it);
     if (it) {
       const tools = document.createElement("div");
       tools.className = "mb-pop-tools";
@@ -1659,6 +1688,7 @@
         `<div class="mb-acts"><button class="mini" type="button" data-t="mx" title="Mirror across a vertical line (left ↔ right)">Mirror horizontally ↔</button><button class="mini" type="button" data-t="my" title="Mirror across a horizontal line (top ↕ bottom)">Mirror vertically ↕</button>` +
         `<button class="mini" type="button" data-t="cp" title="Copy (or Alt/Option-drag in the figure)">Copy</button><button class="mini" type="button" data-t="mc" title="A left-right mirror-image copy on the other side">Mirrored copy ↔</button><button class="mini" type="button" data-t="mcv" title="A top-bottom mirror-image copy on the other side">Mirrored copy ↕</button>` +
         `${isX ? `<button class="mini" type="button" data-t="del">Remove this shape</button>` : ""}` +
+        `${it.type === "lipoprotein" && part === "tails" ? `<button class="mini" type="button" data-t="dellipotails" title="Remove the lipid tails (bring them back in All settings → Lipid tails → Tails)">Remove these tails</button>` : ""}` +
         `${/^t\d+$/.test(part) ? `<button class="mini" type="button" data-t="deltails">Remove these tails</button>` : `<button class="mini" type="button" data-t="addtails" title="Attach lipid tails to this piece">+ Lipid tails</button>`}</div>` +
         `<div class="mb-pickmode" role="radiogroup" aria-label="What clicking a shape does"><label><input type="radio" name="pickmode" value="switch"${pickMode === "switch" ? " checked" : ""}/> Switch this to</label><label><input type="radio" name="pickmode" value="add"${pickMode === "add" ? " checked" : ""}/> Add a new</label><span>shape (click one)</span></div><div class="mb-picker">${PICK.map((k) => `<button type="button" data-pick="${k}" title="${esc(SHAPE_NAME[k] || k)}"><svg viewBox="-13 -13 26 26" aria-hidden="true">${shapeIcon(k)}</svg></button>`).join("")}</div>` +
         (n ? `<div class="mb-row"><label for="popFuse">Fuse ${T.base && T.base(it.p, it) ? "with the " + (it.type === "lipoprotein" ? "head" : "shape") : "added shapes"} into one outline</label><span class="val"><input id="popFuse" type="checkbox"${it.fuse ? " checked" : ""}/></span></div>` : "");
@@ -1684,6 +1714,8 @@
       });
       const at = tools.querySelector('[data-t="addtails"]');
       if (at) at.addEventListener("click", () => { const np = addTails(it, part); edit = { id: it.id, part: np }; render(); commit(); const pos = { left: pop.style.left, top: pop.style.top }; openPop(null, it, np); pop.style.left = pos.left; pop.style.top = pos.top; status("Lipid tails added. Drag the orange dot to move them, and the square at their tip to turn or lengthen them."); });
+      const dlt = tools.querySelector('[data-t="dellipotails"]');
+      if (dlt) dlt.addEventListener("click", () => { it.p.tails = 0; edit = null; bboxCache.delete(it.id); render(); buildSel(); commit(); closePop(); status("Lipid tails removed. To bring them back: Selected tab → Lipid tails → Tails."); });
       const dt = tools.querySelector('[data-t="deltails"]');
       if (dt) dt.addEventListener("click", () => { it.tails.splice(+part.slice(1), 1); bboxCache.delete(it.id); commit(); closePop(); });
       const del = tools.querySelector('[data-t="del"]');
@@ -1802,16 +1834,19 @@
     } else if (g) {
       const id = +g.dataset.id;
       let it = scene.items.find((q) => q.id === id);
+      const grp = groupOf(it);
       if (e.shiftKey) {
-        // build a selection of several pieces
-        if (!multi.size && sel !== null) multi.add(sel);
-        if (multi.has(id)) multi.delete(id); else multi.add(id);
+        // build a selection of several pieces (a grouped piece brings its whole group)
+        if (!multi.size && sel !== null) { const cg = groupOf(current()); (cg || [current()]).forEach((q) => q && multi.add(q.id)); }
+        const ids = (grp || [it]).map((q) => q.id);
+        if (multi.has(id)) ids.forEach((x) => multi.delete(x)); else ids.forEach((x) => multi.add(x));
         sel = multi.size ? (multi.has(id) ? id : [...multi][multi.size - 1]) : null;
         if (multi.size < 2) multi.clear();
         buildSel(); showSel(); render();
         e.preventDefault();
         return;
       }
+      if (grp && !(multi.size > 1 && multi.has(id))) { multi = new Set(grp.map((q) => q.id)); sel = id; buildSel(); showSel(); }
       if (multi.size > 1 && multi.has(id)) {
         let group = scene.items.filter((q) => multi.has(q.id));
         if (e.altKey) { group = group.map((q) => cloneItem(q, 0, 0)); multi = new Set(group.map((q) => q.id)); status("Copied. Release to drop the copies."); }
@@ -1966,6 +2001,7 @@
     } else if ((e.key === "Delete" || e.key === "Backspace") && multi.size > 1) { e.preventDefault(); removeMulti(); }
     else if (e.key === "Delete" || e.key === "Backspace") { e.preventDefault(); removeSel(); }
     else if (mod && e.key.toLowerCase() === "d") { e.preventDefault(); dupSel(); }
+    else if (mod && e.key.toLowerCase() === "g" && !typing) { e.preventDefault(); e.shiftKey ? ungroupSel() : groupSel(); }
     else if (e.key.startsWith("Arrow")) {
       e.preventDefault();
       const d = e.shiftKey ? 2.5 : 0.25;
@@ -2274,6 +2310,16 @@
   let library = [];
   try { library = JSON.parse(localStorage.getItem(LIB) || "[]"); if (!Array.isArray(library)) library = []; } catch (e) { library = []; }
   const libId = () => "L" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  // molecules added to everyone's library once (removing them later is respected)
+  const LIB_SEEDS = [
+    { key: "pore-barrel-teal-2", name: "Teal pore barrel", items: [{ id: 1, type: "barrel", x: 0, y: 0, rot: 0, scale: 100, flip: false, push: true,
+      p: { style: "cyl", w: 16.5, h: 15.5, ry: 2.6, topColor: "#9fd3ce", color: "#4a958d", bottomColor: "#4a958d", stripes: 0, corner: 3.4, bottomOn: false, pore: 0.68, poreColor: "#4a958d", outline: "#231f20", sw: 0.6 } }] }
+  ];
+  try {
+    const done = JSON.parse(localStorage.getItem("sharaf-membrane-libseeds") || "[]");
+    LIB_SEEDS.forEach((sd) => { if (!done.includes(sd.key)) { library.push({ id: libId(), name: sd.name, items: sd.items }); done.push(sd.key); } });
+    localStorage.setItem("sharaf-membrane-libseeds", JSON.stringify(done)); localStorage.setItem(LIB, JSON.stringify(library));
+  } catch (e) { /* storage blocked: skip */ }
   function saveLib() { try { localStorage.setItem(LIB, JSON.stringify(library)); } catch (e) { status("Your browser would not store the library; use Export library to keep it."); } }
   function libThumb(en) {
     const items = en.items.map((q, i) => Object.assign(JSON.parse(JSON.stringify(q)), { id: en.id + "_" + i }));
@@ -2310,7 +2356,7 @@
   }
   function addFromLibrary(en) {
     const boxes = scene.items.map(worldBox), right = boxes.length ? Math.max(...boxes.map((b) => b.x1)) : 0;
-    const items = en.items.map((q) => { const c = JSON.parse(JSON.stringify(q)); c.id = scene.next++; return c; });
+    const items = en.items.map((q) => { const c = JSON.parse(JSON.stringify(q)); c.id = scene.next++; regroup(c); return c; });
     const eb = items.map(worldBox), minX = Math.min(...eb.map((b) => b.x0)), maxX = Math.max(...eb.map((b) => b.x1));
     const dx = boxes.length ? right + 5 - minX : -(minX + maxX) / 2;
     items.forEach((c) => { c.x = f(c.x + dx); bboxCache.delete(c.id); });
@@ -2318,9 +2364,84 @@
     multi = items.length > 1 ? new Set(items.map((c) => c.id)) : new Set();
     sel = items[items.length - 1].id; buildSel(); render(); commit(); status(`Added “${en.name}”.`);
   }
+  // Click a molecule → "+ Library" in its popup → name it → Save. If several are Shift-selected
+  // (including this one), the whole group is saved together.
+  function popLibItems() {
+    if (!popItem) return [];
+    const group = scene.items.filter((q) => multi.has(q.id));
+    return group.length > 1 && multi.has(popItem.id) ? group : [popItem];
+  }
+  $("popLib").addEventListener("click", () => {
+    const items = popLibItems(); if (!items.length) return;
+    const row = $("popLibRow"), name = $("popLibName");
+    if (!row.classList.contains("hidden")) { row.requestSubmit(); return; }
+    name.value = (items.length > 1 ? "Group of " + items.length : TYPES[items[0].type].label) + " " + (library.length + 1);
+    row.classList.remove("hidden"); name.focus(); name.select();
+  });
+  $("popLibRow").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const items = popLibItems(); if (!items.length) return;
+    saveToLibrary(items, $("popLibName").value);
+    $("popLibRow").classList.add("hidden");
+    const b = $("popLib"); b.textContent = "Saved ✓"; setTimeout(() => { b.textContent = "+ Library"; }, 1400);
+  });
+  $("popLibName").addEventListener("keydown", (e) => { if (e.key === "Escape") { e.stopPropagation(); $("popLibRow").classList.add("hidden"); } });
+  function groupSel() {
+    const list = scene.items.filter((q) => multi.has(q.id));
+    if (list.length < 2) { status("Shift-click two or more pieces, then Group."); return; }
+    const g = newGroupId(); list.forEach((q) => { q.group = g; });
+    buildSel(); render(); commit(); status("Grouped " + list.length + " pieces. Click any of them to select the group; double-click one to edit it on its own.");
+  }
+  function ungroupSel() {
+    const list = multi.size > 1 ? scene.items.filter((q) => multi.has(q.id)) : (groupOf(current()) || []);
+    const had = list.filter((q) => q.group); if (!had.length) { status("Nothing grouped here."); return; }
+    had.forEach((q) => { delete q.group; });
+    buildSel(); render(); commit(); status("Ungrouped. The pieces are still selected together until you click elsewhere.");
+  }
+  $("mGroup").addEventListener("click", groupSel);
+  $("mUngroup").addEventListener("click", ungroupSel);
+  // SVG of just the selected piece(s), without the membrane, same size settings as the full figure
+  function itemsSVG(items) {
+    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+    items.forEach((q) => { const b = worldBox(q); x0 = Math.min(x0, b.x0); y0 = Math.min(y0, b.y0); x1 = Math.max(x1, b.x1); y1 = Math.max(y1, b.y1); });
+    const pad = 1.5; x0 -= pad; y0 -= pad; x1 += pad; y1 += pad;
+    const w = x1 - x0, h = y1 - y0, sc = (+$("scale").value || 100) / 100;
+    let unit = "pt", W = w * sc, H = h * sc;
+    if ($("pasteInto").value === "affinity") { const d = +$("docDpi").value || 288; W = (W / 72) * d; H = (H / 72) * d; unit = ""; }
+    const order = scene.items.filter((q) => items.includes(q));
+    const body = order.map((q) => `<g transform="${itemTransform(q)}">${itemMarkupExport(q)}</g>`).join("").replace(/<line data-part="linker" data-hit="1"[^>]*\/>/g, "").replace(/ data-part="[^"]*"/g, "");
+    return `<svg xmlns="${NS}" version="1.1" viewBox="${f(x0)} ${f(y0)} ${f(w)} ${f(h)}" width="${f(W)}${unit}" height="${f(H)}${unit}">${body}</svg>`;
+  }
+  const selItems = () => (multi.size > 1 ? scene.items.filter((q) => multi.has(q.id)) : scene.items.filter((q) => q.id === sel));
+  function selName(items) { return (items.length > 1 ? "group" : TYPES[items[0].type].label).toLowerCase().replace(/[^a-z0-9]+/g, "-"); }
+  function dlSelSvg() { const items = selItems(); if (!items.length) return; download(new Blob(['<?xml version="1.0" encoding="UTF-8"?>\n' + itemsSVG(items)], { type: "image/svg+xml" }), "membrane-" + selName(items) + ".svg"); status("SVG of the selection downloaded."); }
+  async function copySelSvg() {
+    const items = selItems(); if (!items.length) return; const svg = itemsSVG(items);
+    try { await navigator.clipboard.write([new ClipboardItem({ "image/svg+xml": new Blob([svg], { type: "image/svg+xml" }), "text/plain": new Blob([svg], { type: "text/plain" }) })]); status("SVG of the selection copied."); }
+    catch (e) { try { await navigator.clipboard.writeText(svg); status("SVG of the selection copied."); } catch (e2) { status("Copy failed; use Download SVG instead."); } }
+  }
+  $("sSvgDl").addEventListener("click", dlSelSvg); $("mSvgDl").addEventListener("click", dlSelSvg);
+  $("sSvgCopy").addEventListener("click", copySelSvg); $("mSvgCopy").addEventListener("click", copySelSvg);
   $("sLibSave").addEventListener("click", () => { const it = current(); if (it) { saveToLibrary([it], $("sLibName").value); $("sLibName").value = ""; } });
   $("mLibSave").addEventListener("click", () => { saveToLibrary(scene.items.filter((q) => multi.has(q.id)), $("mLibName").value); $("mLibName").value = ""; });
-  $("libExport").addEventListener("click", () => { download(new Blob([JSON.stringify({ app: "sharaf-membrane-library", version: 1, library }, null, 1)], { type: "application/json" }), "membrane-library.json"); status("Library exported."); });
+  // Export library: name it first; the file is saved as "<name>.json" and the name is kept inside the file.
+  $("libExport").addEventListener("click", () => {
+    const row = $("libExportRow"), input = $("libExportName");
+    if (!row.classList.contains("hidden")) { row.requestSubmit(); return; }
+    let last = ""; try { last = localStorage.getItem("sharaf-membrane-libname") || ""; } catch (e) { /* ignore */ }
+    input.value = last || "membrane-library";
+    row.classList.remove("hidden"); input.focus(); input.select();
+  });
+  $("libExportRow").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const name = $("libExportName").value.trim() || "membrane-library";
+    const file = name.replace(/[\\/:*?"<>|]+/g, "-").replace(/\.json$/i, "") + ".json";
+    download(new Blob([JSON.stringify({ app: "sharaf-membrane-library", version: 1, name, library }, null, 1)], { type: "application/json" }), file);
+    try { localStorage.setItem("sharaf-membrane-libname", name); } catch (err) { /* ignore */ }
+    $("libExportRow").classList.add("hidden");
+    status(`Library exported as “${file}” (${library.length} molecule${library.length === 1 ? "" : "s"}).`);
+  });
+  $("libExportName").addEventListener("keydown", (e) => { if (e.key === "Escape") $("libExportRow").classList.add("hidden"); });
   function mergeLibrary(list) {
     let n = 0;
     (list || []).forEach((en) => {
@@ -2333,7 +2454,7 @@
   }
   $("libImport").addEventListener("change", (e) => {
     const fl = e.target.files[0]; e.target.value = ""; if (!fl) return;
-    fl.text().then((t) => { try { const d = JSON.parse(t); const n = mergeLibrary(d.library || d); status(n + " molecule" + (n === 1 ? "" : "s") + " added to your library."); } catch (err) { status("That file is not a membrane library."); } });
+    fl.text().then((t) => { try { const d = JSON.parse(t); const n = mergeLibrary(d.library || d); status(n + " molecule" + (n === 1 ? "" : "s") + " added to your library" + (d.name ? " from “" + d.name + "”" : "") + "."); } catch (err) { status("That file is not a membrane library."); } });
   });
 
   // ---------- sessions: the figure and your library in one file ----------
