@@ -50,7 +50,7 @@
 .arw-actions{display:flex;gap:8px;padding:0 12px 12px}
 .arw-actions .btn{white-space:nowrap;padding:7px 9px}
 .arw-actions .primary{flex:1}
-.arw-sections{display:flex;gap:4px;border-bottom:2px solid #d8e0e0;margin:0 0 14px}
+.arw-sections{display:flex;flex-wrap:wrap;gap:4px;border-bottom:2px solid #d8e0e0;margin:0 0 14px}
 .arw-sections button{border:0;background:none;padding:10px 16px;margin-bottom:-2px;border-bottom:3px solid transparent;font:700 15px "Montserrat",Arial,sans-serif;color:#46606a;cursor:pointer}
 .arw-sections button[aria-selected=true]{color:#0b6870;border-bottom-color:#0b6870}
 .arw-filter:empty{display:none}
@@ -98,10 +98,10 @@
     <main>
       <section class="outreach-hero">
         <a class="tool-back" href="../../tools.html">← All lab tools</a>
-        <p class="eyebrow eyebrow-dark">Lab tools · Figures · Arrows · Bacteria · Animals · Symbols · Objects · Medical</p>
+        <p class="eyebrow eyebrow-dark">Lab tools · Figures · Arrows · Bacteria · DNA & RNA · Animals · Symbols · Objects · Medical</p>
         <h1>Figure library.</h1>
         <p>
-          Arrows, bacteria, animal silhouettes and symbols for figures, each in
+          Arrows, bacteria, DNA and RNA, animal silhouettes and symbols for figures, each in
           its own section. Set the color, line width and size once, then copy any figure
           as SVG and paste it into Affinity, Illustrator or PowerPoint.
         </p>
@@ -147,6 +147,18 @@
           <div class="arw-row"><label for="fillPeri">Fill between membranes</label><span class="val"><input id="fillPeri" type="checkbox" /><input id="fillPeriC" type="color" value="#ababbb" aria-label="Fill color between membranes" /></span></div>
           <p class="arw-note"><strong>Double-click a bacterium</strong> (or click ✎) to change its own shape: spacing between cells, number of cells, tail waves and height, line width and more.</p>
           <p class="arw-note">Bacteria use the color above, their own line width, and are sized by their overall width (the long spirochete is drawn longer so its waves match the standard one). Each membrane is a stroked shape, with the inner membrane inside the outer one; fills go on those shapes. If only the space between membranes is filled, the inside is filled white. </p>
+          </div>
+
+          <div data-sec="nucleic" hidden>
+          <h3>DNA and RNA</h3>
+          <div class="arw-row"><label for="naSize">Figure width (in)</label><span class="val"><input id="naSize" type="range" min="0.25" max="10" step="0.05" value="3" /><input id="naSizeNum" type="number" step="any" min="0.05" value="3" aria-label="Nucleic acid figure width in inches" /></span></div>
+          <div class="arw-row"><label for="naLw">Strand line (pt)</label><span class="val"><input id="naLw" type="range" min="0.1" max="8" step="0.05" value="2" /><input id="naLwNum" type="number" step="any" min="0.01" value="2" aria-label="Strand line width in pt" /></span></div>
+          <div class="arw-row"><label for="naBpLw">Base-pair line (pt)</label><span class="val"><input id="naBpLw" type="range" min="0.1" max="8" step="0.05" value="1" /><input id="naBpLwNum" type="number" step="any" min="0.01" value="1" aria-label="Base-pair line width in pt" /></span></div>
+          <div class="arw-row"><label for="naCap">Line ends</label><span class="val"><select id="naCap"><option value="round">Round</option><option value="butt">Flat</option><option value="square">Square</option></select></span></div>
+          <div class="arw-row"><label for="naC2On">Second strand color</label><span class="val"><input id="naC2On" type="checkbox" /><input id="naC2" type="color" value="#4e9d9c" aria-label="Second strand color" /></span></div>
+          <div class="arw-row"><label for="naBpOn">Base-pair color</label><span class="val"><input id="naBpOn" type="checkbox" /><input id="naBpC" type="color" value="#ababbb" aria-label="Base-pair color" /></span></div>
+          <p class="arw-note"><strong>Double-click a figure</strong> (or click ✎) to change its own shape: number of turns or waves, wave height and length, base pairs, gaps where the strands cross, and its own line widths.</p>
+          <p class="arw-note">Strands are strokes (gapped where one passes behind the other); base pairs are separate lines drawn behind the strands. The second strand color also colors new (daughter) strands in the replication fork.</p>
           </div>
 
           <div data-sec="animals" hidden>
@@ -214,7 +226,8 @@
   const f = (x) => (Math.round(x * 100) / 100).toString();
   const SWATCHES = ["#000000", "#515151", "#929292", "#ffffff", "#151549", "#564087", "#ababbb", "#4e9d9c", "#8dcd7b", "#efe75a", "#f19737", "#b24434", "#c6327c"];
   const DEFAULTS = { color: "#929292", lw: 1.5, cap: "round", dashed: false, head: "triangle", hl: 4.2, hw: 4.2, double: false, size: 0.6, rot: 0, flipH: false, flipV: false, dpi: 360,
-    cellSize: 4, cellLw: 2, membranes: "2", gap: 3, fillIn: false, fillInC: "#ffffff", fillPeri: false, fillPeriC: "#ababbb", aniSize: 1, aniStyle: "fill", aniLw: 2, symSize: 0.3, symLw: 2, symCap: "round", objSize: 1.5, objStyle: "fill", objLw: 2 };
+    cellSize: 4, cellLw: 2, membranes: "2", gap: 3, fillIn: false, fillInC: "#ffffff", fillPeri: false, fillPeriC: "#ababbb", aniSize: 1, aniStyle: "fill", aniLw: 2, symSize: 0.3, symLw: 2, symCap: "round", objSize: 1.5, objStyle: "fill", objLw: 2,
+    naSize: 3, naLw: 2, naBpLw: 1, naCap: "round", naC2On: false, naC2: "#4e9d9c", naBpOn: false, naBpC: "#ababbb" };
   const KEY = "arw-settings-v2";
 
   // ---------- geometry helpers (unit coordinates: main span = 1, y points down) ----------
@@ -471,7 +484,7 @@
     const wh = opts && opts.preview ? ` style="width:${f(w * k)}px;height:${f(h * k)}px"` : ` width="${f(w)}" height="${f(h)}"`;
     return `<svg xmlns="${NS}" viewBox="${f(x0)} ${f(y0)} ${f(w)} ${f(h)}"${wh} role="img" aria-label="${def.name}">${parts.join("")}</svg>`;
   }
-  const figSVG = (d, p, opts) => (d.cell ? cellSVG(d, p, opts) : d.animal || d.traced || d.obj || d.mpoly ? aniSVG(d, p, opts) : d.sym ? symSVG(d, p, opts) : arrowSVG(d, p, opts));
+  const figSVG = (d, p, opts) => (d.cell ? cellSVG(d, p, opts) : d.na ? naSVG(d, p, opts) : d.animal || d.traced || d.obj || d.mpoly ? aniSVG(d, p, opts) : d.sym ? symSVG(d, p, opts) : arrowSVG(d, p, opts));
 
   // ---------- drawing ----------
   function read() {
@@ -486,6 +499,8 @@
       aniSize: Math.max(0.01, +$("aniSize").value || DEFAULTS.aniSize), aniStyle: $("aniStyle").value, aniLw: Math.max(0.01, +$("aniLw").value || DEFAULTS.aniLw),
       symSize: Math.max(0.01, +$("symSize").value || DEFAULTS.symSize), symLw: Math.max(0.01, +$("symLw").value || DEFAULTS.symLw), symCap: $("symCap").value,
       objSize: Math.max(0.01, +$("objSize").value || DEFAULTS.objSize), objStyle: $("objStyle").value, objLw: Math.max(0.01, +$("objLw").value || DEFAULTS.objLw),
+      naSize: Math.max(0.01, +$("naSize").value || DEFAULTS.naSize), naLw: Math.max(0.01, +$("naLw").value || DEFAULTS.naLw), naBpLw: Math.max(0.01, +$("naBpLw").value || DEFAULTS.naBpLw), naCap: $("naCap").value,
+      naC2On: $("naC2On").checked, naC2: $("naC2").value, naBpOn: $("naBpOn").checked, naBpC: $("naBpC").value,
     };
   }
   const len = (a, b) => Math.hypot(b[0] - a[0], b[1] - a[1]);
@@ -943,6 +958,14 @@
       const pill = turn(D(capsule([0.42, 0.6], [0.68, 0.6], 0.07), box(0.542, 0.5, 0.558, 0.7)), -10, 0.55, 0.6);
       return U(horse, pill);
     } },
+    { name: "Door wedge", mpoly: () => {
+      // side view of a wedge: a sloped top with grip notches cut into it and a hanging hole near the tall end
+      const body = R1([[0, 0.42], [1.3, 0.42], [1.3, 0.07], [1.25, 0.02]]);
+      const A = [0, 0.42], Bp = [1.25, 0.02], L = Math.hypot(Bp[0] - A[0], Bp[1] - A[1]), dx = (Bp[0] - A[0]) / L, dy = (Bp[1] - A[1]) / L, nx = -dy, ny = dx; // n points into the wedge
+      const notches = [0.3, 0.42, 0.54, 0.66, 0.78, 0.9].map((t) => { const P = [A[0] + (Bp[0] - A[0]) * t, A[1] + (Bp[1] - A[1]) * t], w = 0.032, d = 0.04;
+        return R1([[P[0] - dx * w - nx * 0.01, P[1] - dy * w - ny * 0.01], [P[0] + dx * w - nx * 0.01, P[1] + dy * w - ny * 0.01], [P[0] + nx * d, P[1] + ny * d]]); });
+      return D(body, ...notches, disc(1.12, 0.27, 0.055));
+    } },
     { name: "Nasal spray", mpoly: () => nasal(false) },
     { name: "Nasal spray, spraying", mpoly: () => nasal(true) },
   ].map((d) => Object.assign({ g: "Medical", obj: true, med: true }, d));
@@ -962,9 +985,115 @@
   } });
 
 
+  // ---------- DNA and RNA (model units; strands are open or closed polylines, base pairs are straight lines) ----------
+  // a figure returns { strands: [{ pts, role: "a" | "b", closed }], bps: [[p, q]], cuts: [{ s: strand index, p: crossing point }] }
+  function helixNA(q) {
+    const lam = q.wl, A = 0.28 * q.wh, Lx = q.n * lam, n = Math.max(8, Math.ceil(q.n * 160));
+    const y1 = (x) => -A * Math.cos((2 * Math.PI * x) / lam), y2 = (x) => -A * Math.cos(2 * Math.PI * (x / lam - q.gr));
+    const s1 = [], s2 = [], cuts = [];
+    for (let i = 0; i <= n; i++) { const x = (i / n) * Lx; s1.push([x, y1(x)]); s2.push([x, y2(x)]); }
+    let k = 0;
+    for (let i = 1; i <= n; i++) {
+      const d0 = s1[i - 1][1] - s2[i - 1][1], d1 = s1[i][1] - s2[i][1];
+      if (d0 === 0 || d0 * d1 < 0) { const t = d0 / (d0 - d1 || 1), x = s1[i - 1][0] + t * (s1[i][0] - s1[i - 1][0]); cuts.push({ s: k % 2 ? 0 : 1, p: [x, y1(x)] }); k++; }
+    }
+    const nb = Math.round(q.n * q.bp), bps = [];
+    for (let j = 0; j < nb; j++) { const x = ((j + 0.5) * Lx) / nb, a = y1(x), b = y2(x); if (Math.abs(a - b) > 0.35 * A) bps.push([[x, a], [x, b]]); }
+    return { strands: [{ pts: s1, role: "a" }, { pts: s2, role: "b" }], bps, cuts: q.cg > 0 ? cuts : [] };
+  }
+  function strandNA(q) {
+    const lam = q.wl, A = 0.18 * q.wh, Lx = q.n * lam, n = Math.max(8, Math.ceil(q.n * 160)), s = [];
+    const Y = (x) => -A * Math.sin((2 * Math.PI * x) / lam), dY = (x) => (-A * 2 * Math.PI * Math.cos((2 * Math.PI * x) / lam)) / lam;
+    for (let i = 0; i <= n; i++) { const x = (i / n) * Lx; s.push([x, Y(x)]); }
+    const bps = [], L = 0.14 * q.tk;
+    for (let j = 0; j < q.nb; j++) { const x = ((j + 0.5) * Lx) / q.nb, d = dY(x), l = Math.hypot(1, d), nx = d / l, ny = -1 / l; bps.push([[x, Y(x)], [x + nx * L, Y(x) + ny * L]]); }
+    return { strands: [{ pts: s, role: "a" }], bps, cuts: [] };
+  }
+  function ladderNA(q) {
+    const h = q.sw / 2, L = q.len, o1 = q.oh || 0, o2 = q.oh2 || 0, bps = [];
+    for (let j = 0; j < q.nb; j++) { const x = ((j + 0.5) * L) / q.nb; bps.push([[x, -h], [x, h]]); }
+    return { strands: [{ pts: [[0, -h], [L + o1, -h]], role: "a" }, { pts: [[-o2, h], [L, h]], role: "b" }], bps, cuts: [] };
+  }
+  function hairpinNA(q) {
+    const h = q.sw / 2, R = Math.max(q.lr, h + 0.01), Ls = q.sl, cx = Ls + Math.sqrt(R * R - h * h), al = Math.asin(h / R);
+    const loop = Array.from({ length: 121 }, (_, i) => { const a = -(Math.PI - al) + (2 * (Math.PI - al) * i) / 120; return [cx + R * Math.cos(a), R * Math.sin(a)]; });
+    const t5 = q.t5, t3 = q.t3, sp = q.ts * 0.5;
+    const pts = [[-t5, -h - t5 * sp], [0, -h], ...loop, [0, h], [-t3, h + t3 * sp]];
+    const bps = []; for (let j = 0; j < q.nb; j++) { const x = ((j + 0.5) * Ls) / q.nb; bps.push([[x, -h], [x, h]]); }
+    return { strands: [{ pts: pts.filter((p, i) => i === 0 || Math.hypot(p[0] - pts[i - 1][0], p[1] - pts[i - 1][1]) > 1e-9), role: "a" }], bps, cuts: [] };
+  }
+  function plasmidNA(q) {
+    const r1 = 0.5, r2 = 0.5 - q.rs, bps = [];
+    for (let j = 0; j < q.nb; j++) { const a = (2 * Math.PI * j) / q.nb; bps.push([[0.5 + r1 * Math.cos(a), r1 * Math.sin(a)], [0.5 + r2 * Math.cos(a), r2 * Math.sin(a)]]); }
+    const strands = [{ pts: ellipse(0.5, 0, r1, r1), role: "a", closed: true }];
+    if (q.ds) strands.push({ pts: ellipse(0.5, 0, r2, r2), role: "b", closed: true });
+    return { strands, bps: q.ds ? bps : [], cuts: [] };
+  }
+  function forkNA(q) {
+    const h = q.sw / 2, Lp = q.pl, Lf = q.fl, H = q.fo, bps = [];
+    for (let j = 0; j < q.nb; j++) { const x = ((j + 0.5) * Lp) / q.nb; bps.push([[x, -h], [x, h]]); }
+    const arm = (sg) => bez([Lp, sg * h], [Lp + Lf * 0.45, sg * h], [Lp + Lf * 0.55, sg * H], [Lp + Lf, sg * H], 60);
+    const top = arm(-1), bot = arm(1), strands = [{ pts: [[0, -h], ...top], role: "a" }, { pts: [[0, h], ...bot], role: "a" }];
+    if (q.dg) [[top, 1], [bot, -1]].forEach(([c, sg]) => {
+      const u = tangents(c), i0 = Math.round(c.length * 0.5), off = c.map((p, i) => [p[0] - sg * u[i][1] * q.sw, p[1] + sg * u[i][0] * q.sw]).slice(i0);
+      strands.push({ pts: off, role: "b" });
+      const m = Math.max(0, Math.round((q.nb * (c.length - i0)) / (c.length * 1.6)));
+      for (let j = 0; j < m; j++) { const i = i0 + Math.round(((j + 0.5) * (c.length - 1 - i0)) / m); bps.push([c[i], off[i - i0]]); }
+    });
+    return { strands, bps, cuts: [] };
+  }
+  const HELIX = (n, gr) => [P("n", "Number of turns", 0.5, 12, n, 0.25), P("wh", "Helix height (×)", 0.2, 3, 1, 0.05), P("wl", "Turn length (×)", 0.2, 3, 1, 0.05),
+    N("bp", "Base pairs per turn", 0, 20, 6), P("gr", "Strand offset (fraction of turn; 0.5 = even grooves)", 0.05, 0.5, gr, 0.005), P("cg", "Gap where strands cross (× line; 0 = none)", 0, 8, 1.5, 0.1)];
+  const NA = [
+    { g: "DNA & RNA", name: "Double helix", params: HELIX(3, 0.5), na: helixNA },
+    { g: "DNA & RNA", name: "Double helix, major and minor grooves", params: HELIX(3, 0.375), na: helixNA },
+    { g: "DNA & RNA", name: "Double helix, no gaps", params: HELIX(3, 0.5).map((s) => (s.k === "cg" ? Object.assign({}, s, { def: 0 }) : s)), na: helixNA },
+    { g: "DNA & RNA", name: "Single strand (ssDNA / RNA)", params: [P("n", "Number of waves", 0.5, 12, 3, 0.25), P("wh", "Wave height (×)", 0, 3, 1, 0.05), P("wl", "Wave length (×)", 0.2, 3, 1, 0.05), N("nb", "Bases", 0, 80, 0), P("tk", "Base length (×)", 0.2, 3, 1, 0.05)], na: strandNA },
+    { g: "DNA & RNA", name: "Single strand with bases", params: [P("n", "Number of waves", 0.5, 12, 2, 0.25), P("wh", "Wave height (×)", 0, 3, 0.6, 0.05), P("wl", "Wave length (×)", 0.2, 3, 1.2, 0.05), N("nb", "Bases", 0, 80, 14), P("tk", "Base length (×)", 0.2, 3, 1, 0.05)], na: strandNA },
+    { g: "DNA & RNA", name: "Straight duplex", params: [P("len", "Length (×)", 0.2, 6, 2, 0.05), P("sw", "Strand spacing (×)", 0.05, 1, 0.22, 0.01), N("nb", "Base pairs", 0, 80, 12)], na: ladderNA },
+    { g: "DNA & RNA", name: "Duplex with sticky ends", params: [P("len", "Length (×)", 0.2, 6, 2, 0.05), P("sw", "Strand spacing (×)", 0.05, 1, 0.22, 0.01), N("nb", "Base pairs", 0, 80, 12), P("oh", "Top overhang, right (×)", 0, 2, 0.3, 0.01), P("oh2", "Bottom overhang, left (×)", 0, 2, 0.3, 0.01)], na: ladderNA },
+    { g: "DNA & RNA", name: "RNA hairpin (stem-loop)", params: [P("sl", "Stem length (×)", 0.1, 3, 0.9, 0.05), P("sw", "Stem width (×)", 0.05, 1, 0.22, 0.01), P("lr", "Loop radius (×)", 0.05, 1, 0.22, 0.01), N("nb", "Base pairs in stem", 0, 40, 6), P("t5", "5′ tail length (×)", 0, 2, 0.35, 0.01), P("t3", "3′ tail length (×)", 0, 2, 0.35, 0.01), P("ts", "Tail splay", 0, 2, 0.6, 0.05)], na: hairpinNA },
+    { g: "DNA & RNA", name: "Plasmid (circular DNA)", params: [N("ds", "Double-stranded (1 = yes, 0 = no)", 0, 1, 1), P("rs", "Strand spacing (×)", 0.01, 0.3, 0.08, 0.005), N("nb", "Base pairs", 0, 120, 36)], na: plasmidNA },
+    { g: "DNA & RNA", name: "Replication fork", params: [P("pl", "Parental duplex length (×)", 0.1, 4, 1.2, 0.05), P("fl", "Fork length (×)", 0.2, 4, 1.2, 0.05), P("fo", "Fork opening (×)", 0.1, 2, 0.45, 0.01), P("sw", "Strand spacing (×)", 0.05, 0.6, 0.16, 0.01), N("nb", "Base pairs in duplex", 0, 60, 8), N("dg", "Daughter strands (1 = yes, 0 = no)", 0, 1, 1)], na: forkNA },
+  ];
+  LIB.push(...NA);
+  // drop the points of a polyline within r of point c, splitting it into pieces
+  function cutAround(seg, c, r) {
+    const out = []; let cur = [];
+    seg.forEach((p) => { if (Math.hypot(p[0] - c[0], p[1] - c[1]) > r) cur.push(p); else { if (cur.length > 1) out.push(cur); cur = []; } });
+    if (cur.length > 1) out.push(cur);
+    return out;
+  }
+  function naSVG(def, p, opts) {
+    const q = figQ(def), m = def.na(q), W = p.naSize * p.dpi;
+    const lw = ((q.lw != null ? q.lw : p.naLw) * p.dpi) / 72, blw = ((q.blw != null ? q.blw : p.naBpLw) * p.dpi) / 72;
+    let mx0 = Infinity, mx1 = -Infinity;
+    [...m.strands.map((s) => s.pts), ...m.bps].forEach((pts) => pts.forEach((v) => { mx0 = Math.min(mx0, v[0]); mx1 = Math.max(mx1, v[0]); }));
+    const S = W / (mx1 - mx0 || 1), r = ((0.5 + (q.cg || 0)) * lw) / S;
+    const segs = m.strands.map((s) => [s.pts]);
+    m.cuts.forEach((c) => (segs[c.s] = segs[c.s].flatMap((sg) => cutAround(sg, c.p, r))));
+    const c = Math.cos(rad(p.rot)), s = Math.sin(rad(p.rot));
+    const tf = (v) => { let x = (v[0] - mx0) * S, y = v[1] * S; if (p.flipH) x = W - x; if (p.flipV) y = -y; return [x * c - y * s, x * s + y * c]; };
+    const tol = Math.max(0.02, (0.3 * p.dpi) / 360), B = [];
+    const col = (role) => (role === "b" && p.naC2On ? p.naC2 : p.color), bpc = p.naBpOn ? p.naBpC : p.color;
+    const st = (cl, w) => `fill="none" stroke="${cl}" stroke-width="${f(w)}" stroke-linecap="${p.naCap}" stroke-linejoin="round"`;
+    const parts = [];
+    if (m.bps.length) parts.push(`<g id="base-pairs">${m.bps.map((b) => { const t = b.map(tf); t.forEach((v) => B.push([v[0], v[1], blw / 2])); return `<path d="${pathD(t)}" ${st(bpc, blw)}/>`; }).join("")}</g>`);
+    m.strands.forEach((sd, i) => {
+      const closed = !!sd.closed && segs[i].length === 1;
+      const d = segs[i].map((sg) => { const t = sg.map(tf); t.forEach((v) => B.push([v[0], v[1], lw / 2])); return t.length > 3 ? fitD(t, closed, tol) : pathD(t) + (closed ? " Z" : ""); });
+      if (d.length) parts.push(`<path id="strand-${i + 1}" d="${d.join(" ")}" ${st(col(sd.role), lw)}/>`);
+    });
+    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+    B.forEach(([x, y, rr]) => { x0 = Math.min(x0, x - rr); y0 = Math.min(y0, y - rr); x1 = Math.max(x1, x + rr); y1 = Math.max(y1, y + rr); });
+    const w = x1 - x0, h = y1 - y0, k = opts && opts.preview ? Math.min(opts.preview, (opts.maxH || 140) / h, (opts.maxW || 170) / w) : 1;
+    const wh = opts && opts.preview ? ` style="width:${f(w * k)}px;height:${f(h * k)}px"` : ` width="${f(w)}" height="${f(h)}"`;
+    return `<svg xmlns="${NS}" viewBox="${f(x0)} ${f(y0)} ${f(w)} ${f(h)}"${wh} role="img" aria-label="${def.name}">${parts.join("")}</svg>`;
+  }
+
   // ---------- page ----------
-  const SECTIONS = [["arrows", "Arrows"], ["bacteria", "Bacteria"], ["animals", "Animals"], ["symbols", "Symbols"], ["objects", "Objects"], ["medical", "Medical"]];
-  const secOf = (d) => (d.cell ? "bacteria" : d.animal || d.traced || (d.mpoly && d.g === "Animals") ? "animals" : d.sym ? "symbols" : d.med ? "medical" : d.obj ? "objects" : "arrows");
+  const SECTIONS = [["arrows", "Arrows"], ["bacteria", "Bacteria"], ["nucleic", "DNA & RNA"], ["animals", "Animals"], ["symbols", "Symbols"], ["objects", "Objects"], ["medical", "Medical"]];
+  const secOf = (d) => (d.cell ? "bacteria" : d.na ? "nucleic" : d.animal || d.traced || (d.mpoly && d.g === "Animals") ? "animals" : d.sym ? "symbols" : d.med ? "medical" : d.obj ? "objects" : "arrows");
   let section = "arrows";
   try { const s0 = localStorage.getItem("arw-section"); if (SECTIONS.some(([k]) => k === s0)) section = s0; } catch (e) {}
   const h0 = (location.hash || "").slice(1); if (SECTIONS.some(([k]) => k === h0)) section = h0;
@@ -1009,7 +1138,7 @@
   function download(svg, name) {
     const a = document.createElement("a");
     a.href = URL.createObjectURL(new Blob(['<?xml version="1.0" encoding="UTF-8"?>\n' + svg], { type: "image/svg+xml" }));
-    a.download = ({ bacteria: "cell-", animals: "animal-", symbols: "symbol-", objects: "", medical: "medical-", arrows: "arrow-" })[secOf(LIB.find((d) => d.name === name) || {})] + name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/-$/, "") + ".svg";
+    a.download = ({ nucleic: "", bacteria: "cell-", animals: "animal-", symbols: "symbol-", objects: "", medical: "medical-", arrows: "arrow-" })[secOf(LIB.find((d) => d.name === name) || {})] + name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/-$/, "") + ".svg";
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(a.href), 1000);
   }
@@ -1022,14 +1151,14 @@
     const grid = $("grid"); grid.innerHTML = "";
     LIB.filter((d) => secOf(d) === section && (group === "All" || d.g === group)).forEach((d) => {
       const card = document.createElement("div"); card.className = "arw-card";
-      card.innerHTML = `<h4>${d.name}</h4><small>${d.g}</small><div class="arw-stage">${figSVG(d, p, { preview: d.cell ? 165 / (p.cellSize * p.dpi) : (d.animal || d.traced || d.mpoly) && !d.obj ? 120 / (p.aniSize * p.dpi) : d.sym ? 90 / (p.symSize * p.dpi) : d.obj ? 140 / (p.objSize * p.dpi) : scale })}</div>`;
+      card.innerHTML = `<h4>${d.name}</h4><small>${d.g}</small><div class="arw-stage">${figSVG(d, p, { preview: d.cell ? 165 / (p.cellSize * p.dpi) : d.na ? 165 / (p.naSize * p.dpi) : (d.animal || d.traced || d.mpoly) && !d.obj ? 120 / (p.aniSize * p.dpi) : d.sym ? 90 / (p.symSize * p.dpi) : d.obj ? 140 / (p.objSize * p.dpi) : scale })}</div>`;
       const act = document.createElement("div"); act.className = "arw-actions";
       const cp = document.createElement("button"); cp.type = "button"; cp.className = "btn primary"; cp.textContent = "Copy SVG";
       cp.addEventListener("click", () => copySVG(figSVG(d, read()), d.name));
       const dl = document.createElement("button"); dl.type = "button"; dl.className = "btn"; dl.textContent = "↓ SVG"; dl.title = "Download this arrow as an SVG file";
       dl.addEventListener("click", () => download(figSVG(d, read()), d.name));
       act.append(cp, dl);
-      if (d.cell) {
+      if (d.cell || d.na) {
         const ed = document.createElement("button"); ed.type = "button"; ed.className = "btn edit"; ed.textContent = "✎"; ed.title = "Edit this figure (or double-click it)"; ed.setAttribute("aria-label", "Edit " + d.name);
         ed.addEventListener("click", () => openEditor(d));
         card.appendChild(ed); card.classList.add("editable"); card.title = "Double-click to edit";
@@ -1042,12 +1171,13 @@
   // ---------- figure editor (double-click a cell figure) ----------
   let edDef = null;
   function edSpecs(d) {
+    if (d.na) { const p = read(); return [...(d.params || []), { head: "Lines" }, P("lw", "Strand line (pt)", 0.1, 8, p.naLw, 0.05), P("blw", "Base-pair line (pt)", 0.1, 8, p.naBpLw, 0.05)]; }
     const p = read(), tail = (d.params || []).some((x) => x.k === "tw");
     return [...(d.params || []), { head: "Lines" }, P("lw", "Line width (pt)", 0.1, 6, p.cellLw, 0.05), ...(tail ? [P("tlw", "Tail line width (pt)", 0.1, 6, p.cellLw, 0.05)] : []), P("gap", "Membrane spacing (× line)", 1, 10, p.gap, 0.1)];
   }
   function drawEditor() {
     if (!edDef) return;
-    $("edStage").innerHTML = cellSVG(edDef, read(), { preview: 1e9, maxW: Math.max(200, $("edStage").clientWidth - 30), maxH: Math.max(180, $("edStage").clientHeight - 30) });
+    $("edStage").innerHTML = figSVG(edDef, read(), { preview: 1e9, maxW: Math.max(200, $("edStage").clientWidth - 30), maxH: Math.max(180, $("edStage").clientHeight - 30) });
   }
   function buildEditor() {
     const d = edDef, side = $("edSide"), cur = Object.assign({}, figQ(d));
@@ -1085,7 +1215,7 @@
   window.addEventListener("resize", drawEditor);
 
   // sliders with typed values (typed values may go past the slider's range)
-  const pairs = [["lw", "lwNum"], ["hl", "hlNum"], ["hw", "hwNum"], ["size", "sizeNum"], ["rot", "rotNum"], ["cellSize", "cellSizeNum"], ["cellLw", "cellLwNum"], ["gap", "gapNum"], ["aniSize", "aniSizeNum"], ["aniLw", "aniLwNum"], ["symSize", "symSizeNum"], ["symLw", "symLwNum"], ["objSize", "objSizeNum"], ["objLw", "objLwNum"]];
+  const pairs = [["lw", "lwNum"], ["hl", "hlNum"], ["hw", "hwNum"], ["size", "sizeNum"], ["rot", "rotNum"], ["cellSize", "cellSizeNum"], ["cellLw", "cellLwNum"], ["gap", "gapNum"], ["aniSize", "aniSizeNum"], ["aniLw", "aniLwNum"], ["symSize", "symSizeNum"], ["symLw", "symLwNum"], ["objSize", "objSizeNum"], ["objLw", "objLwNum"], ["naSize", "naSizeNum"], ["naLw", "naLwNum"], ["naBpLw", "naBpLwNum"]];
   pairs.forEach(([r, n]) => {
     $(r).addEventListener("input", () => { $(n).value = $(r).value; changed(); });
     $(n).addEventListener("input", () => {
@@ -1094,7 +1224,7 @@
     });
     $(n).addEventListener("keydown", (e) => { if (e.key === "Enter") $(n).blur(); });
   });
-  ["color", "cap", "dashed", "head", "double", "flipH", "flipV", "dpi", "membranes", "fillIn", "fillInC", "fillPeri", "fillPeriC", "aniStyle", "symCap", "objStyle"].forEach((id) => $(id).addEventListener("input", changed));
+  ["color", "cap", "dashed", "head", "double", "flipH", "flipV", "dpi", "membranes", "fillIn", "fillInC", "fillPeri", "fillPeriC", "aniStyle", "symCap", "objStyle", "naCap", "naC2On", "naC2", "naBpOn", "naBpC"].forEach((id) => $(id).addEventListener("input", changed));
 
   function save() { try { localStorage.setItem(KEY, JSON.stringify(read())); } catch (e) {} }
   function apply(v) {
